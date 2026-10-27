@@ -12,7 +12,7 @@ import { engine, type LibraryClip } from '../src/engine';
 import { host } from '../src/host';
 import { demoProject } from '../src/engine/mockProject';
 import { openStarterMosh, starterClips } from '../src/lib/starterMosh';
-import { TEST_CLIPS_DIR } from '../src/lib/testClips';
+
 import { commit, emptyDoc, getDoc, projectStore } from '../src/state/project';
 import { lifeStore, newProject } from '../src/state/lifecycle';
 import { setUi } from '../src/state/ui';
@@ -66,12 +66,12 @@ describe('portable Starter Mosh', () => {
     expect(timelineFrames(getDoc().timeline.blocks) * before.settings.fps.den / before.settings.fps.num).toBe(30);
     expect(projectStore.get().past).toHaveLength(1);
   });
-  it('missing test folder leads to a picker; cancelling preserves even an empty edited project', async () => {
+  it('no bundled footage leads to a picker; cancelling preserves even an empty edited project', async () => {
     vi.mocked(engine.libraryClips).mockResolvedValue([]);
     commit('Name', d => void (d.name = 'Keep this empty project'));
     const before = getDoc();
     expect(await openStarterMosh()).toBe(false);
-    expect(engine.listDir).toHaveBeenCalledWith(TEST_CLIPS_DIR);
+    expect(engine.listDir).not.toHaveBeenCalled();
     expect(host.files!.pickFolder).toHaveBeenCalledTimes(1);
     expect(engine.importClip).not.toHaveBeenCalled();
     expect(getDoc()).toBe(before);

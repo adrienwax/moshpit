@@ -20,3 +20,7 @@ library.db
 test-footage/
 # Local browser fixture bundles and screenshots; retain evidence outside Git.
 /output/
+
+# Locally assembled binary inputs and generated icon; not source release assets.
+/third-party-binary/
+/app/build/icon.png

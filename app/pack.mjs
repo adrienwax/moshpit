@@ -10,6 +10,9 @@ import { ensureScratch, configureToolCaches, requireScratchOutput } from '../scr
 
 const managed = ensureScratch('package');
 const unpackedOnly = process.argv.includes('--unpacked');
+const candidate = process.argv.includes('--candidate');
+const installer = process.argv.includes('--installer');
+const productName = candidate ? 'Moshpit KRAB Candidate' : 'Moshpit KRAB';
 configureToolCaches(managed);
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -37,7 +40,9 @@ if (builderVersion !== '26.15.3') throw new Error(`pack: electron-builder ${buil
 for (const exe of ['ffmpeg.exe', 'ffprobe.exe']) if (!fs.existsSync(path.join(ffmpegDir, exe))) throw new Error(`pack: ${exe} not found in ${ffmpegDir}; set MOSHPIT_FFMPEG_DIR`);
 if (fs.existsSync(output) && fs.readdirSync(output).length) throw new Error(`pack: output is not empty: ${output}. Use a fresh MOSHPIT_PACK_OUT; previous builds are preserved.`);
 const tmp = managed.temp;
-const env = { ...process.env, MOSHPIT_BUILD_OUT: buildOut };
+const env = { ...process.env, MOSHPIT_BUILD_OUT: buildOut, CSC_IDENTITY_AUTO_DISCOVERY: 'false' };
+for (const key of ['CSC_LINK','WIN_CSC_LINK','CSC_KEY_PASSWORD','WIN_CSC_KEY_PASSWORD']) delete env[key];
+execFileSync(process.env.KRAB_BUILD_PYTHON || 'python', [path.join(root,'scripts/make-package-icon.py')], { env, windowsHide:true });
 const sha256 = file => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 const mediaTools = Object.fromEntries(['ffmpeg.exe', 'ffprobe.exe'].map(name => [name, { bytes: fs.statSync(path.join(ffmpegDir, name)).size, sha256: sha256(path.join(ffmpegDir, name)) }]));
 
@@ -46,24 +51,27 @@ const stage = fs.mkdtempSync(path.join(tmp, 'moshpit-stage-'));
 {
   fs.cpSync(buildOut, path.join(stage, 'dist'), { recursive: true });
   fs.writeFileSync(path.join(stage, 'package.json'), JSON.stringify({
-    name: 'moshpit', productName: 'Moshpit 3', version: appPkg.version, description: `Moshpit ${appPkg.version} datamosh editor`,
-    author: 'ak wax', main: 'dist/main.cjs',
+    name: 'moshpit', productName, version: appPkg.version, description: `Moshpit ${appPkg.version} datamosh editor`,
+    author: 'ak wax', license: 'MIT', main: 'dist/main.cjs',
   }, null, 2));
   const config = {
-    appId: 'com.waxy.moshpit3', productName: 'Moshpit 3', electronVersion,
+    appId: candidate ? 'com.waxy.moshpit3.candidate' : 'com.waxy.moshpit3', productName, electronVersion,
     electronDist: path.join(electronDir, 'dist'),
     directories: { app: stage, output }, files: ['dist/**', 'package.json'], asar: true, npmRebuild: false,
-    extraResources: [{ from: ffmpegDir, to: 'ffmpeg', filter: ['ffmpeg.exe', 'ffprobe.exe'] }],
-    win: { target: [{ target: 'portable', arch: ['x64'] }], icon: path.join(here, 'build', 'icon.png'), signAndEditExecutable: true },
+    extraResources: [{ from: ffmpegDir, to: 'ffmpeg', filter: ['ffmpeg.exe', 'ffprobe.exe'] },
+      {from:root,to:'legal',filter:['LICENSE','THIRD-PARTY-NOTICES.txt','ASSET-NOTICES.txt','LOCAL-CANDIDATE-NOTICE.txt','third-party/**/*']},
+      {from:path.join(root,'third-party-binary'),to:'legal/binary',filter:['**/*']}],
+    win: { target: [{ target: installer ? 'nsis' : 'portable', arch: ['x64'] }], icon: path.join(here, 'build', 'icon.png'), signAndEditExecutable: true },
     portable: { artifactName: 'Moshpit-${version}-portable.${ext}' },
+    nsis: {oneClick:true,perMachine:false,runAfterFinish:false,deleteAppDataOnUninstall:false,artifactName:'Moshpit-KRAB-${version}-Setup-x64.${ext}'},
   };
   const configFile = path.join(stage, 'electron-builder.json');
   fs.writeFileSync(configFile, JSON.stringify(config, null, 2));
   // Direct Node invocation preserves Windows paths with spaces and needs no shell/npx.
-  execFileSync(process.execPath, [builder, '--win', ...(unpackedOnly ? ['--dir'] : []), '--projectDir', stage, '--config', configFile], { stdio: 'inherit', cwd: root, env, windowsHide: true });
+  execFileSync(process.execPath, [builder, '--publish', 'never', '--win', ...(unpackedOnly ? ['--dir'] : []), '--projectDir', stage, '--config', configFile], { stdio: 'inherit', cwd: root, env, windowsHide: true });
   fs.copyFileSync(path.join(root, 'QUICKSTART.md'), path.join(output, 'QUICKSTART.md'));
-  const exe = unpackedOnly ? path.join(output, 'win-unpacked', 'Moshpit 3.exe') : path.join(output, `Moshpit-${appPkg.version}-portable.exe`);
+  const exe = unpackedOnly ? path.join(output, 'win-unpacked', `${productName}.exe`) : path.join(output, installer ? `Moshpit-KRAB-${appPkg.version}-Setup-x64.exe` : `Moshpit-${appPkg.version}-portable.exe`);
   const build = JSON.parse(fs.readFileSync(path.join(buildOut, 'build-info.json'), 'utf8'));
-  fs.writeFileSync(path.join(output, 'BUILD-MANIFEST.json'), JSON.stringify({ ...build, electron: electronVersion, builder: builderVersion, mediaTools, packageKind: unpackedOnly ? 'unpacked-runtime' : 'portable', [unpackedOnly ? 'executable' : 'portable']: { file: path.basename(exe), bytes: fs.statSync(exe).size, sha256: sha256(exe) } }, null, 2) + '\n');
+  fs.writeFileSync(path.join(output, 'BUILD-MANIFEST.json'), JSON.stringify({ ...build, electron: electronVersion, builder: builderVersion, mediaTools, candidate, unsigned:true, packageKind: unpackedOnly ? 'unpacked-runtime' : installer ? 'nsis-installer' : 'portable', [unpackedOnly ? 'executable' : 'portable']: { file: path.basename(exe), bytes: fs.statSync(exe).size, sha256: sha256(exe) } }, null, 2) + '\n');
   console.log(`pack: ${output}`);
 }

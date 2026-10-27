@@ -1,0 +1,5 @@
+UNSIGNED LOCAL TEST CANDIDATE - NOT FOR PUBLIC DISTRIBUTION
+This build is for isolated local testing. It does not replace the stable KRAB release.
+Signing, clean-Windows acceptance and complete binary redistribution review remain open.
+FFmpeg/source provenance and the strict-event-emitter notice gap are not waived.
+No personal projects, profiles, media or private ATLAS library are bundled.
