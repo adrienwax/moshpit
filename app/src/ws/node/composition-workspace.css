@@ -1,0 +1,13 @@
+.graph-levels{display:flex;align-items:center;gap:0;flex:none}
+.graph-levels button{font:500 11px var(--font-ui);height:23px;padding:0 9px;border:1px solid var(--line-2);background:var(--surface-1);color:var(--txt-2)}
+.graph-levels button+button{border-left:0}
+.graph-levels button.on{color:var(--txt-1);background:var(--surface-3);box-shadow:inset 0 -2px var(--fn-select)}
+.graph-levels button:focus-visible{outline:2px solid var(--fn-interactive);outline-offset:2px}
+.graphbar .gblock{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.composition-workspace{display:grid;grid-template-columns:minmax(0,1fr) 300px;flex:1;min-height:0;min-width:0;gap:1px;background:var(--line)}
+.composition-workspace>div{min-width:0;min-height:0}
+.composition-inspector{display:flex;flex-direction:column;min-height:0;background:var(--surface-1);border-left:1px solid var(--line-2)}
+.composition-inspector section>header{flex:none;padding:7px 9px;border-bottom:1px solid var(--line-2);color:var(--txt-2);font:500 11px var(--font-ui)}
+.composition-node-preview{height:220px;min-height:140px;flex:0 1 30%;display:flex;flex-direction:column;overflow:hidden}
+.composition-node-controls{flex:1;min-height:0;overflow:auto;border-top:1px solid var(--line-2)}
+@container app-shell (max-width:1100px){.composition-workspace{grid-template-columns:minmax(0,1fr) 250px}}

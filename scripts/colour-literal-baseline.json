@@ -1,0 +1,38 @@
+{
+  "app/src/engine/mockEngine.ts": {
+    "all": 16,
+    "red": 0
+  },
+  "app/src/params/scrub-fields.css": {
+    "all": 3,
+    "red": 0
+  },
+  "app/src/scopes/scopes.css": {
+    "all": 2,
+    "red": 0
+  },
+  "app/src/styles/app.css": {
+    "all": 21,
+    "red": 0
+  },
+  "app/src/styles/design.css": {
+    "all": 3,
+    "red": 0
+  },
+  "app/src/styles/prototype.css": {
+    "all": 88,
+    "red": 0
+  },
+  "app/src/styles/tokens.css": {
+    "all": 12,
+    "red": 0
+  },
+  "app/src/ws/node/GraphCanvas.tsx": {
+    "all": 4,
+    "red": 0
+  },
+  "shared/ui/viewer.css": {
+    "all": 12,
+    "red": 0
+  }
+}

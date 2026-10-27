@@ -1,0 +1,32 @@
+/* Existing Moshpit tokens; colour marks severity/unread state only. */
+.notification-history { flex: 0 1 auto; min-height: 28px; max-height: 42%; display: flex; flex-direction: column; overflow: hidden; border-top: 1px solid var(--line-2); background: var(--surface-1); color: var(--txt-1); font: var(--fs-base)/1.4 var(--font-ui); }
+.notification-header { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex: none; min-height: 28px; padding: 2px 8px; }
+.notification-header button, .notification-actions button { color: var(--txt-2); background: var(--surface-2); border: 1px solid var(--line-2); font: inherit; padding: 2px 8px; cursor: pointer; }
+.notification-header button:hover, .notification-actions button:hover { background: var(--surface-3); color: var(--txt-1); }
+.notification-header .notification-toggle { display: inline-flex; align-items: center; gap: 8px; border: none; background: transparent; color: var(--txt-1); }
+.notification-retention { color: var(--txt-3); margin-right: auto; }
+.notification-new { color: var(--fn-interactive); font-weight: var(--fw-bold); }
+.notification-errors { color: var(--fn-error); font-weight: var(--fw-bold); }
+.notification-log { flex: 1 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain; border-top: 1px solid var(--line); }
+.notification-entry { border-bottom: 1px solid var(--line); }
+.notification-entry summary { display: flex; align-items: baseline; gap: 10px; padding: 6px 12px; cursor: pointer; list-style: none; }
+.notification-entry summary::-webkit-details-marker { display: none; }
+.notification-entry summary:hover, .notification-entry[open] summary { background: var(--surface-2); }
+.notification-entry time { color: var(--txt-3); font: var(--fs-sm)/1.4 var(--font-mono); flex: none; }
+.notification-severity { color: var(--txt-2); width: 14px; flex: none; text-align: center; font-weight: var(--fw-bold); }
+.notification-entry.err .notification-severity { color: var(--fn-error); }
+.notification-entry.warn .notification-severity { color: var(--fn-warn); }
+.notification-entry.ok .notification-severity { color: var(--fn-valid); }
+.notification-entry.unread summary { box-shadow: inset 2px 0 var(--fn-interactive); }
+.notification-title { flex: 1; min-width: 0; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+.notification-count { color: var(--txt-2); font: var(--fs-sm)/1.4 var(--font-mono); }
+.notification-chevron { color: var(--txt-3); }
+.notification-entry[open] .notification-chevron { transform: rotate(180deg); }
+.notification-details { padding: 4px 12px 10px; }
+.notification-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; color: var(--txt-3); font-size: var(--fs-sm); }
+.notification-actions > span:first-child { margin-right: auto; }
+.notification-details pre { margin: 8px 0 0; padding: 8px; background: var(--surface-bg); color: var(--txt-2); font: var(--fs-sm)/1.6 var(--font-mono); white-space: pre-wrap; overflow-wrap: anywhere; user-select: text; -webkit-user-select: text; }
+.notification-empty { margin: 16px; color: var(--txt-3); }
+.notification-resize { flex: 0 0 5px; background: var(--surface-2); }
+.notification-resize:hover, .notification-resize.drag { background: var(--fn-interactive); }
+@media (max-width: 700px) { .notification-retention { display: none; } .notification-header { gap: 2px; padding-inline: 2px; } .notification-header button { padding-inline: 4px; } }

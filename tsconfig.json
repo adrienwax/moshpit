@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": [
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@moshpit/core": ["./core/src/index.ts"],
+      "@moshpit/engine": ["./engine/src/index.ts"]
+    },
+    "strict": true,
+    "noUncheckedIndexedAccess": false,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "exactOptionalPropertyTypes": false,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "jsx": "react-jsx",
+    "types": [
+      "node"
+    ],
+    "noEmit": true
+  },
+  "include": [
+    "core/src",
+    "engine/src",
+    "engine/test",
+    "app/src",
+    "app/electron",
+    "harness/src",
+    "scripts/*.ts"
+  ]
+}

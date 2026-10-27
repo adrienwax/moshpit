@@ -1,0 +1,22 @@
+.parameter-timeline{background:var(--surface-1);color:var(--txt-1);border-top:1px solid var(--line-2);padding:6px 0;min-width:0;color-scheme:dark}
+.tl>.parameter-timeline{flex:1 1 auto;min-height:40px;overflow:auto}.animation-open{flex:none;text-align:left;color:var(--fn-interactive)}
+.tl.has-animation>.tlview{flex:none;height:62px;min-height:62px}.tl.has-animation>.bpm{display:none}
+.parameter-timeline header,.parameter-timeline nav,.animation-source,.animation-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}
+.parameter-timeline header strong{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:45%}
+.parameter-timeline header span,.animation-source{color:var(--txt-3);font-size:10px}
+.parameter-timeline header button,.animation-source button{margin-left:auto}
+.parameter-timeline button,.parameter-timeline select,.parameter-timeline input{color:var(--txt-1);background:var(--surface-2);border:1px solid var(--line-2);font:inherit;min-height:24px}
+.parameter-timeline nav{padding:2px 0}.parameter-timeline nav .active{border-color:var(--fn-interactive);color:var(--fn-interactive)}
+.animation-source{min-height:26px}.animation-ruler{position:relative;height:22px;overflow:hidden;background:var(--surface-bg)}
+.animation-plot{position:relative;height:80px;overflow:hidden;background:var(--surface-bg);touch-action:none}
+.animation-plot svg{display:block;width:100%;height:100%;overflow:hidden}.animation-plot polyline{stroke:var(--fn-interactive);stroke-width:2;vector-effect:non-scaling-stroke;fill:none}
+.animation-grid{fill:none;stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke}
+.animation-max,.animation-min{position:absolute;left:4px;color:var(--txt-3);font-size:10px;pointer-events:none}.animation-max{top:0}.animation-min{bottom:0}
+.animation-playhead{position:absolute;top:0;bottom:0;border-left:1px solid var(--txt-2);pointer-events:none}
+.parameter-timeline .animation-key{position:absolute;transform:translate(-50%,-50%);border:0;background:transparent;color:var(--fn-interactive);padding:0;width:24px;min-height:24px;cursor:ew-resize;touch-action:none;font-size:18px}
+.parameter-timeline .animation-key.selected{color:var(--txt-1);text-shadow:0 0 2px var(--fn-interactive)}
+.animation-controls{padding:6px 0}.animation-controls input{width:76px;padding:2px 5px;font-variant-numeric:tabular-nums}.animation-controls span{font-size:10px;color:var(--txt-3)}
+.animation-help,.animation-formula{font-size:11px;color:var(--txt-2)}.animation-help p{max-width:70ch;margin:6px 0}.animation-formula code{display:block;overflow-wrap:anywhere;padding:6px;background:var(--surface-bg)}
+.animation-empty{padding:5px 8px;color:var(--txt-3);font-size:11px}
+.node-param-animation{display:grid;grid-template-columns:minmax(0,1fr) 26px;align-items:center;gap:4px;min-width:0}
+.node-param-animation>.param{min-width:0;width:100%}.parameter-animation-button{color:var(--fn-interactive);background:var(--surface-2);border:1px solid var(--line-2);font-size:15px;width:26px;min-height:29px;padding:0}

@@ -1,0 +1,11 @@
+/* Low-specificity structure: each application retains its tokens and visual skin. */
+:where(.es-shell){display:flex;flex-direction:column;height:100%;min-width:0;min-height:0;overflow:hidden}
+:where(.es-shell__body){display:flex;flex:1 1 0;min-width:0;min-height:0;overflow:hidden}
+:where(.es-shell__content){flex:1 1 0;min-width:0;min-height:0;overflow:hidden}
+:where(.es-shell__navigation,.es-shell__inspector){display:flex;flex-direction:column;flex:0 0 auto;min-width:0;min-height:0;overflow:auto}
+:where(.es-pane){display:flex;flex-direction:column;min-width:0;min-height:0}
+:where(.es-pane__body){flex:1 1 auto;min-width:0;min-height:0;overflow:auto}
+:where(.es-resize){position:relative;flex:0 0 6px;touch-action:none;user-select:none;-webkit-user-select:none}
+:where(.es-resize[aria-orientation="vertical"]){cursor:col-resize}
+:where(.es-resize[aria-orientation="horizontal"]){cursor:row-resize}
+.es-resize:focus-visible{outline:2px solid var(--es-focus,currentColor);outline-offset:-2px}

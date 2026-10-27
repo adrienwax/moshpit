@@ -1,0 +1,68 @@
+/* IN: quiet navigation chrome, footage first. Bind to the shared theme tokens. */
+.browse-clips{min-width:0;container-type:inline-size}
+.browse-intro{position:sticky;top:0;z-index:3;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--surface-1)}
+.browse-folder-summary{display:flex;align-items:center;gap:7px;flex:1;min-width:80px;color:var(--txt-2)}
+.browse-folder-summary b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:550}
+.starter-mosh{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.ghostbtn.starter-mosh{color:var(--fn-interactive);border:1px solid var(--line-2);background:var(--surface-2);padding:5px 8px}
+.hact.starter-mosh{border-color:var(--fn-interactive)}
+.starter-mosh:disabled{color:var(--txt-3);cursor:wait}
+.navig .navbar{min-width:0;gap:4px}
+.navig .navbar>.ghostbtn{flex:none;white-space:nowrap;padding:4px}
+.browse-location{display:flex;align-items:center;gap:4px;flex:1;min-width:0;overflow:hidden}
+.browse-location select{width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--surface-2);border:1px solid var(--line-2);color:var(--txt-1);font:500 11px var(--font-ui);padding:5px 2px}
+.browse-location option{background:var(--surface-2);color:var(--txt-1)}
+.navig button.navdir{display:flex;gap:7px;width:100%;min-width:0;border:0;background:transparent;color:var(--txt-2);font:inherit;text-align:left}
+.browse-folder-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+[role=tree] .tnode{min-width:0;gap:5px}
+[role=tree] .tnode>.ico,.navdir>.ico{flex:none;color:var(--txt-3)}
+.browse-expand{padding:0;background:none;border:0;color:var(--txt-2);cursor:pointer;flex:none}
+.browse-roots{display:flex;align-items:center;gap:5px;min-width:0}
+.browse-roots>span{flex:1}
+.browse-roots .ghostbtn{white-space:nowrap;font:inherit}
+.places .browse-place{height:auto;min-height:32px;padding:0 4px 0 0;gap:0;min-width:0;align-items:stretch}
+.browse-place-open{display:flex;align-items:center;gap:7px;flex:1;min-width:0;padding:7px 8px;border:0;background:none;color:inherit;text-align:left;font:inherit;cursor:pointer}
+.browse-place-open>.ico{flex:none;color:var(--txt-3)}
+.browse-place-label{display:flex;flex-direction:column;min-width:0;gap:3px}
+.browse-place-label>span,.browse-place-label>small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.browse-place-label>small{font-size:10px;line-height:1.35;color:var(--txt-3);white-space:normal;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.browse-place .px{flex:none}
+.browse-toolbar.bstoolbar{display:flex;flex-wrap:wrap;gap:6px;min-width:0;padding:8px 10px}
+.browse-toolbar .bsearch{flex:1 1 140px;min-width:100px;margin:0}
+.browse-toolbar .bsearch input{width:100%;min-width:0}
+.browse-toolbar .sortsel{width:auto;min-width:70px}
+.browse-toolbar .seg{flex:none;margin:0}
+.browse-toolbar .seg button{white-space:nowrap}
+.browse-clips .picktools{display:flex;flex-wrap:wrap;gap:5px;padding:0 10px 7px;min-width:0}
+.browse-clips .pickcount{flex:1;min-width:65px;white-space:nowrap;font-size:10px;color:var(--txt-3)}
+.browse-clips .cellsize{display:flex;align-items:center;gap:4px;margin-left:auto;max-width:125px}
+.browse-clips .cellsize input{width:72px;min-width:0}
+.browse-clips .chips{display:flex;flex-wrap:wrap;gap:4px;padding:0 10px 8px}
+.browse-clips .chip{font:inherit;font-size:10px;white-space:nowrap;cursor:pointer}
+.browse-clips .gm .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.selread .browse-selected-times{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.selread .timecode,.selread .timecode span{display:inline;gap:0}
+.selread .media-mark{align-items:center;gap:4px}
+.selread>span>em{display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+.browse-clips .rtable{table-layout:fixed;width:100%}
+.browse-clips .rtable th:first-child{width:32%}
+.browse-clips .rtable td{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.browse-clips button:focus-visible,.browse-place-open:focus-visible,.browse-location select:focus-visible,.navig button:focus-visible,[role=treeitem]:focus-visible{outline:2px solid var(--fn-focus);outline-offset:-2px}
+@container (max-width:340px){
+  .browse-toolbar .bsearch{flex-basis:100%}
+  .browse-intro{gap:6px}
+  .browse-clips .grid-thumbs{grid-template-columns:repeat(auto-fill,minmax(min(100%,140px),1fr))}
+  .browse-clips .rtable th:nth-child(3),.browse-clips .rtable td:nth-child(3),.browse-clips .rtable th:nth-child(4),.browse-clips .rtable td:nth-child(4){display:none}
+}
+/* Places stays quiet; the full-height browser owns navigation and clip scrolling. */
+.browse-browser{height:100%;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.browse-folder-navigation{flex:0 1 auto;max-height:30%;min-height:70px;overflow:auto;border-bottom:1px solid var(--line-2)}
+.browse-browser .browse-clips{display:flex;flex-direction:column;min-height:0;flex:1;overflow:hidden}
+.browse-browser .browse-clips>*{flex-shrink:0}
+.browse-browser .browse-clip-results{flex:1 1 auto;min-height:80px;overflow:auto;overscroll-behavior:contain}
+.browse-browser .browse-intro{position:static}
+.ws-browse .wcol[data-col="places"]{max-width:16vw}
+.ws-browse .wcol[data-col="browser"]{max-width:27vw}
+.ws-browse .wcol[data-col="clip"]{max-width:22vw}
+.ws-browse .places .place{padding-inline:7px}
+@media(max-width:1200px){.ws-browse .wcol[data-col="places"]{max-width:136px}.ws-browse .wcol[data-col="browser"]{max-width:260px}.ws-browse .wcol[data-col="clip"]{max-width:240px}}

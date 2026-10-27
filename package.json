@@ -1,0 +1,55 @@
+{
+  "name": "moshpit-v3",
+  "version": "3.0.0-m1",
+  "private": true,
+  "description": "Moshpit 3.0: offline datamosh and frame-slice production tool",
+  "workspaces": [
+    "core",
+    "engine",
+    "app"
+  ],
+  "scripts": {
+    "typecheck": "node scripts/run-tool.mjs tsc -p tsconfig.json",
+    "lint:colours": "node scripts/check-colour-tokens.mjs",
+    "test": "node scripts/run-tool.mjs vitest run --configLoader runner",
+    "test:watch": "node scripts/run-tool.mjs vitest --configLoader runner",
+    "test:app": "node scripts/run-tool.mjs vitest run --configLoader runner app/test",
+    "test:release": "node scripts/run-tool.mjs vitest run --configLoader runner app/test engine/test/looks.test.ts engine/test/container.test.ts engine/test/control.test.ts engine/test/controlFeedback.test.ts engine/test/controlDiscreteModes.test.ts engine/test/project.test.ts engine/test/params.test.ts engine/test/paramclamp.test.ts engine/test/atlas.test.ts engine/test/values.test.ts engine/test/expr.test.ts engine/test/utility.test.ts engine/test/renderSnapshot.test.ts engine/test/serviceSlotIdentity.test.ts engine/test/renderCancellation.test.ts engine/test/checkpointIsolation.test.ts",
+    "fixtures": "node scripts/make-fixtures.mjs",
+    "build:harness": "node scripts/build.mjs",
+    "build:app": "node app/build.mjs",
+    "gate": "node scripts/build.mjs && electron harness/main.cjs gate",
+    "slice": "node scripts/build.mjs && electron harness/main.cjs slice",
+    "service": "node scripts/build.mjs && electron harness/main.cjs service",
+    "colour": "node scripts/build.mjs && electron harness/main.cjs colour",
+    "scale": "node scripts/build.mjs && electron harness/main.cjs scale",
+    "e2e": "node app/build.mjs e2e",
+    "start": "node app/build.mjs start",
+    "dev": "node app/build.mjs dev",
+    "effects": "node scripts/build.mjs && electron harness/main.cjs effects",
+    "audio": "node scripts/build.mjs && electron harness/main.cjs audio",
+    "long": "node scripts/build.mjs && electron harness/main.cjs long",
+    "preview": "node scripts/build.mjs && electron harness/main.cjs preview"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.4",
+    "@types/ws": "^8.18.2",
+    "electron": "43.4.1",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3",
+    "vite": "8.3.3"
+  },
+  "dependencies": {
+    "immer": "11.1.18",
+    "mediabunny": "1.61.3",
+    "mp4box": "2.4.1",
+    "ws": "^8.22.0"
+  },
+  "allowScripts": {
+    "electron@43.4.1": true,
+    "esbuild@0.28.2": true
+  },
+  "license": "MIT"
+}

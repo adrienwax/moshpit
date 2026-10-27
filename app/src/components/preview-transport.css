@@ -1,0 +1,22 @@
+/* One stable, scoped transport. Existing palette and fonts remain authoritative. */
+.preview-transport{flex:0 0 auto;min-width:0;padding:8px 10px;background:var(--surface-1);border-top:1px solid var(--line);color:var(--txt-1)}
+.preview-target{display:flex;justify-content:center;align-items:baseline;gap:8px;min-height:20px;min-width:0;font-size:11px}
+.preview-target>span,.preview-target>small{color:var(--txt-2);flex:none}
+.preview-target>strong{white-space:nowrap;text-overflow:ellipsis;overflow:hidden;max-width:70%;font-weight:600}
+.preview-buttons{display:flex;justify-content:center;align-items:center;gap:5px;margin:6px 0}
+.preview-buttons>button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:42px;min-height:42px;padding:5px 7px;border:1px solid var(--line);background:var(--surface-2);color:var(--txt-1);line-height:1.1;cursor:pointer}
+.preview-buttons>button>small{font-size:10px;white-space:nowrap}
+.preview-buttons>button.preview-play{flex-direction:row;min-width:84px;min-height:46px;color:var(--txt-on-fill);background:var(--sky);border-color:var(--sky);font-weight:700;font-size:13px}
+.preview-buttons>button:disabled{opacity:.4;cursor:default}
+.preview-transport button:focus-visible,.preview-seek:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+.preview-counters{display:flex;justify-content:center;align-items:baseline;gap:18px;flex-wrap:wrap;row-gap:3px;font-variant-numeric:tabular-nums}
+.preview-counters>div{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
+.preview-counters>div>span{font-size:10px;color:var(--txt-2)}
+.preview-counters b{font:600 16px var(--font-mono,monospace)}
+.preview-counters em{font:11px var(--font-mono,monospace);color:var(--txt-2)}
+.preview-seek{display:block;min-width:0;width:100%;height:22px;margin:3px 0 0;accent-color:var(--sky)}
+.preview-detail{font-size:10px;color:var(--txt-2);text-align:center;margin-top:3px}
+
+.preview-seek-lane{position:relative;min-width:0}
+.preview-seek-boundaries{position:absolute;inset:3px 7px;pointer-events:none}
+.preview-seek-boundaries i{position:absolute;top:0;bottom:0;border-left:1px solid var(--ident-io);z-index:1}

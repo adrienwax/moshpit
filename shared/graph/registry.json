@@ -1,0 +1,2879 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "b4817ee48e946da617492da3bf23b0290c62ab4f",
+  "sectionVersions": {
+    "project": 1,
+    "graph": 2,
+    "nodeDefs": 1,
+    "components": 1,
+    "resources": 1
+  },
+  "definitions": [
+    {
+      "kind": "source.clip",
+      "defVersion": 1,
+      "label": "Clip",
+      "blurb": "The block's clip as an encoded stream: the input every mosh starts from.",
+      "category": "Source",
+      "inputs": [],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Stream",
+          "type": "EncodedVideoStream"
+        }
+      ],
+      "params": [],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": false
+    },
+    {
+      "kind": "decode.webcodecs",
+      "defVersion": 1,
+      "label": "Decode",
+      "blurb": "The one decode boundary between the encoded stream and the GPU graph.",
+      "category": "Routing",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Stream",
+          "type": "EncodedVideoStream",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": true
+    },
+    {
+      "kind": "seam.mosh",
+      "defVersion": 1,
+      "label": "Seam mosh",
+      "blurb": "Where one block bleeds into the next: the motion of the incoming clip smears over the picture already on screen.",
+      "category": "Mosh",
+      "family": "Bitstream",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Stream",
+          "type": "EncodedVideoStream",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Stream",
+          "type": "EncodedVideoStream"
+        }
+      ],
+      "params": [
+        {
+          "key": "keepInnerKeyframes",
+          "label": "Heal at GOPs",
+          "type": "bool",
+          "default": false,
+          "help": "Off: the smear runs to the next picture block. On: the incoming clip's own keyframes reset the picture every GOP.",
+          "modulatable": false
+        }
+      ],
+      "impl": {
+        "preview": "PROXY",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": false
+    },
+    {
+      "kind": "mosh.reorder",
+      "defVersion": 1,
+      "label": "Reorder",
+      "blurb": "Play a window of P-frames reversed, ping-ponged or strided: the motion runs backwards over the current picture.",
+      "category": "Mosh",
+      "family": "Bitstream",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Stream",
+          "type": "EncodedVideoStream",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Stream",
+          "type": "EncodedVideoStream"
+        }
+      ],
+      "params": [
+        {
+          "key": "mode",
+          "label": "Mode",
+          "type": "enum",
+          "default": "reverse",
+          "help": "Reverse plays the window backwards; ping-pong plays it forward then back; stride plays the even frames, then the odd.",
+          "modulatable": false,
+          "options": [
+            "reverse",
+            "pingpong",
+            "stride"
+          ],
+          "onNode": true
+        },
+        {
+          "key": "from",
+          "label": "From",
+          "type": "int",
+          "default": 0,
+          "help": "First frame of the window, counted from the block's in-point.",
+          "modulatable": false,
+          "min": 0,
+          "max": 100000,
+          "step": 1,
+          "onNode": true
+        },
+        {
+          "key": "to",
+          "label": "To",
+          "type": "int",
+          "default": 30,
+          "help": "Frame after the window. The window stays inside one GOP: a keyframe at its start stays put, and it stops at the next keyframe.",
+          "modulatable": false,
+          "min": 1,
+          "max": 100000,
+          "step": 1,
+          "onNode": true
+        }
+      ],
+      "impl": {
+        "preview": "PROXY",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.plane-desync",
+      "defVersion": 1,
+      "label": "Plane desync",
+      "blurb": "Shift one colour channel sideways, off-register from the other two.",
+      "category": "Effect",
+      "family": "Plane",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "channel",
+          "label": "Channel",
+          "type": "enum",
+          "default": "r",
+          "help": "Which channel shifts.",
+          "modulatable": false,
+          "options": [
+            "r",
+            "g",
+            "b"
+          ],
+          "onNode": true,
+          "ctOrder": 4
+        },
+        {
+          "key": "dx",
+          "label": "Shift X",
+          "type": "float",
+          "default": 24,
+          "help": "Horizontal shift at full effect, in pixels of a 1080p frame so a recipe looks the same at any size. Clamped to the edge, not wrapped.",
+          "modulatable": true,
+          "min": -200,
+          "max": 200,
+          "unit": "px",
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "dy",
+          "label": "Shift Y",
+          "type": "float",
+          "default": 0,
+          "help": "Vertical shift at full effect, in pixels of a 1080p frame.",
+          "modulatable": true,
+          "min": -200,
+          "max": 200,
+          "unit": "px",
+          "onNode": true,
+          "ctOrder": 2
+        },
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the shift applies. Drive it with an LFO to make the channel breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 3
+        },
+        {
+          "key": "noise",
+          "label": "Grain",
+          "type": "float",
+          "default": 0,
+          "help": "Seeded per-frame grain on the shifted channel. Deterministic: the same frame always gets the same grain.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 5
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.feedback",
+      "defVersion": 1,
+      "label": "Feedback loop",
+      "blurb": "Blend each frame over a zoomed, turned copy of the last output: trails that grow and drift.",
+      "category": "Effect",
+      "family": "Feedback",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "decay",
+          "label": "Trail",
+          "type": "float",
+          "default": 0.82,
+          "help": "How much of the last output survives each frame. 0 is off; near 1 the trail never fades.",
+          "modulatable": true,
+          "min": 0,
+          "max": 0.99,
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "zoom",
+          "label": "Zoom",
+          "type": "float",
+          "default": 0.985,
+          "help": "Scale of the fed-back copy. Below 1 the trail rushes outwards; above 1 it falls inwards.",
+          "modulatable": true,
+          "min": 0.9,
+          "max": 1.1,
+          "onNode": true,
+          "ctOrder": 2
+        },
+        {
+          "key": "rotate",
+          "label": "Turn",
+          "type": "float",
+          "default": 0,
+          "help": "Degrees the fed-back copy turns each frame.",
+          "modulatable": true,
+          "min": -10,
+          "max": 10,
+          "unit": "°",
+          "onNode": true,
+          "ctOrder": 3
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "route.mix",
+      "defVersion": 1,
+      "label": "Mix",
+      "blurb": "Blend two frames by a mode (mix, add, screen, difference, multiply), optionally through a mask.",
+      "category": "Routing",
+      "inputs": [
+        {
+          "key": "a",
+          "label": "A",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        },
+        {
+          "key": "b",
+          "label": "B",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        },
+        {
+          "key": "mask",
+          "label": "Mask",
+          "type": "Field",
+          "cardinality": "optional-one",
+          "subtype": "Mask",
+          "disconnected": "CONSTANT_ONE"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "mix",
+          "label": "Mix",
+          "type": "float",
+          "default": 0.5,
+          "help": "Share of B in the result. With a mask, the mask scales it per pixel.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "mode",
+          "label": "Mode",
+          "type": "enum",
+          "default": "mix",
+          "help": "How B combines with A: mix (cross-fade), add, screen, difference or multiply.",
+          "modulatable": false,
+          "options": [
+            "mix",
+            "add",
+            "screen",
+            "difference",
+            "multiply"
+          ],
+          "onNode": true
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "route.delay",
+      "defVersion": 1,
+      "label": "Delay",
+      "blurb": "Last frame's input. The only way to wire a loop.",
+      "category": "Routing",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": true
+    },
+    {
+      "kind": "output.sink",
+      "defVersion": 1,
+      "label": "Output",
+      "blurb": "What this block hands to the timeline: preview, export and freeze all read here.",
+      "category": "Output",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [],
+      "params": [],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": false
+    },
+    {
+      "kind": "route.reroute",
+      "defVersion": 1,
+      "label": "Reroute",
+      "blurb": "Tidies a picture wire: passes it on unchanged (double-click a wire to add one).",
+      "category": "Routing",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": true
+    },
+    {
+      "kind": "route.reroute-stream",
+      "defVersion": 1,
+      "label": "Reroute (stream)",
+      "blurb": "Tidies an encoded wire before the Decode: passes the stream on unchanged.",
+      "category": "Routing",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Stream",
+          "type": "EncodedVideoStream",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Stream",
+          "type": "EncodedVideoStream"
+        }
+      ],
+      "params": [],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": true
+    },
+    {
+      "kind": "route.null",
+      "defVersion": 1,
+      "label": "Null",
+      "blurb": "A named checkpoint: wire downstream from it, then add nodes before it without rewiring what follows.",
+      "category": "Routing",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": true
+    },
+    {
+      "kind": "route.switch",
+      "defVersion": 1,
+      "label": "Switch",
+      "blurb": "Picks one of up to four pictures. Animate Input (an LFO, a Value) to hot-swap branches.",
+      "category": "Routing",
+      "inputs": [
+        {
+          "key": "a",
+          "label": "A",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        },
+        {
+          "key": "b",
+          "label": "B",
+          "type": "VideoFrame",
+          "cardinality": "optional-one",
+          "disconnected": "PASS_THROUGH"
+        },
+        {
+          "key": "c",
+          "label": "C",
+          "type": "VideoFrame",
+          "cardinality": "optional-one",
+          "disconnected": "PASS_THROUGH"
+        },
+        {
+          "key": "d",
+          "label": "D",
+          "type": "VideoFrame",
+          "cardinality": "optional-one",
+          "disconnected": "PASS_THROUGH"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "select",
+          "label": "Input",
+          "type": "float",
+          "default": 0,
+          "help": "Which input passes: 0 = A … 3 = D (rounded). An unwired input shows A.",
+          "modulatable": true,
+          "min": 0,
+          "max": 3,
+          "step": 1,
+          "onNode": true,
+          "ctOrder": 1
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "group.in",
+      "defVersion": 1,
+      "label": "Group input",
+      "blurb": "Inside a container: its outputs are the container's inputs.",
+      "category": "Routing",
+      "inputs": [],
+      "outputs": [],
+      "params": [],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": false
+    },
+    {
+      "kind": "group.out",
+      "defVersion": 1,
+      "label": "Group output",
+      "blurb": "Inside a container: its inputs are the container's outputs.",
+      "category": "Routing",
+      "inputs": [],
+      "outputs": [],
+      "params": [],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": false
+    },
+    {
+      "kind": "group.container",
+      "defVersion": 1,
+      "label": "Container",
+      "blurb": "A look you can open: several nodes wired together, with a few knobs on its face.",
+      "category": "Routing",
+      "inputs": [],
+      "outputs": [],
+      "params": [],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": false
+    },
+    {
+      "kind": "fx.saturation",
+      "defVersion": 1,
+      "label": "Saturation",
+      "blurb": "Pull colour out or push it in. 0 is grayscale.",
+      "category": "Effect",
+      "family": "Tone",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "float",
+          "default": 100,
+          "help": "100 is the source unchanged. 0 is grayscale; above 100 pushes colour past the source.",
+          "modulatable": true,
+          "min": 0,
+          "max": 300,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 1,
+          "initial": 170
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.contrast",
+      "defVersion": 1,
+      "label": "Contrast",
+      "blurb": "Push blacks and whites apart, or collapse them toward grey.",
+      "category": "Effect",
+      "family": "Tone",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "float",
+          "default": 100,
+          "help": "100 is the source unchanged. 0 flattens to flat grey; above 100 pushes contrast past the source.",
+          "modulatable": true,
+          "min": 0,
+          "max": 300,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 1,
+          "initial": 150
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.brightness",
+      "defVersion": 1,
+      "label": "Brightness",
+      "blurb": "Push the picture darker or brighter.",
+      "category": "Effect",
+      "family": "Tone",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "level",
+          "label": "Level",
+          "type": "float",
+          "default": 100,
+          "help": "100 is unchanged; 0 is black, above 100 blows out toward white.",
+          "modulatable": true,
+          "min": 0,
+          "max": 300,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 1,
+          "initial": 70
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.hue-rotate",
+      "defVersion": 1,
+      "label": "Hue rotate",
+      "blurb": "Spin every colour around the wheel by a fixed angle.",
+      "category": "Effect",
+      "family": "Tone",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "degrees",
+          "label": "Degrees",
+          "type": "float",
+          "default": 0,
+          "help": "0 leaves colour unchanged; 180 is the fullest rotation.",
+          "modulatable": true,
+          "min": -180,
+          "max": 180,
+          "unit": "°",
+          "onNode": true,
+          "ctOrder": 1,
+          "initial": 90
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.invert",
+      "defVersion": 1,
+      "label": "Invert",
+      "blurb": "Flip every colour to its negative.",
+      "category": "Effect",
+      "family": "Tone",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "float",
+          "default": 100,
+          "help": "100 is a full negative; partial values mix toward it.",
+          "modulatable": true,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.sepia",
+      "defVersion": 1,
+      "label": "Sepia",
+      "blurb": "Tint the picture toward a warm monochrome.",
+      "category": "Effect",
+      "family": "Tone",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "float",
+          "default": 100,
+          "help": "100 is a full sepia tint.",
+          "modulatable": true,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.posterize",
+      "defVersion": 1,
+      "label": "Posterize",
+      "blurb": "Quantise every channel to a handful of levels: real banding, not a filter imitating it.",
+      "category": "Effect",
+      "family": "Tone",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "levels",
+          "label": "Levels",
+          "type": "int",
+          "default": 6,
+          "help": "How many steps each channel is quantised to. Lower is harsher.",
+          "modulatable": true,
+          "min": 2,
+          "max": 32,
+          "step": 1,
+          "onNode": true,
+          "ctOrder": 1,
+          "initial": 4
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.channel-isolation",
+      "defVersion": 1,
+      "label": "Channel isolation",
+      "blurb": "Drop one or two colour channels outright. Real corruption of the decoded picture, not a colour filter.",
+      "category": "Effect",
+      "family": "Plane",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "keepR",
+          "label": "Keep red",
+          "type": "bool",
+          "default": true,
+          "help": "Off zeroes the red channel.",
+          "modulatable": false,
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "keepG",
+          "label": "Keep green",
+          "type": "bool",
+          "default": false,
+          "help": "Off zeroes the green channel.",
+          "modulatable": false,
+          "onNode": true,
+          "ctOrder": 2
+        },
+        {
+          "key": "keepB",
+          "label": "Keep blue",
+          "type": "bool",
+          "default": true,
+          "help": "Off zeroes the blue channel.",
+          "modulatable": false,
+          "onNode": true,
+          "ctOrder": 3
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.chroma-drift",
+      "defVersion": 1,
+      "label": "Chroma drift",
+      "blurb": "Bias the blue-difference and red-difference colour values. Pixels stay in place. Animate Cb and Cr with an LFO; use Plane desync for spatial separation.",
+      "category": "Effect",
+      "family": "Plane",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "cb",
+          "label": "Cb shift",
+          "type": "float",
+          "default": 24,
+          "help": "Blue-difference offset. Negative pulls toward yellow, positive toward blue.",
+          "modulatable": true,
+          "min": -128,
+          "max": 128,
+          "onNode": true,
+          "ctOrder": 1,
+          "initial": 60
+        },
+        {
+          "key": "cr",
+          "label": "Cr shift",
+          "type": "float",
+          "default": -24,
+          "help": "Red-difference offset. Negative pulls toward green, positive toward red.",
+          "modulatable": true,
+          "min": -128,
+          "max": 128,
+          "onNode": true,
+          "ctOrder": 2,
+          "initial": -60
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.mirror",
+      "defVersion": 1,
+      "label": "Mirror",
+      "blurb": "Reflect one half of the frame onto the other, horizontal or vertical.",
+      "category": "Effect",
+      "family": "Geometry",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "vertical",
+          "label": "Vertical",
+          "type": "bool",
+          "default": false,
+          "help": "Off mirrors left/right. On mirrors top/bottom.",
+          "modulatable": false,
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "flip",
+          "label": "Flip",
+          "type": "bool",
+          "default": false,
+          "help": "Off: the first half (left/top) is the source. On: the second half (right/bottom) is the source.",
+          "modulatable": false,
+          "onNode": true,
+          "ctOrder": 2
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.transform",
+      "defVersion": 1,
+      "label": "Transform",
+      "blurb": "Rotate, scale and offset the picture, and move the crop centre when zoomed in.",
+      "category": "Effect",
+      "family": "Geometry",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "turn",
+          "label": "Turn",
+          "type": "int",
+          "default": 0,
+          "help": "Quarter turns. Off the right angles, rotate leaves wedges by design.",
+          "modulatable": false,
+          "min": 0,
+          "max": 3,
+          "step": 1,
+          "unit": "×90",
+          "ctOrder": 5
+        },
+        {
+          "key": "rotate",
+          "label": "Rotate",
+          "type": "float",
+          "default": 0,
+          "help": "Fine rotation on top of the turn, around the frame centre.",
+          "modulatable": true,
+          "min": -180,
+          "max": 180,
+          "unit": "°",
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "scale",
+          "label": "Scale",
+          "type": "float",
+          "default": 100,
+          "help": "100 is the source unchanged.",
+          "modulatable": true,
+          "min": 10,
+          "max": 400,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 2
+        },
+        {
+          "key": "offsetX",
+          "label": "Offset X",
+          "type": "float",
+          "default": 0,
+          "help": "Shift the picture horizontally, in 1080p pixels.",
+          "modulatable": true,
+          "min": -500,
+          "max": 500,
+          "unit": "px",
+          "onNode": true,
+          "ctOrder": 3
+        },
+        {
+          "key": "offsetY",
+          "label": "Offset Y",
+          "type": "float",
+          "default": 0,
+          "help": "Shift the picture vertically, in 1080p pixels.",
+          "modulatable": true,
+          "min": -500,
+          "max": 500,
+          "unit": "px",
+          "ctOrder": 4
+        },
+        {
+          "key": "cropX",
+          "label": "Crop X",
+          "type": "float",
+          "default": 50,
+          "help": "Where a zoomed-in crop is centred, left to right. 50 is centred.",
+          "modulatable": true,
+          "min": 0,
+          "max": 100,
+          "unit": "%"
+        },
+        {
+          "key": "cropY",
+          "label": "Crop Y",
+          "type": "float",
+          "default": 50,
+          "help": "Where a zoomed-in crop is centred, top to bottom. 50 is centred.",
+          "modulatable": true,
+          "min": 0,
+          "max": 100,
+          "unit": "%"
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.row-displacement",
+      "defVersion": 1,
+      "label": "Row displacement",
+      "blurb": "Shift horizontal bands sideways: rolling shutter, VHS tracking, screen tearing, or a wave melt, by curve.",
+      "category": "Effect",
+      "family": "Geometry",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "band",
+          "label": "Band",
+          "type": "float",
+          "default": 20,
+          "help": "Height of each displaced band, in 1080p pixels.",
+          "modulatable": true,
+          "min": 1,
+          "max": 200,
+          "unit": "px",
+          "onNode": true,
+          "ctOrder": 2
+        },
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "float",
+          "default": 60,
+          "help": "Maximum horizontal shift, in 1080p pixels.",
+          "modulatable": true,
+          "min": -200,
+          "max": 200,
+          "unit": "px",
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "curve",
+          "label": "Curve",
+          "type": "enum",
+          "default": "sine",
+          "help": "Linear is a rolling-shutter shear; sine a wave melt; random a tracking error; stepped a single tearing seam.",
+          "modulatable": false,
+          "options": [
+            "linear",
+            "sine",
+            "random",
+            "stepped"
+          ],
+          "onNode": true,
+          "ctOrder": 3
+        },
+        {
+          "key": "speed",
+          "label": "Speed",
+          "type": "float",
+          "default": 20,
+          "help": "How fast the sine and random curves drift over time. 0 holds still.",
+          "modulatable": true,
+          "min": 0,
+          "max": 100,
+          "ctOrder": 4
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.pixel-stretch",
+      "defVersion": 1,
+      "label": "Pixel stretch",
+      "blurb": "Smear one line of colour outward from a source row or column: a streak, not a shift.",
+      "category": "Effect",
+      "family": "Geometry",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "mode",
+          "label": "Mode",
+          "type": "enum",
+          "default": "horizontal",
+          "help": "Horizontal smears sideways from a column; vertical down from a row; wave lets the source column ripple over time.",
+          "modulatable": false,
+          "options": [
+            "horizontal",
+            "vertical",
+            "wave"
+          ],
+          "onNode": true,
+          "ctOrder": 3
+        },
+        {
+          "key": "origin",
+          "label": "Origin",
+          "type": "float",
+          "default": 50,
+          "help": "Where the source line sits across the frame.",
+          "modulatable": true,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "reach",
+          "label": "Reach",
+          "type": "float",
+          "default": 30,
+          "help": "How far the smear reaches from the source line. 0 is off.",
+          "modulatable": true,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 2
+        },
+        {
+          "key": "speed",
+          "label": "Speed",
+          "type": "float",
+          "default": 30,
+          "help": "How fast the source line ripples, in wave mode only.",
+          "modulatable": true,
+          "min": 0,
+          "max": 100,
+          "ctOrder": 4
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.resolution-crush",
+      "defVersion": 1,
+      "label": "Resolution crush",
+      "blurb": "Draw at a lower internal resolution and scale back: blocky or soft, your choice.",
+      "category": "Effect",
+      "family": "Geometry",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "factor",
+          "label": "Factor",
+          "type": "int",
+          "default": 8,
+          "help": "How many times smaller the intermediate draw is. Higher is chunkier.",
+          "modulatable": false,
+          "min": 2,
+          "max": 32,
+          "step": 1,
+          "onNode": true,
+          "ctOrder": 1,
+          "initial": 16
+        },
+        {
+          "key": "smooth",
+          "label": "Smooth",
+          "type": "bool",
+          "default": false,
+          "help": "Off: blocky nearest-neighbour. On: soft bilinear reconstruction.",
+          "modulatable": false,
+          "onNode": true,
+          "ctOrder": 2
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.soft-blur",
+      "defVersion": 1,
+      "label": "Soft blur",
+      "blurb": "A gentle box blur: softens raw, rough footage without touching timing.",
+      "category": "Effect",
+      "family": "Degrade",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "radius",
+          "label": "Radius",
+          "type": "float",
+          "default": 3,
+          "help": "Blur radius in 1080p pixels. 0 is off.",
+          "modulatable": true,
+          "min": 0,
+          "max": 12,
+          "unit": "px",
+          "onNode": true,
+          "ctOrder": 1,
+          "initial": 6
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.salt-pepper",
+      "defVersion": 1,
+      "label": "Salt & pepper",
+      "blurb": "Sparse random black and white pixels: impulse noise, not grain.",
+      "category": "Effect",
+      "family": "Degrade",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "density",
+          "label": "Density",
+          "type": "float",
+          "default": 5,
+          "help": "Chance any given pixel is hit. 0 is off.",
+          "modulatable": true,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.plane-desync-temporal",
+      "defVersion": 1,
+      "label": "Plane desync (temporal)",
+      "blurb": "One or more channels lag behind, pulled from a frame N back: chromatic ghosting with real memory behind it.",
+      "category": "Effect",
+      "family": "Plane",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "pastR",
+          "label": "Past red",
+          "type": "bool",
+          "default": true,
+          "help": "On pulls red from the past frame instead of now.",
+          "modulatable": false,
+          "onNode": true,
+          "ctOrder": 3
+        },
+        {
+          "key": "pastG",
+          "label": "Past green",
+          "type": "bool",
+          "default": false,
+          "help": "On pulls green from the past frame instead of now.",
+          "modulatable": false,
+          "onNode": true,
+          "ctOrder": 4
+        },
+        {
+          "key": "pastB",
+          "label": "Past blue",
+          "type": "bool",
+          "default": false,
+          "help": "On pulls blue from the past frame instead of now.",
+          "modulatable": false,
+          "onNode": true,
+          "ctOrder": 5
+        },
+        {
+          "key": "back",
+          "label": "Frames back",
+          "type": "int",
+          "default": 3,
+          "help": "How many frames back to read. Deeper costs one working-size texture per frame of depth.",
+          "modulatable": false,
+          "min": 1,
+          "max": 20,
+          "step": 1,
+          "ctOrder": 2
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.field-desync",
+      "defVersion": 1,
+      "label": "Field desync",
+      "blurb": "Interlace against the past: alternating rows pulled from a frame N back, the rest held in the present.",
+      "category": "Effect",
+      "family": "Plane",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "parity",
+          "label": "Odd rows",
+          "type": "bool",
+          "default": false,
+          "help": "Off: even rows pull from the past. On: odd rows do.",
+          "modulatable": false,
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "back",
+          "label": "Frames back",
+          "type": "int",
+          "default": 2,
+          "help": "How many frames back to read. Deeper costs one working-size texture per frame of depth.",
+          "modulatable": false,
+          "min": 1,
+          "max": 20,
+          "step": 1,
+          "ctOrder": 2
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.feedback-trail",
+      "defVersion": 1,
+      "label": "Feedback trail",
+      "blurb": "Blend toward a frame from N back, at a tunable strength: a smoothing trail, not noise.",
+      "category": "Effect",
+      "family": "Feedback",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "float",
+          "default": 50,
+          "help": "How much of the past frame blends in. 0 is off.",
+          "modulatable": true,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "back",
+          "label": "Frames back",
+          "type": "int",
+          "default": 3,
+          "help": "How many frames back to read. Deeper costs one working-size texture per frame of depth.",
+          "modulatable": false,
+          "min": 1,
+          "max": 20,
+          "step": 1,
+          "ctOrder": 2
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.chroma-trail",
+      "defVersion": 1,
+      "label": "Chroma trail",
+      "blurb": "Each colour channel lags by a different amount, so the trail separates into colour rather than grey.",
+      "category": "Effect",
+      "family": "Plane",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "float",
+          "default": 60,
+          "help": "How much of the lagged frames blends in. 0 is off.",
+          "modulatable": true,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "back",
+          "label": "Frames back",
+          "type": "int",
+          "default": 2,
+          "help": "How many frames back to read. Deeper costs one working-size texture per frame of depth.",
+          "modulatable": false,
+          "min": 1,
+          "max": 6,
+          "step": 1,
+          "ctOrder": 2
+        },
+        {
+          "key": "spread",
+          "label": "Spread",
+          "type": "float",
+          "default": 50,
+          "help": "How unevenly the channels are weighted. 0 blends all three equally; 100 leans hardest on the furthest-back channel.",
+          "modulatable": true,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 3
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.drift-trail",
+      "defVersion": 1,
+      "label": "Drift trail",
+      "blurb": "Blends toward a past frame that is nudged sideways, so the trail drifts rather than sitting still.",
+      "category": "Effect",
+      "family": "Feedback",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "float",
+          "default": 50,
+          "help": "How much of the drifting past frame blends in. 0 is off.",
+          "modulatable": true,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "back",
+          "label": "Frames back",
+          "type": "int",
+          "default": 3,
+          "help": "How many frames back to read. Deeper costs one working-size texture per frame of depth.",
+          "modulatable": false,
+          "min": 1,
+          "max": 20,
+          "step": 1,
+          "ctOrder": 2
+        },
+        {
+          "key": "driftX",
+          "label": "Drift X",
+          "type": "float",
+          "default": 12,
+          "help": "Sideways nudge applied to the past frame before blending, in 1080p pixels.",
+          "modulatable": true,
+          "min": -60,
+          "max": 60,
+          "unit": "px",
+          "onNode": true,
+          "ctOrder": 3
+        },
+        {
+          "key": "driftY",
+          "label": "Drift Y",
+          "type": "float",
+          "default": 0,
+          "help": "Vertical nudge, in 1080p pixels.",
+          "modulatable": true,
+          "min": -60,
+          "max": 60,
+          "unit": "px",
+          "ctOrder": 4
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.breath-trail",
+      "defVersion": 1,
+      "label": "Breath trail",
+      "blurb": "A feedback trail whose depth rises and falls on a slow cycle, in step across every block that uses it.",
+      "category": "Effect",
+      "family": "Feedback",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "float",
+          "default": 70,
+          "help": "Trail depth at the top of the breath. 0 is off.",
+          "modulatable": true,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "back",
+          "label": "Frames back",
+          "type": "int",
+          "default": 3,
+          "help": "How many frames back to read. Deeper costs one working-size texture per frame of depth.",
+          "modulatable": false,
+          "min": 1,
+          "max": 20,
+          "step": 1,
+          "ctOrder": 2
+        },
+        {
+          "key": "period",
+          "label": "Period",
+          "type": "float",
+          "default": 150,
+          "help": "Frames per full breath.",
+          "modulatable": true,
+          "min": 4,
+          "max": 600,
+          "unit": "f",
+          "onNode": true,
+          "ctOrder": 3
+        },
+        {
+          "key": "floor",
+          "label": "Floor",
+          "type": "float",
+          "default": 0,
+          "help": "Depth at the bottom of the breath, as a share of amount. 0 fades the trail away completely each cycle.",
+          "modulatable": true,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "ctOrder": 4
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.echo-taps",
+      "defVersion": 1,
+      "label": "Echo taps",
+      "blurb": "Several past frames at falling weight: distinct ghosts rather than one smear.",
+      "category": "Effect",
+      "family": "Feedback",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Frame",
+          "type": "VideoFrame",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Frame",
+          "type": "VideoFrame"
+        }
+      ],
+      "params": [
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "float",
+          "default": 60,
+          "help": "Weight of the first echo. Each later one is quieter. 0 is off.",
+          "modulatable": true,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "taps",
+          "label": "Taps",
+          "type": "int",
+          "default": 3,
+          "help": "How many echoes. Each costs another read of a past frame.",
+          "modulatable": false,
+          "min": 1,
+          "max": 4,
+          "step": 1,
+          "onNode": true,
+          "ctOrder": 2
+        },
+        {
+          "key": "spacing",
+          "label": "Spacing",
+          "type": "int",
+          "default": 4,
+          "help": "Frames between echoes. The furthest read is taps × spacing frames back.",
+          "modulatable": false,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "unit": "f",
+          "ctOrder": 3
+        },
+        {
+          "key": "decay",
+          "label": "Decay",
+          "type": "float",
+          "default": 60,
+          "help": "How much of the previous echo's weight each further one keeps. Lower separates them harder.",
+          "modulatable": true,
+          "min": 10,
+          "max": 95,
+          "unit": "%",
+          "ctOrder": 4
+        },
+        {
+          "key": "wet",
+          "label": "Wet",
+          "type": "float",
+          "default": 1,
+          "help": "How much of the effect is mixed in. 0 is the input untouched; drive it with an LFO to make the effect breathe.",
+          "modulatable": true,
+          "min": 0,
+          "max": 1,
+          "ctOrder": 6
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": true,
+      "creationEligible": true
+    },
+    {
+      "kind": "mosh.hold",
+      "defVersion": 1,
+      "label": "Hold",
+      "blurb": "Repeat frames. Their motion re-applies and the picture drifts: the classic bloom.",
+      "category": "Mosh",
+      "family": "Bitstream",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Stream",
+          "type": "EncodedVideoStream",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Stream",
+          "type": "EncodedVideoStream"
+        }
+      ],
+      "params": [
+        {
+          "key": "at",
+          "label": "At",
+          "type": "float",
+          "default": 0,
+          "help": "Where in the window to hold, as a percentage of it.",
+          "modulatable": false,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "span",
+          "label": "Span",
+          "type": "int",
+          "default": 1,
+          "help": "How many frames are held. 1 freezes; more loops that many frames.",
+          "modulatable": false,
+          "min": 1,
+          "max": 60,
+          "step": 1,
+          "unit": "f",
+          "onNode": true,
+          "ctOrder": 2
+        },
+        {
+          "key": "times",
+          "label": "Times",
+          "type": "int",
+          "default": 8,
+          "help": "How many times the held run repeats. More repeats, more drift.",
+          "modulatable": false,
+          "min": 2,
+          "max": 120,
+          "step": 1,
+          "unit": "×",
+          "onNode": true,
+          "ctOrder": 3
+        },
+        {
+          "key": "winFrom",
+          "label": "Window from",
+          "type": "float",
+          "default": 0,
+          "help": "Where in the block the effect begins. 0 is the first frame.",
+          "modulatable": false,
+          "min": 0,
+          "max": 99,
+          "unit": "%"
+        },
+        {
+          "key": "winLen",
+          "label": "Window length",
+          "type": "float",
+          "default": 100,
+          "help": "How much of the block it covers. 100 is all of it.",
+          "modulatable": false,
+          "min": 1,
+          "max": 100,
+          "unit": "%"
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": true
+    },
+    {
+      "kind": "mosh.stride",
+      "defVersion": 1,
+      "label": "Stride",
+      "blurb": "Keep every Nth frame. Motion arrives with gaps.",
+      "category": "Mosh",
+      "family": "Bitstream",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Stream",
+          "type": "EncodedVideoStream",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Stream",
+          "type": "EncodedVideoStream"
+        }
+      ],
+      "params": [
+        {
+          "key": "every",
+          "label": "Every",
+          "type": "int",
+          "default": 3,
+          "help": "Keep one frame out of this many. 2 keeps half, 4 a quarter.",
+          "modulatable": false,
+          "min": 2,
+          "max": 24,
+          "step": 1,
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "offset",
+          "label": "Offset",
+          "type": "int",
+          "default": 0,
+          "help": "Which frame of each group survives. Wraps at the group size.",
+          "modulatable": false,
+          "min": 0,
+          "max": 11,
+          "step": 1,
+          "onNode": true,
+          "ctOrder": 2
+        },
+        {
+          "key": "invert",
+          "label": "Invert",
+          "type": "bool",
+          "default": false,
+          "help": "Drop one in N instead of keeping one in N.",
+          "modulatable": false,
+          "onNode": true,
+          "ctOrder": 3
+        },
+        {
+          "key": "winFrom",
+          "label": "Window from",
+          "type": "float",
+          "default": 0,
+          "help": "Where in the block the effect begins. 0 is the first frame.",
+          "modulatable": false,
+          "min": 0,
+          "max": 99,
+          "unit": "%"
+        },
+        {
+          "key": "winLen",
+          "label": "Window length",
+          "type": "float",
+          "default": 100,
+          "help": "How much of the block it covers. 100 is all of it.",
+          "modulatable": false,
+          "min": 1,
+          "max": 100,
+          "unit": "%"
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": true
+    },
+    {
+      "kind": "mosh.reverse",
+      "defVersion": 1,
+      "label": "Reverse",
+      "blurb": "Play backwards. Motion applies the wrong way.",
+      "category": "Mosh",
+      "family": "Bitstream",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Stream",
+          "type": "EncodedVideoStream",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Stream",
+          "type": "EncodedVideoStream"
+        }
+      ],
+      "params": [
+        {
+          "key": "chunk",
+          "label": "Chunk",
+          "type": "int",
+          "default": 0,
+          "help": "Reverse in groups of this many frames. 0 reverses the whole window.",
+          "modulatable": false,
+          "min": 0,
+          "max": 60,
+          "step": 1,
+          "unit": "f",
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "winFrom",
+          "label": "Window from",
+          "type": "float",
+          "default": 0,
+          "help": "Where in the block the effect begins. 0 is the first frame.",
+          "modulatable": false,
+          "min": 0,
+          "max": 99,
+          "unit": "%"
+        },
+        {
+          "key": "winLen",
+          "label": "Window length",
+          "type": "float",
+          "default": 100,
+          "help": "How much of the block it covers. 100 is all of it.",
+          "modulatable": false,
+          "min": 1,
+          "max": 100,
+          "unit": "%"
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": true
+    },
+    {
+      "kind": "mosh.pingpong",
+      "defVersion": 1,
+      "label": "Ping-pong",
+      "blurb": "Forward, then backward. The run folds onto itself.",
+      "category": "Mosh",
+      "family": "Bitstream",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Stream",
+          "type": "EncodedVideoStream",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Stream",
+          "type": "EncodedVideoStream"
+        }
+      ],
+      "params": [
+        {
+          "key": "laps",
+          "label": "Laps",
+          "type": "int",
+          "default": 1,
+          "help": "How many out-and-back passes over the window.",
+          "modulatable": false,
+          "min": 1,
+          "max": 8,
+          "step": 1,
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "pause",
+          "label": "Pause",
+          "type": "int",
+          "default": 0,
+          "help": "Frames held at each turnaround, where the motion reverses.",
+          "modulatable": false,
+          "min": 0,
+          "max": 30,
+          "step": 1,
+          "unit": "f",
+          "onNode": true,
+          "ctOrder": 2
+        },
+        {
+          "key": "doubleEnds",
+          "label": "Double ends",
+          "type": "bool",
+          "default": false,
+          "help": "Keep the first and last frame in the return pass as well.",
+          "modulatable": false,
+          "onNode": true,
+          "ctOrder": 3
+        },
+        {
+          "key": "winFrom",
+          "label": "Window from",
+          "type": "float",
+          "default": 0,
+          "help": "Where in the block the effect begins. 0 is the first frame.",
+          "modulatable": false,
+          "min": 0,
+          "max": 99,
+          "unit": "%"
+        },
+        {
+          "key": "winLen",
+          "label": "Window length",
+          "type": "float",
+          "default": 100,
+          "help": "How much of the block it covers. 100 is all of it.",
+          "modulatable": false,
+          "min": 1,
+          "max": 100,
+          "unit": "%"
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": true
+    },
+    {
+      "kind": "mosh.stride-slip",
+      "defVersion": 1,
+      "label": "Stride slip",
+      "blurb": "Motion updates once every N frames; the rest repeat the last real one. A stutter, not a cut: same length in, same length out.",
+      "category": "Mosh",
+      "family": "Bitstream",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Stream",
+          "type": "EncodedVideoStream",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Stream",
+          "type": "EncodedVideoStream"
+        }
+      ],
+      "params": [
+        {
+          "key": "every",
+          "label": "Every",
+          "type": "int",
+          "default": 3,
+          "help": "A new frame lands once out of this many. The rest repeat it.",
+          "modulatable": false,
+          "min": 2,
+          "max": 24,
+          "step": 1,
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "offset",
+          "label": "Offset",
+          "type": "int",
+          "default": 0,
+          "help": "Which frame of each group is the one that updates.",
+          "modulatable": false,
+          "min": 0,
+          "max": 11,
+          "step": 1,
+          "onNode": true,
+          "ctOrder": 2
+        },
+        {
+          "key": "winFrom",
+          "label": "Window from",
+          "type": "float",
+          "default": 0,
+          "help": "Where in the block the effect begins. 0 is the first frame.",
+          "modulatable": false,
+          "min": 0,
+          "max": 99,
+          "unit": "%"
+        },
+        {
+          "key": "winLen",
+          "label": "Window length",
+          "type": "float",
+          "default": 100,
+          "help": "How much of the block it covers. 100 is all of it.",
+          "modulatable": false,
+          "min": 1,
+          "max": 100,
+          "unit": "%"
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": true
+    },
+    {
+      "kind": "mosh.speed",
+      "defVersion": 1,
+      "label": "Speed",
+      "blurb": "Play the block faster or slower at any rate. Repeated frames re-apply their motion, so slowing down smears.",
+      "category": "Mosh",
+      "family": "Bitstream",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Stream",
+          "type": "EncodedVideoStream",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Stream",
+          "type": "EncodedVideoStream"
+        }
+      ],
+      "params": [
+        {
+          "key": "rate",
+          "label": "Rate",
+          "type": "float",
+          "default": 100,
+          "help": "100 is untouched. 50 is half speed and twice as long; 200 is double speed and half as long.",
+          "modulatable": false,
+          "min": 10,
+          "max": 400,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "winFrom",
+          "label": "Window from",
+          "type": "float",
+          "default": 0,
+          "help": "Where in the block the effect begins. 0 is the first frame.",
+          "modulatable": false,
+          "min": 0,
+          "max": 99,
+          "unit": "%"
+        },
+        {
+          "key": "winLen",
+          "label": "Window length",
+          "type": "float",
+          "default": 100,
+          "help": "How much of the block it covers. 100 is all of it.",
+          "modulatable": false,
+          "min": 1,
+          "max": 100,
+          "unit": "%"
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": true
+    },
+    {
+      "kind": "mosh.speed-ramp",
+      "defVersion": 1,
+      "label": "Speed ramp",
+      "blurb": "Speed that changes across the block: wind up, or grind to a halt.",
+      "category": "Mosh",
+      "family": "Bitstream",
+      "inputs": [
+        {
+          "key": "in",
+          "label": "Stream",
+          "type": "EncodedVideoStream",
+          "cardinality": "required-one"
+        }
+      ],
+      "outputs": [
+        {
+          "key": "out",
+          "label": "Stream",
+          "type": "EncodedVideoStream"
+        }
+      ],
+      "params": [
+        {
+          "key": "rateIn",
+          "label": "Rate in",
+          "type": "float",
+          "default": 100,
+          "help": "Rate at the start of the block. 100 is untouched.",
+          "modulatable": false,
+          "min": 10,
+          "max": 400,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 1
+        },
+        {
+          "key": "rateOut",
+          "label": "Rate out",
+          "type": "float",
+          "default": 40,
+          "help": "Rate at the end. Below rate in it slows across the block; above, it speeds up.",
+          "modulatable": false,
+          "min": 10,
+          "max": 400,
+          "unit": "%",
+          "onNode": true,
+          "ctOrder": 2
+        },
+        {
+          "key": "winFrom",
+          "label": "Window from",
+          "type": "float",
+          "default": 0,
+          "help": "Where in the block the effect begins. 0 is the first frame.",
+          "modulatable": false,
+          "min": 0,
+          "max": 99,
+          "unit": "%"
+        },
+        {
+          "key": "winLen",
+          "label": "Window length",
+          "type": "float",
+          "default": 100,
+          "help": "How much of the block it covers. 100 is all of it.",
+          "modulatable": false,
+          "min": 1,
+          "max": 100,
+          "unit": "%"
+        }
+      ],
+      "impl": {
+        "preview": "EXACT",
+        "export": "EXACT"
+      },
+      "freezable": false,
+      "creationEligible": true
+    }
+  ]
+}

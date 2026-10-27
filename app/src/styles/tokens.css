@@ -1,0 +1,673 @@
+/* Moshpit v3 visual language (moshpit-visual-language.md) + the bounded, no-scroll shell
+   (v3-usability-plan.md, locked decisions 1, 2, 9). Loaded last: it wins over prototype.css
+   (the verbatim spec copy) and app.css without editing either. */
+
+
+/* ---------- flat & sharp: no rounded corners anywhere, no glow ---------- */
+*,*::before,*::after{border-radius:0!important}
+body{font-family:var(--font-ui);font-size:var(--fs-base);line-height:1.35;background:var(--surface-void);font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--fn-focus);outline-offset:0}
+.pill .lamp,.nd .run,.dropzone.over::after,.brand .dot{box-shadow:none!important}
+.brand .dot{background:var(--fn-interactive)!important}
+
+/* ---------- the shell never scrolls ---------- */
+html,body{height:100%;overflow:hidden}
+.app{height:calc(100vh / var(--ui-zoom, 1));overflow:hidden;background:var(--surface-void)}
+.wsview{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.stage{flex:1 1 auto;display:flex;flex-direction:column;height:auto;min-height:0;padding:var(--gutter);gap:0;overflow:hidden;background:var(--surface-void)}
+.stagecols{flex:1 1 0;display:flex;min-height:0;overflow:hidden}
+.wcol{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;padding:0;gap:0}
+.wcol.main{flex:1 1 0}
+.wband{display:flex;min-height:0;overflow:hidden}
+.lane{flex:1 1 auto;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden}
+.lane.h{flex-direction:row}
+.lane>.card{position:relative;min-height:var(--header-h);min-width:0}
+.lane:not(.h)>.card:not(.collapsed){min-height:56px}
+.lane.h>.card:not(.collapsed){min-width:160px}
+.lane>.card.collapsed{flex:0 0 auto}
+
+/* Splitters: 1px void gutters with a wider invisible grip. */
+.vsplit,.hsplit,.stacksplit{flex:0 0 var(--gutter);background:var(--surface-void);position:relative;z-index:5;touch-action:none}
+.vsplit,.stacksplit.h{cursor:col-resize}
+.hsplit,.stacksplit:not(.h){cursor:row-resize}
+.vsplit::before,.hsplit::before,.stacksplit::before{content:"";position:absolute;background:transparent}
+.vsplit::before,.stacksplit.h::before{top:0;bottom:0;left:-3px;right:-3px;width:auto;height:auto}
+.hsplit::before,.stacksplit:not(.h)::before{left:0;right:0;top:-3px;bottom:-3px;width:auto;height:auto}
+.vsplit:hover,.hsplit:hover,.stacksplit:hover,.vsplit.drag,.hsplit.drag,.stacksplit.drag{background:var(--fn-select)}
+.hsplit{flex-basis:calc(var(--gutter) + 1px)}
+
+/* Drop zones: a 1px gutter at rest; a wider target only while re-docking (no layout shift). */
+.dropzone{flex:0 0 var(--gutter);height:auto;background:var(--surface-void)}
+.lane.h>.dropzone{width:var(--gutter)}
+.dropzone.end{flex:0 0 0;min-height:0;background:transparent}
+.dropzone.end.live::before{top:-24px;bottom:0}
+.dropzone.live::before{top:-6px;bottom:-6px}
+.dropzone.live::after{left:0;right:0;top:0;height:2px;background:transparent}
+.dropzone.over::after{background:var(--fn-interactive)}
+.dropzone.end.live::after{border:1px dashed var(--line-hi)}
+.dropzone.end.over::after{border-color:var(--fn-interactive);background:rgba(194,242,61,.08)}
+
+/* ---------- panes: header 28px on s2, body s1, 8px padding, hairlines ---------- */
+.card{border:1px solid var(--line-2);background:var(--surface-1)}
+.card>.hd{min-height:var(--header-h);height:var(--header-h);padding:0 var(--sp-1) 0 var(--sp-3);gap:var(--sp-2);
+  background:var(--surface-2);border-bottom:1px solid var(--line);flex-wrap:nowrap;overflow:hidden}
+.card>.hd .ttl{font-size:var(--fs-micro);letter-spacing:var(--track);color:var(--txt-1);font-weight:var(--fw-med);white-space:nowrap}
+.card>.hd .paneno{font-family:var(--font-mono);background:none;color:var(--fn-info);padding:0;font-size:11px;font-weight:var(--fw-bold)}
+.card>.hd .built{font-size:9px;color:var(--txt-3);border:1px solid var(--line-2);padding:0 4px;white-space:nowrap;text-transform:uppercase;letter-spacing:var(--track)}
+.card>.hd .hdnote{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card>.pbody{padding:0}
+.card.anno>.tip{top:var(--header-h)}
+.panetools{display:flex;gap:0;margin-left:auto}
+.panetools button{width:22px;height:22px;border:0;background:transparent;color:var(--txt-2)}
+.panetools button:hover{background:var(--surface-3);color:var(--txt-1)}
+.helpbadge{border:1px solid var(--line-2);color:var(--txt-2);background:transparent}
+.ptabs{display:flex;flex-wrap:nowrap;align-items:stretch;gap:0;min-width:0;overflow:hidden}
+.ptabs button{white-space:nowrap;font-size:var(--fs-micro);text-transform:uppercase;letter-spacing:var(--track);color:var(--txt-2);border:0;background:transparent;padding:0 var(--sp-2);height:var(--header-h)}
+.ptabs button.on{color:var(--txt-1);box-shadow:inset 0 2px 0 var(--fn-select);background:var(--surface-1)}
+
+/* ---------- top bar ---------- */
+.topbar{position:relative;flex:0 0 auto;padding:0 var(--sp-3);gap:var(--sp-3);height:44px;flex-wrap:nowrap;background:var(--surface-bg);border-bottom:1px solid var(--line)}
+.brand b{font-size:var(--fs-md);letter-spacing:var(--track);text-transform:uppercase}
+.brand .ver{font-family:var(--font-mono);border-color:var(--line-2)}
+.wsswitch{display:flex;gap:0;flex-wrap:nowrap;border:1px solid var(--line-2)}
+.wsswitch button{height:28px;padding:0 var(--sp-4);border:0;background:transparent;color:var(--txt-2);font-size:var(--fs-sm);
+  font-weight:var(--fw-med);text-transform:uppercase;letter-spacing:var(--track);display:flex;align-items:center;gap:var(--sp-2)}
+.wsswitch button+button{border-left:1px solid var(--line-2)}
+.wsswitch button:hover{background:var(--surface-3);color:var(--txt-1)}
+.wsswitch button.on{background:var(--surface-3-hi);color:var(--txt-1);box-shadow:inset 0 2px 0 var(--fn-select)}
+.wsswitch .k{font-family:var(--font-mono);font-size:9px;color:var(--txt-3);border:0;padding:0}
+.pill{border-color:var(--line-2);background:transparent;color:var(--txt-2);white-space:nowrap}
+
+/* ---------- controls by salience ---------- */
+/* T1 POP: the one major action per context. */
+.pop,.btn-run,.btn-pop{background:var(--fn-interactive)!important;color:var(--txt-on-fill)!important;border:0!important;font-weight:var(--fw-bold);
+  text-transform:uppercase;letter-spacing:var(--track);font-size:var(--fs-micro);height:var(--ctl-h);padding:0 var(--sp-3);white-space:nowrap;cursor:pointer}
+.pop:hover,.btn-run:hover,.btn-pop:hover{background:var(--fn-interactive-hi)!important}
+.pop:active,.btn-run:active,.btn-pop:active{background:var(--fn-interactive-dim)!important}
+.pop:disabled,.btn-run:disabled{background:var(--surface-2)!important;color:var(--txt-3)!important;cursor:not-allowed}
+/* T2 ACCENT (secondary) and T3 QUIET. */
+.ghostbtn{background:var(--surface-3);border:1px solid var(--line-2);color:var(--txt-1);padding:0 var(--sp-3);height:var(--ctl-h);font-size:var(--fs-sm);white-space:nowrap}
+.ghostbtn:hover{background:var(--surface-3-hi);border-color:var(--fn-select)}
+.ghostbtn.act,.ghostbtn.on{border-color:var(--fn-select);color:var(--fn-select-hi)}
+.ghostbtn:disabled{background:var(--surface-2);color:var(--txt-3);border-color:transparent;cursor:not-allowed}
+.tbtn{background:var(--surface-3);border:1px solid var(--line-2);color:var(--txt-1);height:var(--ctl-h);font-size:var(--fs-sm)}
+.tbtn:hover{border-color:var(--fn-select);background:var(--surface-3-hi)}
+input,select,textarea,.sel2{background:var(--surface-3);border:1px solid var(--line-2);color:var(--txt-1)}
+input::placeholder{color:var(--txt-3)}
+
+/* ---------- timeline drags never select text (locked decision 8) ---------- */
+.scrub,.ztrack,.zscroll,.blk,.bpmruler,.tl,.slicebar,.sliceside,.clipzoom,.syncview,.lane,.card>.hd{user-select:none;-webkit-user-select:none}
+
+/* ---------- Graph mode (Open Graph on the selected block) ---------- */
+.graphmode{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+.graphbar{flex:0 0 auto;display:flex;align-items:center;gap:var(--sp-3);height:30px;padding:0 var(--sp-3);background:var(--surface-2);border-bottom:1px solid var(--line);font-size:var(--fs-sm)}
+.graphbar .backbtn{height:var(--ctl-h);background:var(--surface-3);border:1px solid var(--fn-select);color:var(--txt-1);padding:0 var(--sp-3);text-transform:uppercase;font-size:var(--fs-micro);letter-spacing:var(--track);font-weight:var(--fw-med)}
+.graphbar .backbtn:hover{background:var(--surface-3-hi)}
+.graphbar .gtitle{font-size:var(--fs-micro);text-transform:uppercase;letter-spacing:var(--track);color:var(--fn-select);font-weight:var(--fw-bold)}
+.graphbar .gblock{font-family:var(--font-mono);color:var(--txt-1)}
+
+/* Provenance badges live in the pane's tooltip; the header keeps index + title + tools only. */
+.card>.hd .built{display:none}
+
+/* ---------- scopes in the top bar ---------- */
+.topscopes{display:flex;align-items:stretch;gap:1px;height:34px;background:var(--surface-void);border:1px solid var(--line);cursor:zoom-in;flex:0 1 auto;min-width:0}
+.topscopes.big{height:88px;cursor:zoom-out;position:absolute;left:50%;transform:translateX(-50%);top:5px;z-index:60;box-shadow:var(--shadow)}
+.topscopes .scopebox{position:relative;display:flex;align-items:center;background:var(--surface-1);width:120px;padding:0;margin:0;border:0}
+.topscopes .scopebox.sq{width:34px}
+.topscopes.big .scopebox{width:260px}
+.topscopes.big .scopebox.sq{width:88px}
+.topscopes svg{width:100%;height:100%;display:block}
+.topscopes .slabel{position:absolute;left:2px;top:1px;font-size:8px;letter-spacing:var(--track);color:var(--txt-3);pointer-events:none}
+.topscopes .sval{position:absolute;right:2px;bottom:1px;font-family:var(--font-mono);font-size:9px;color:var(--txt-2);background:var(--surface-1);padding:0 2px}
+.topscopes .sempty{font-size:9px;color:var(--txt-3);padding:0 6px 0 34px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---------- status strip: one scroll-immune line ---------- */
+.statusstrip{flex:0 0 22px;display:flex;align-items:stretch;gap:1px;background:var(--surface-void);border-bottom:1px solid var(--line);
+  font-size:var(--fs-micro);letter-spacing:var(--track);text-transform:uppercase;color:var(--txt-2);overflow:hidden;white-space:nowrap}
+.statusstrip .st{display:flex;align-items:center;gap:var(--sp-1);padding:0 var(--sp-3);background:var(--surface-bg)}
+.statusstrip .st b{font-family:var(--font-mono);font-weight:var(--fw-med);color:var(--txt-1);letter-spacing:0}
+.statusstrip .sel{text-transform:none;letter-spacing:0;color:var(--txt-1);font-family:var(--font-mono)}
+.statusstrip .spacer{flex:1;background:var(--surface-bg)}
+.statusstrip .ok{color:var(--fn-valid)}
+.statusstrip .warn{color:var(--fn-warn)}
+.statusstrip .info{color:var(--fn-info)}
+.statusstrip .live{color:var(--txt-1)}
+.statusstrip .cell{width:8px;height:8px;background:var(--surface-3);border:1px solid var(--line-2);display:inline-block}
+.statusstrip .cell.on{background:var(--fn-valid);border-color:var(--fn-valid)}
+.statusstrip .live .cell.on{background:var(--fn-rec);border-color:var(--fn-rec)}
+
+/* ---------- viewers fit their pane: the picture shrinks, the controls under it stay ---------- */
+.card>.pbody>.dual{height:100%;min-height:0;background:var(--surface-void)}
+.dual .loupe{display:flex;flex-direction:column;min-height:0;min-width:0;padding:var(--sp-3);background:var(--surface-1)}
+.dual .loupe>*{flex:0 0 auto}
+.dual .loupe>.frameview.bigframe,.fitpane>.frameview.bigpv{flex:1 1 0;min-height:48px;max-height:none;width:100%;aspect-ratio:auto;margin:0;background:#000;border:1px solid var(--line)}
+.frameview.bigframe canvas,.frameview.bigpv canvas{object-fit:contain}
+.fitpane{height:100%;display:flex;flex-direction:column;min-height:0}
+.fitpane>*{flex:0 0 auto}
+.fitpane>.notimported.big{flex:1 1 0;min-height:48px;aspect-ratio:auto;max-height:none}
+.loupe .strip{margin-top:var(--sp-1);gap:2px}
+.clipzoom{margin-top:var(--sp-1)}
+.slicebar{padding:var(--sp-3)}
+
+/* ---------- proxy-first import + conform quality ---------- */
+.cbadge{display:inline-flex;align-items:center;gap:var(--sp-1);font-size:var(--fs-micro);letter-spacing:var(--track);text-transform:uppercase;white-space:nowrap;font-family:var(--font-ui)}
+.cbadge.pend{color:var(--fn-warn)}
+.cbadge.done{color:var(--fn-valid)}
+.cbadge.fail{color:var(--fn-caution)}
+.clip .meta .cbadge{display:flex;margin-top:2px}
+.convbar .qfld{min-width:180px;max-width:300px}
+.convbar .qhint{display:block;margin-top:2px;font-size:var(--fs-micro);color:var(--txt-3);line-height:1.2}
+.job .st.wait{color:var(--fn-warn);background:transparent;border:1px solid var(--fn-warn)}
+.statusstrip button.st{border:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--txt-1);cursor:pointer}
+.statusstrip button.st:hover{background:var(--surface-3)}
+.libroots{display:flex;align-items:center;gap:var(--sp-2)}
+.libroots .rescan{margin-left:auto;height:18px;padding:0 6px}
+
+/* ---------- B3: form fields sized to what they hold (native field-sizing), bounded ---------- */
+.fld input,.pathinput input{field-sizing:content;min-width:6ch;max-width:min(70ch,100%)}
+.pathfld{flex:0 1 auto;min-width:0}
+.pathfld input{width:auto}
+.pathinput input{flex:0 1 auto;width:auto}
+.sel2{min-width:0}
+.pathinput{display:inline-flex;flex:0 1 auto;width:fit-content;max-width:100%}
+.convbar .qfld .sel2{align-self:flex-start;width:auto}
+.card>.pbody>.logbox,.card>.pbody .logbox{height:auto;min-height:100%;border:0}
+
+/* ---------- Phase C: raw-preview Source browser ---------- */
+/* Drag never selects text (Waxy: "dragging a clip highlights text"). */
+.gcell,.gcell *,.rtable tr,.tnode,.place,.places,.chaprow,.cellthumb,.fitpane{user-select:none;-webkit-user-select:none}
+.gcell[draggable]{cursor:grab}
+.gcell[draggable]:active{cursor:grabbing}
+
+.cellthumb{position:absolute;inset:0;background:#000;cursor:ew-resize;overflow:hidden}
+.cellthumb canvas,.cellthumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.cellthumb canvas.hidden{visibility:hidden}
+.cellscrub{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--fn-interactive);pointer-events:none;z-index:2}
+
+.frameview.raw .rawbadge{color:var(--fn-warn);border-color:var(--fn-warn)}
+.frameview.raw canvas{object-fit:contain}
+
+.scopestrip{flex:0 0 40px;display:flex;gap:1px;background:var(--surface-void);border-bottom:1px solid var(--line);position:relative}
+.scopestrip svg{flex:1 1 0;height:100%;background:var(--surface-1);display:block}
+.scopestrip svg.hist{flex:0 0 32%}
+.scopestrip .sv{position:absolute;right:calc(32% + 4px);bottom:2px;font-family:var(--font-mono);font-size:9px;color:var(--txt-2);background:var(--surface-1);padding:0 2px}
+.scopestrip.empty{align-items:center;justify-content:center;font-size:var(--fs-micro);color:var(--txt-3);text-transform:uppercase;letter-spacing:var(--track)}
+
+.dropover{outline:2px dashed var(--fn-interactive);outline-offset:-2px}
+
+/* Places: Arena-style accordions — the header keeps its live state when folded. */
+.places{display:flex;flex-direction:column}
+.acc{border-bottom:1px solid var(--line)}
+.acchd{display:flex;align-items:center;gap:var(--sp-2);width:100%;height:var(--row-h);padding:0 var(--sp-3);border:0;background:var(--surface-2);color:var(--txt-1);
+  font-size:var(--fs-micro);letter-spacing:var(--track);font-weight:var(--fw-med);text-align:left}
+.acchd:hover{background:var(--surface-3)}
+.acchd .tw{color:var(--txt-3);width:10px}
+.accstate{margin-left:auto;font-family:var(--font-mono);font-size:var(--fs-micro);color:var(--txt-2);text-transform:none;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-flex;align-items:center;gap:4px}
+.accstate.ok{color:var(--fn-valid)}
+.accstate.warn{color:var(--fn-warn)}
+.place{display:flex;align-items:center;gap:var(--sp-2);height:24px;padding:0 var(--sp-3);font-size:var(--fs-sm);color:var(--txt-2);cursor:pointer}
+.place:hover{background:var(--surface-3);color:var(--txt-1)}
+.place.on{color:var(--txt-1);box-shadow:inset 2px 0 0 var(--fn-select);background:var(--surface-2)}
+.place .pic{color:var(--fn-warn);width:12px}
+.place .pn{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.place .px{border:0;background:transparent;color:var(--txt-3);visibility:hidden}
+.place:hover .px{visibility:visible}
+.placehint{padding:var(--sp-2) var(--sp-3);font-size:var(--fs-micro);color:var(--txt-3)}
+
+/* Right-click menu: an overlay, so it may cast the one allowed shadow. */
+.ctxmenu{position:fixed;z-index:500;min-width:220px;display:flex;flex-direction:column;background:var(--surface-2);border:1px solid var(--line-2);box-shadow:var(--shadow);padding:2px 0}
+.ctxmenu button{height:26px;padding:0 var(--sp-3);border:0;background:transparent;color:var(--txt-1);font-size:var(--fs-sm);text-align:left}
+.ctxmenu button:hover:not(:disabled){background:var(--surface-3-hi)}
+.ctxmenu button:disabled{color:var(--txt-3)}
+.ctxmenu button.danger{color:var(--fn-caution)}
+.ctxsep{height:1px;margin:2px 0;background:var(--line)}
+
+.tbtn.usebusy{color:var(--fn-warn);border-color:var(--fn-warn)}
+.gcell .gt2>span,.gcell .gt2>.scrub2,.gcell .gt2>.ph2{pointer-events:none}
+
+/* ---------- clip timelines: IN/OUT you can see (A and B) ---------- */
+.ztrack .zdim{position:absolute;top:0;bottom:0;background:rgba(8,9,12,.62);pointer-events:none;z-index:1}
+.ztrack .win{border:1px solid var(--fn-interactive);background:transparent;z-index:1}
+.ztrack .mkin,.ztrack .mkout{width:2px;z-index:2;background:var(--ident-io)}
+.ztrack .mkin .flag,.ztrack .mkout .flag{position:absolute;top:0;font-family:var(--font-mono);font-size:8px;font-weight:var(--fw-bold);line-height:11px;padding:0 3px;background:var(--surface-1);color:var(--ident-io);box-shadow:inset 0 0 0 1px var(--ident-io);white-space:nowrap}
+.ztrack .mkin .flag{left:0}
+.ztrack .mkout .flag{right:0;background:var(--ident-io);color:var(--txt-on-fill);box-shadow:none}
+.ztrack .zph{z-index:3;box-shadow:none}
+.zscroll{position:relative;overflow:hidden}
+.zscroll .zmark{position:absolute;top:0;bottom:0;background:var(--fn-interactive);opacity:.55;pointer-events:none}
+.zmeta .zio{color:var(--txt-1);font-family:var(--font-mono)}
+.zmeta .zio b{color:var(--fn-interactive);font-weight:var(--fw-med)}
+.zmeta .zio.none{color:var(--txt-3);font-family:var(--font-ui)}
+
+/* ---------- Averox: the display face for labels (letters only; see main.tsx) ---------- */
+.card>.hd .ttl,.wsswitch button,.pop,.btn-run,.acchd,.graphbar .gtitle,.statusstrip .st,.brand b,.ptabs button,.ctxmenu button{font-family:var(--font-ui)}
+.fitpane>.scopestrip{flex:0 0 40px;height:40px;min-height:0;overflow:hidden}
+.scopestrip svg{height:40px}
+.convbar .pathfld{flex:1 1 100%;min-width:0}
+.convbar .pathfld input{width:100%;max-width:100%;field-sizing:fixed;text-overflow:ellipsis}
+
+/* ---------- Source preview: the picture box takes the clip's aspect (no letterbox) ---------- */
+.pvstage{flex:1 1 0;min-height:60px;container-type:size;display:flex;align-items:center;justify-content:center;background:var(--surface-1);overflow:hidden}
+.fitpane>.pvstage>.frameview.bigpv{flex:none;aspect-ratio:var(--arn);width:min(100cqw,calc(100cqh * var(--arn)));height:auto;max-height:100cqh;border:1px solid var(--line)}
+
+/* ---------- Source grid: size slider, multi-select ---------- */
+.grid-thumbs{grid-template-columns:repeat(auto-fill,minmax(var(--cell,168px),1fr));gap:var(--sp-2);padding:var(--sp-3)}
+.picktools{display:flex;align-items:center;gap:var(--sp-2);padding:0 var(--sp-3) var(--sp-2);flex-wrap:wrap}
+.picktools .pickcount{font-size:var(--fs-micro);color:var(--txt-3)}
+.picktools .cellsize{margin-left:auto;display:flex;align-items:center;gap:4px;color:var(--txt-3);font-size:10px}
+.picktools .cellsize input{width:90px;accent-color:var(--fn-select)}
+.gcell.picked{box-shadow:0 0 0 2px var(--fn-info)}
+.gcell.picked.sel{box-shadow:0 0 0 2px var(--fn-select)}
+.rtable tr.picked td{background:rgba(91,184,240,.12)}
+
+/* ---------- Compose Library (use footage without leaving Compose) ---------- */
+.libstrip{display:flex;flex-direction:column;min-height:0;height:100%}
+.libhd{display:flex;gap:var(--sp-1);padding:var(--sp-2);border-bottom:1px solid var(--line)}
+.libhd .radfield{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.libhd .libq{flex:0 1 90px;min-width:50px;height:var(--ctl-h);padding:0 6px}
+.librows{flex:1 1 auto;overflow:auto}
+.librow{display:flex;align-items:center;gap:var(--sp-2);padding:4px var(--sp-2);border-bottom:1px solid var(--line);user-select:none}
+.librow:hover{background:var(--surface-2)}
+.libthumb{position:relative;flex:0 0 72px;height:40px;background:#000}
+.libmeta{flex:1;min-width:0}
+.libmeta .nm{font-size:var(--fs-sm);color:var(--txt-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.libmeta .mt{font-family:var(--font-mono);font-size:9px;color:var(--txt-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.librow .ghostbtn{flex:none;height:20px;padding:0 6px;font-size:10px}
+.librow .libbusy{flex:none;font-family:var(--font-mono);font-size:10px;color:var(--fn-warn)}
+.bstoolbar{flex-wrap:wrap;row-gap:var(--sp-1)}
+.bstoolbar .bsearch{flex:1 1 140px;min-width:120px}
+
+/* ---------- Phase D: HUD tokens (visual language §12.1, verbatim) ---------- */
+
+/* ---------- the status strip as an instrument cluster (§12.2 readouts, §12.3 linear gauge) ---------- */
+.statusstrip.hud{flex:0 0 26px}
+.statusstrip.hud .ro{position:relative;display:flex;align-items:baseline;gap:var(--sp-1);padding:0 var(--sp-3);background:var(--surface-bg);border:0;font:inherit;color:inherit;text-align:left;white-space:nowrap}
+.statusstrip.hud button.ro{cursor:pointer}
+.statusstrip.hud button.ro:hover{background:var(--surface-3)}
+.statusstrip.hud .lbl{font-style:normal;font-family:var(--font-ui);font-size:9px;letter-spacing:var(--track);color:var(--txt-3);text-transform:uppercase;align-self:center}
+.statusstrip.hud .val{font-family:var(--font-mono);font-size:var(--fs-md);font-weight:var(--fw-med);color:var(--txt-1);letter-spacing:0;text-transform:none;align-self:center}
+.statusstrip.hud .eta{font-style:normal;font-family:var(--font-mono);font-size:9px;color:var(--txt-3);align-self:center}
+.statusstrip.hud .cell{align-self:center}
+.statusstrip.hud .ro.live .val{color:var(--txt-1)}
+.statusstrip.hud .ro.info .val{color:var(--fn-info)}
+.statusstrip.hud .ro.warn .val,.statusstrip.hud .ro.warn .lbl{color:var(--fn-warn)}
+.statusstrip.hud .ro.ok .val{color:var(--fn-valid)}
+.statusstrip.hud .chip{align-self:center;font-family:var(--font-mono);font-size:10px;font-weight:var(--fw-bold);padding:0 5px;line-height:15px;letter-spacing:0}
+.statusstrip.hud .chip.ok{background:var(--fn-valid);color:var(--txt-on-fill)}
+.statusstrip.hud .chip.warn{background:var(--fn-warn);color:var(--txt-on-fill)}
+.statusstrip.hud .chip.idle{border:1px solid var(--line-2);color:var(--txt-3)}
+.statusstrip.hud .gauge{position:absolute;left:var(--sp-3);right:var(--sp-3);bottom:2px;height:var(--gauge-stroke);background:var(--line-2)}
+.statusstrip.hud .gauge .fill{display:block;height:100%;background:var(--fn-interactive)}
+.statusstrip.hud .gauge .fill.done{background:var(--fn-valid)}
+.statusstrip.hud .ro.warn .gauge .fill{background:var(--fn-warn)}
+
+/* ---------- compact LFO tiles (plan §6.3): many per row, a readout header, open to edit ---------- */
+.lfopane{padding:var(--sp-3)}
+.lfotiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:var(--sp-2);align-items:start}
+.lfotile{position:relative;display:flex;flex-direction:column;gap:2px;padding:var(--sp-2) var(--sp-3) var(--sp-3);background:var(--surface-2);border:1px solid var(--line-2);color:var(--txt-1);text-align:left;cursor:pointer}
+.lfotile:hover{border-color:var(--fn-select)}
+.lfotile .lthd{display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-sm)}
+.lfotile .lthd svg{color:var(--fn-warn)}
+.lfotile .ltro{display:flex;align-items:baseline;justify-content:space-between}
+.lfotile .ltro i{font-style:normal;font-family:var(--font-ui);font-size:9px;letter-spacing:var(--track);color:var(--txt-3)}
+.lfotile .ltro b{font-family:var(--font-mono);font-size:var(--fs-md);font-weight:var(--fw-med)}
+.lfotile .ltro b.on{color:var(--fn-warn)}
+.lfotile .ltphase{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--line)}
+.lfotile .ltphase span{position:absolute;top:0;bottom:0;width:3px;margin-left:-1px;background:var(--fn-warn)}
+.lforow.open{grid-column:1/-1;border:1px solid var(--fn-select);background:var(--surface-2);padding:var(--sp-2) var(--sp-3)}
+.lforow .ltclose{border:0;background:transparent;color:var(--txt-2);width:18px}
+.lfoadd{height:100%;min-height:64px;border:1px dashed var(--line-hi);background:transparent;color:var(--txt-2);font-size:var(--fs-sm)}
+.lfoadd:hover{border-color:var(--fn-select);color:var(--txt-1)}
+/* per-block HUD readout in the arrangement */
+.blk .bro{display:flex;align-items:baseline;gap:4px;margin-top:2px;white-space:nowrap;overflow:hidden}
+.blk .bro i{font-style:normal;font-family:var(--font-ui);font-size:8px;letter-spacing:var(--track);color:var(--txt-3)}
+.blk .bro b{font-family:var(--font-mono);font-size:var(--fs-sm);font-weight:var(--fw-med);color:var(--txt-1)}
+.blk .bro .brange{font-family:var(--font-mono);font-size:9px;color:var(--txt-3);overflow:hidden;text-overflow:ellipsis}
+.lfotile .lthd svg{width:28px;height:12px;flex:none}
+
+/* ---------- the full 34px stacked readout cluster (§12.1 --mp-readout-h): label over value ---------- */
+.statusstrip.hud{flex:0 0 var(--readout-h)}
+.statusstrip.hud .ro{flex-direction:column;align-items:flex-start;justify-content:center;gap:0;padding:0 var(--sp-3);min-width:0}
+/* Waxy's micro-pass: the value is what the eye lands on (larger, bolder, tabular); the label whispers. */
+.statusstrip.hud .ro .lbl{align-self:flex-start;line-height:10px;font-size:8px;letter-spacing:.08em;color:var(--txt-3);opacity:.85}
+.statusstrip.hud .ro .val{align-self:flex-start;line-height:18px;font-size:var(--fs-lg);font-weight:var(--fw-bold);font-variant-numeric:tabular-nums}
+.statusstrip.hud .ro .eta{position:absolute;right:var(--sp-3);top:4px}
+.statusstrip.hud .ro .chip{align-self:flex-start}
+.statusstrip.hud .ro>.cell{position:absolute;right:6px;top:6px}
+.statusstrip.hud .ro .rgauge-row{display:flex;align-items:center;gap:4px}
+.statusstrip.hud .ro .rgauge{flex:none}
+.statusstrip.hud .ro.sys{min-width:64px}
+.statusstrip.hud .ro.gpu-meter{flex-direction:row;align-items:center;gap:5px;flex-shrink:0;min-width:82px}
+.statusstrip.hud .meter-caption{display:flex;flex-direction:column;justify-content:center;min-width:0}
+.statusstrip.hud .ro.gpu-meter .lbl,.statusstrip.hud .ro.memory-meter .lbl{font-size:9px;line-height:11px;letter-spacing:.03em;opacity:1}
+.statusstrip.hud .ro.gpu-meter .val,.statusstrip.hud .ro.memory-meter .val{font-size:12px;line-height:15px;font-weight:var(--fw-med)}
+.statusstrip.hud .ro.memory-meter{min-width:100px;flex-shrink:0;gap:2px;padding-top:1px;padding-bottom:2px}
+.statusstrip.hud .memory-meter .meter-caption{flex-direction:row;align-items:baseline;gap:5px}
+.statusstrip.hud .memory-track{display:block;width:100%;height:7px;background:var(--line-2);overflow:hidden;flex-shrink:0}
+.statusstrip.hud .memory-track>span{display:block;height:100%;background:var(--fn-interactive)}
+.statusstrip.hud .memory-track.unavailable{opacity:.45}
+.statusstrip.hud .ro.warn .memory-track>span{background:var(--fn-warn)}
+
+/* ---------- selection brackets (§12.4): four corner brackets in --mp-bracket replace the outline ---------- */
+.blk.sel,.nd.sel,.gnode.sel{box-shadow:none!important;border-color:var(--line-2)!important;outline:none}
+.blk.sel::before,.nd.sel::before,.gnode.sel::before{content:"";position:absolute;inset:-4px;pointer-events:none;z-index:4;
+  --b:var(--bracket);--l:10px;--w:2px;
+  background:
+    linear-gradient(var(--b),var(--b)) top left/var(--l) var(--w),
+    linear-gradient(var(--b),var(--b)) top left/var(--w) var(--l),
+    linear-gradient(var(--b),var(--b)) top right/var(--l) var(--w),
+    linear-gradient(var(--b),var(--b)) top right/var(--w) var(--l),
+    linear-gradient(var(--b),var(--b)) bottom left/var(--l) var(--w),
+    linear-gradient(var(--b),var(--b)) bottom left/var(--w) var(--l),
+    linear-gradient(var(--b),var(--b)) bottom right/var(--l) var(--w),
+    linear-gradient(var(--b),var(--b)) bottom right/var(--w) var(--l);
+  background-repeat:no-repeat}
+.nd.sel,.gnode.sel{position:relative}
+
+/* ---------- diagonal cut (§12.1 --mp-chamfer): a sharp 45° cut, never a radius ---------- */
+.rawbadge,.statusstrip.hud .chip,.frzbadge,.loupe .tag,.cautiontag,.banner .bic{
+  clip-path:polygon(0 0,calc(100% - var(--chamfer)) 0,100% var(--chamfer),100% 100%,0 100%);padding-right:calc(var(--chamfer) + 3px)}
+/* Banners: a solid severity plate (chamfered) + a spine, on the state colours. */
+.banner{border:0;border-left:2px solid currentColor;background:var(--surface-2);gap:var(--sp-2);padding:var(--sp-2) var(--sp-3) var(--sp-2) 0}
+.banner .bic{align-self:stretch;display:flex;align-items:center;padding-left:var(--sp-2);color:var(--txt-on-fill);font-weight:var(--fw-bold)}
+.banner.warn{color:var(--fn-warn)}.banner.warn .bic{background:var(--fn-warn)}
+.banner.err{color:var(--fn-caution)}.banner.err .bic{background:var(--fn-caution)}
+.banner.ok{color:var(--fn-valid)}.banner.ok .bic{background:var(--fn-valid)}
+.banner .bmsg{color:var(--txt-1)}
+
+/* ---------- destructive confirms: the striped caution plate (§12.5) ---------- */
+.sheet.caution{border:1px solid var(--fn-caution);padding-top:0}
+.sheet.caution .cautionband{height:22px;background:var(--hatch);background-color:var(--surface-2);display:flex;align-items:center;border-bottom:1px solid var(--fn-warn)}
+.sheet.caution .cautiontag{background:var(--fn-warn);color:var(--txt-on-fill);font-family:var(--font-ui);font-size:10px;font-weight:var(--fw-bold);letter-spacing:var(--track);line-height:22px;padding-left:var(--sp-3)}
+.sheet.caution .warnicon{color:var(--fn-caution)}
+.sheet.caution .btn.danger{background:var(--surface-3);color:var(--fn-caution);border:1px solid var(--fn-caution)}
+.sheet.caution .btn.danger:hover{background:var(--fn-caution);color:var(--txt-on-fill)}
+
+/* ---------- HUD icons (icon-design-language.md): inline SVG on currentColor ---------- */
+.ico{display:inline-flex;flex:none;vertical-align:-3px}
+.ico svg{width:100%;height:100%;display:block}
+.wsswitch button .ico,.tbtn .ico{margin-right:5px}
+
+/* Icon-led readouts: the glyph sits left of the stacked label/value, in the label's tier. */
+.statusstrip.hud .ro.ic{padding-left:calc(var(--sp-3) + 22px)}
+.statusstrip.hud .ro.ic>.ico{position:absolute;left:var(--sp-3);top:50%;transform:translateY(-50%);color:var(--txt-2)}
+.statusstrip.hud .ro.warn>.ico{color:var(--fn-warn)}.statusstrip.hud .ro.ok>.ico{color:var(--fn-valid)}.statusstrip.hud .ro.live>.ico{color:var(--fn-interactive)}
+
+/* ---------- HOME (ws-home): start · recent projects · workspaces · system ---------- */
+.topbar .homebtn{padding:0 var(--sp-2)}
+.topbar .homebtn.on{color:var(--fn-interactive);box-shadow:inset 0 -2px 0 var(--fn-interactive)}
+.hstart{display:flex;flex-direction:column;gap:var(--sp-2);padding:var(--sp-3)}
+.hact{flex:none;display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3);background:var(--surface-2);border:1px solid var(--line);color:var(--txt-1);text-align:left;cursor:pointer;font:inherit}
+.hact:hover:not(:disabled){background:var(--surface-3);border-color:var(--line-hi)}
+.hact:disabled{opacity:.45;cursor:default}
+.hact span{display:flex;flex-direction:column;min-width:0}
+.hact b{font-family:var(--font-ui);font-size:12px;letter-spacing:var(--track);text-transform:uppercase;font-weight:var(--fw-bold)}
+.hact i{font-style:normal;font-size:var(--fs-micro);color:var(--txt-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hact.hpop{background:var(--fn-interactive);border-color:var(--fn-interactive);color:var(--txt-on-fill)}
+.hact.hpop i{color:var(--txt-on-fill);opacity:.75}
+.hact.hpop:hover{background:var(--fn-interactive-hi)}
+.hplaces{display:flex;flex-direction:column;padding:var(--sp-1) 0;overflow:auto;height:100%}
+.hplace{display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-1) var(--sp-3);background:none;border:0;color:var(--txt-2);font:inherit;text-align:left;cursor:pointer}
+.hplace:hover{background:var(--surface-3);color:var(--txt-1)}
+.hplace .ico{color:var(--fn-info)}
+.hplace .pn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hplace .pstar{color:var(--fn-warn)}
+.hpad{padding:var(--sp-3)}
+.hprojects{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--sp-3);padding:var(--sp-3);overflow:auto;height:100%;align-content:start}
+.hcard{display:flex;flex-direction:column;background:var(--surface-1);border:1px solid var(--line);padding:0;color:var(--txt-1);font:inherit;text-align:left;cursor:pointer;min-width:0}
+.hcard:hover{border-color:var(--line-hi);background:var(--surface-2)}
+.hcard.cur{border-color:var(--fn-interactive)}
+.hcard.bad{cursor:default;opacity:.7}
+.hthumb{position:relative;aspect-ratio:16/9;background:var(--surface-void);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.hthumb .cellthumb{position:absolute;inset:0}
+.hthumb .cellthumb canvas,.hthumb .cellthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.hnothumb{color:var(--txt-3)}
+.hcur,.hmiss{position:absolute;top:var(--sp-2);font-family:var(--font-ui);font-size:9px;letter-spacing:var(--track);font-weight:var(--fw-bold);padding:1px calc(var(--chamfer) + 3px) 1px 5px;clip-path:polygon(0 0,calc(100% - var(--chamfer)) 0,100% var(--chamfer),100% 100%,0 100%)}
+.hcur{left:var(--sp-2);background:var(--fn-interactive);color:var(--txt-on-fill)}
+.hmiss{right:var(--sp-2);background:var(--fn-warn);color:var(--txt-on-fill)}
+.hcmeta{display:flex;flex-direction:column;gap:2px;padding:var(--sp-2) var(--sp-3) var(--sp-3);min-width:0}
+.hcmeta b{font-size:var(--fs-md);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hcmeta>i{font-style:normal;font-size:var(--fs-micro);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hcmeta i.warn{color:var(--fn-warn)}
+.hro{display:flex;align-items:baseline;gap:4px;font-family:var(--font-mono);font-size:11px;color:var(--txt-1)}
+.hro i{font-style:normal;font-family:var(--font-ui);font-size:8px;letter-spacing:var(--track);color:var(--txt-3);margin-left:4px}
+.hro i:first-child{margin-left:0}
+.hjump{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--sp-3);padding:var(--sp-3)}
+.htile{display:flex;flex-direction:column;align-items:flex-start;gap:var(--sp-2);padding:var(--sp-4);background:var(--surface-2);border:1px solid var(--line);border-left:2px solid var(--fn-select);color:var(--txt-1);font:inherit;text-align:left;cursor:pointer;min-width:0}
+.htile:hover:not(:disabled){background:var(--surface-3)}
+.htile:disabled{opacity:.45;cursor:default}
+.htile .ico{color:var(--fn-select)}
+.htl{display:flex;align-items:baseline;gap:var(--sp-2)}
+.htl b{font-family:var(--font-ui);font-size:14px;letter-spacing:var(--track);text-transform:uppercase}
+.htl .k{font-family:var(--font-mono);font-size:10px;color:var(--txt-3)}
+.htile>i{font-style:normal;font-size:var(--fs-micro);color:var(--txt-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.hsys{display:flex;flex-direction:column;padding:var(--sp-2) 0}
+.hsrow{display:grid;grid-template-columns:16px 64px minmax(0,1fr);align-items:center;gap:var(--sp-2);padding:3px var(--sp-3)}
+.hsrow .ico{color:var(--txt-3)}
+.hsrow>i{font-style:normal;font-family:var(--font-ui);font-size:9px;letter-spacing:var(--track);color:var(--txt-3)}
+.hsrow>b{font-family:var(--font-mono);font-size:11px;font-weight:var(--fw-med);color:var(--txt-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hsrow.ok>b,.hsrow.ok .ico{color:var(--fn-valid)}
+.hsrow.warn>b,.hsrow.warn .ico{color:var(--fn-warn)}
+.hchk{cursor:pointer}
+.hchk input{vertical-align:-2px;margin:0 4px 0 0}
+.hkeys{display:flex;flex-direction:column;gap:3px;padding:var(--sp-2) var(--sp-3);overflow:auto;height:100%}
+.hkeys>div{display:grid;grid-template-columns:96px minmax(0,1fr);gap:var(--sp-2);align-items:baseline;font-size:var(--fs-micro);color:var(--txt-2)}
+.hkeys kbd{font-family:var(--font-mono);font-size:10px;color:var(--txt-1);background:var(--surface-3);padding:0 4px;justify-self:start}
+
+/* ---------- Phase E: the timeline kit (§2b) ---------- */
+/* Ticks: three tiers on a ruler band at the top of a track; majors carry a label. */
+.ticks{position:absolute;left:0;right:0;top:0;height:14px;pointer-events:none;z-index:3}
+.ticks .tk{position:absolute;top:0;width:1px;background:var(--txt-3)}
+.ticks .tk.major{height:14px;background:var(--txt-2)}
+.ticks .tk.minor{height:7px;opacity:.8}
+.ticks .tk.fine{height:4px;opacity:.5}
+.ticks .tk.major span{position:absolute;left:3px;top:0;font-family:var(--font-mono);font-size:8px;line-height:10px;color:var(--txt-2);white-space:nowrap;text-shadow:0 0 2px var(--surface-void),0 0 2px var(--surface-void)}
+.ticks.music .tk.major span{font-family:var(--font-ui);font-size:9px;color:var(--fn-warn)}
+.ticks.big{height:16px}.ticks.big .tk.major{height:16px}.ticks.big .tk.minor{height:8px}
+/* IN/OUT: outside dimmed, the range banded, both edges grabbable handles. */
+.mkdim{position:absolute;top:0;bottom:0;background:rgba(8,9,12,.62);pointer-events:none;z-index:1}
+.mkband{position:absolute;top:0;bottom:0;box-shadow:inset 0 2px 0 var(--fn-warn),inset 0 -2px 0 var(--fn-warn);pointer-events:none;z-index:1}
+.mkh{position:absolute;top:0;bottom:0;width:2px;margin-left:-1px;z-index:4;cursor:ew-resize;touch-action:none}
+.mkh::before{content:"";position:absolute;top:0;bottom:0;left:-6px;right:-6px}
+.mkh.in{background:var(--ident-io)}.mkh.out{background:var(--ident-io)}
+.mkh:hover,.dragging-mark .mkh{box-shadow:0 0 0 1px var(--txt-1)}
+.mkh .flag{position:absolute;bottom:2px;font-family:var(--font-ui);font-size:8px;letter-spacing:var(--track);padding:1px calc(var(--chamfer) + 2px) 1px 4px;color:var(--txt-on-fill);white-space:nowrap;clip-path:polygon(0 0,calc(100% - var(--chamfer)) 0,100% var(--chamfer),100% 100%,0 100%)}
+.mkh.in .flag{left:2px;background:var(--surface-1);color:var(--ident-io);box-shadow:inset 0 0 0 1px var(--ident-io)}
+.mkh.out .flag{right:2px;background:var(--ident-io)}
+body.dragging-mark,body.dragging-mark *{cursor:ew-resize!important;user-select:none!important}
+/* Zoom navigator: the whole length; the window is the view (drag = pan, edges = zoom). */
+.zoomnav{position:relative;height:14px;margin-top:3px;background:var(--surface-1);border:1px solid var(--line);cursor:pointer;touch-action:none;flex:1;min-width:0}
+.zoomnav .znwin{position:absolute;top:0;bottom:0;background:rgba(194,242,61,.14);border:1px solid var(--fn-interactive-dim);cursor:grab;min-width:6px}
+.zoomnav .znwin:active{cursor:grabbing}
+.zoomnav .znh{position:absolute;top:-1px;bottom:-1px;width:6px;background:var(--fn-interactive-dim);cursor:ew-resize}
+.zoomnav .znh.l{left:-3px}.zoomnav .znh.r{right:-3px}
+.zoomnav .znh:hover{background:var(--fn-interactive)}
+.zoomnav .znmark{position:absolute;top:3px;bottom:3px;background:rgba(226,178,74,.45);pointer-events:none}
+.zoomnav .znchap{position:absolute;top:0;bottom:0;width:1px;background:var(--fn-select);opacity:.7;pointer-events:none}
+.zoomnav .znph{position:absolute;top:-1px;bottom:-1px;width:2px;margin-left:-1px;background:var(--fn-warn);pointer-events:none;z-index:2}
+.zoomnav .znblk{position:absolute;top:2px;bottom:2px;border-right:1px solid var(--surface-void);pointer-events:none}
+.zoomnav .znblk.pic{background:var(--fn-info);opacity:.5}.zoomnav .znblk.mot{background:var(--fn-select);opacity:.5}
+.zoomnav .znblk.cur{opacity:.95}
+.zbtns{display:inline-flex;gap:2px;align-items:center}
+.zbtns button{width:20px;height:18px;border:1px solid var(--line);background:var(--surface-2);border-radius:0;color:var(--txt-2);font-size:11px;line-height:1;cursor:pointer}
+.zbtns button:hover{background:var(--surface-3);color:var(--txt-1)}
+.zbtns .zx{font-family:var(--font-mono);font-size:9px;color:var(--txt-3);min-width:30px;text-align:right}
+/* Per-clip slicing timeline (Compose loupes). */
+.clipzoom .zhead{gap:var(--sp-2)}
+.clipzoom .ztools{display:inline-flex;gap:3px;align-items:center}
+.clipzoom .ztools .tbtn{height:18px;padding:0 5px;font-size:9px;display:inline-flex;align-items:center;gap:2px}
+.ztrack{height:46px;border-radius:0}
+.ztrack .thumbs{top:14px}
+.ztrack .zchap{position:absolute;top:14px;bottom:0;width:1px;background:var(--fn-select);z-index:2;pointer-events:none}
+.ztrack .zph{z-index:5;pointer-events:none}
+.loupe.target{box-shadow:inset 0 2px 0 var(--fn-interactive)}
+.loupe .tag.slicing{background:var(--fn-interactive);color:var(--txt-on-fill);font-family:var(--font-ui);letter-spacing:var(--track)}
+.seg.sliceab{display:inline-flex}
+.seg.sliceab button{min-width:22px}
+/* Slice track (Source big preview, Compose pane 2). */
+.scrub{border-radius:0}
+.scrub .wave{top:calc(50% + 7px)}
+.scrub .chaplayer{top:16px}
+.scrub .ph{z-index:5}
+.slicenav{display:flex;gap:var(--sp-2);align-items:center;margin-top:3px}
+.slicenav .zoomnav{margin-top:0}
+/* Arrangement: a zoomed inner strip under a fixed ruler, navigator below. */
+.tlview{position:relative;overflow:hidden}
+.tl .bpmruler{height:18px}
+.tlinner{will-change:transform}
+.tl .tlinner .track{overflow:visible}
+.tlnav{display:flex;gap:var(--sp-2);align-items:center;margin:3px 0 var(--sp-1)}
+.tlnav .zoomnav{margin-top:0}
+
+/* Panel resize handles (Phase E "easy resize"): a visible grip, a wider grab zone, pop on hover/drag. */
+.vsplit::before,.stacksplit.h::before{left:-4px;right:-4px}
+.hsplit::before,.stacksplit:not(.h)::before{top:-4px;bottom:-4px}
+.vsplit::after,.hsplit::after,.stacksplit::after{content:"";position:absolute;background:var(--line-hi);opacity:.55;pointer-events:none}
+.vsplit::after,.stacksplit.h::after{top:50%;left:50%;width:2px;height:28px;transform:translate(-50%,-50%)}
+.hsplit::after,.stacksplit:not(.h)::after{top:50%;left:50%;height:2px;width:28px;transform:translate(-50%,-50%)}
+.vsplit:hover,.hsplit:hover,.stacksplit:hover,.vsplit:active,.hsplit:active,.stacksplit:active{background:var(--fn-interactive-dim)}
+.vsplit:hover::after,.hsplit:hover::after,.stacksplit:hover::after,.vsplit:active::after,.hsplit:active::after,.stacksplit:active::after{background:var(--fn-interactive);opacity:1}
+
+/* Status strip: the ETA sits after the value on the value row (it used to float over the label: "ETA 4s" on "89%"). */
+.statusstrip.hud .ro .val .eta{position:static;margin-left:6px;font-size:9px;font-weight:var(--fw-reg);color:var(--txt-3);vertical-align:1px}
+
+/* Quick render (top bar): the decision colour; while running its face fills with progress. */
+.quickbtn{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;margin:0 6px;border:0;border-radius:0;cursor:pointer;font-family:var(--font-ui);font-size:11px;letter-spacing:var(--track);text-transform:uppercase;font-weight:var(--fw-bold);background:var(--fn-interactive);color:var(--txt-on-fill);white-space:nowrap;flex:none}
+.quickbtn:hover:not(:disabled){background:var(--fn-interactive-hi)}
+.quickbtn:disabled{background:var(--surface-3);color:var(--txt-3);cursor:default}
+.quickbtn.busy{background:var(--surface-3) linear-gradient(var(--fn-interactive-dim),var(--fn-interactive-dim)) no-repeat left/0% 100%;color:var(--txt-1)}
+.quickov{position:fixed;inset:0;z-index:250;background:rgba(5,6,9,.78);display:flex;align-items:center;justify-content:center}
+.quickbox{width:min(1040px,92vw);background:var(--surface-1);border:1px solid var(--line-hi)}
+.quickhd{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-2) var(--sp-3);border-bottom:1px solid var(--line)}
+.quickhd b{font-family:var(--font-ui);letter-spacing:var(--track);text-transform:uppercase;font-size:11px}
+.quickhd .dim{font-size:var(--fs-micro);flex:1}
+.quickhd .x{background:none;border:0;color:var(--txt-2);cursor:pointer;font-size:14px}
+.quickbox video{display:block;width:100%;aspect-ratio:16/9;background:var(--surface-void)}
+
+/* Render stages (P0 #2): the stage is the feedback. Done segments solid, the current one lit and
+   filling with its real fraction, or striped and moving where nothing is measurable. Never empty. */
+.stagebar{display:flex;gap:2px;width:100%;min-width:180px}
+.stagebar .stg{position:relative;flex:1;height:16px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.stagebar .stg i{position:relative;z-index:1;display:block;font-style:normal;font-family:var(--font-ui);font-size:8px;letter-spacing:var(--track);text-transform:uppercase;line-height:14px;padding-left:4px;color:var(--txt-3);white-space:nowrap}
+.stagebar .stg .sfill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--fn-interactive-dim)}
+.stagebar .stg.done{border-color:var(--fn-valid)}
+.stagebar .stg.done .sfill{width:100%;background:color-mix(in srgb,var(--fn-valid) 45%,transparent)}
+.stagebar .stg.done i{color:var(--txt-1)}
+.stagebar .stg.cur{border-color:var(--fn-interactive)}
+.stagebar .stg.cur i{color:var(--txt-1)}
+.stagebar .stg.indet .sfill{width:100%;background:repeating-linear-gradient(-45deg,color-mix(in srgb,var(--fn-interactive) 40%,transparent) 0 6px,transparent 6px 12px);background-size:17px 17px;animation:stgmove .8s linear infinite}
+@keyframes stgmove{to{background-position:17px 0}}
+
+/* Source: the selection readout and Send buttons (Browse → Mark → Send). */
+.sendbtns{display:inline-flex;gap:4px;align-items:center}
+.selread{display:flex;gap:var(--sp-4);align-items:baseline;flex-wrap:wrap;width:100%;padding:var(--sp-1) 0}
+.selread span{display:inline-flex;gap:6px;align-items:baseline}
+.selread i{font-style:normal;font-family:var(--font-ui);font-size:9px;letter-spacing:var(--track);color:var(--txt-3)}
+.selread b{font-family:var(--font-mono);font-size:12px;color:var(--txt-1)}
+.selread em{font-style:normal;font-family:var(--font-mono);font-size:10px;color:var(--txt-2)}
+.selread .on b{color:var(--fn-warn)}
+.selread .none b{color:var(--txt-3)}
+
+/* ---------- Pane chrome, lean (Waxy): 20px headers, no ⓘ / pop-out, help on title hover ---------- */
+.card>.hd{gap:var(--sp-1)}
+.card>.hd .built{display:none}
+.card>.hd .ttl{font-size:10px}
+.card>.hd button,.card>.hd .ghostbtn,.card>.hd .pop,.card>.hd .seg button{height:16px;line-height:14px;font-size:10px;padding:0 6px}
+.card>.hd .panetools button{width:16px;height:16px;padding:0}
+.card>.hd .grab{cursor:help}
+.card>.hd .grab:active{cursor:grabbing}
+.ptabs button{height:var(--header-h);font-size:10px}
+
+/* ================= Restructure v2 (Compose, Source, Render, strip) ================= */
+/* Numbered workspace tabs */
+.wsswitch .stepno{font-family:var(--font-mono);font-size:12px;margin-right:4px;color:var(--txt-3)}
+.wsswitch button.on .stepno{color:var(--fn-interactive)}
+/* Status strip: the purpose line + Next, then jobs and gauges */
+.statusstrip.hud .purpose{flex:0 1 auto;min-width:0;align-self:center;padding:0 var(--sp-3);font-size:var(--fs-sm);color:var(--txt-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nextbtn{flex:none;align-self:center;height:22px;padding:0 10px;border:1px solid var(--fn-interactive-dim);background:transparent;color:var(--fn-interactive);font-family:var(--font-ui);font-size:10px;letter-spacing:var(--track);text-transform:uppercase;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.nextbtn:hover:not(:disabled){background:var(--fn-interactive);color:var(--txt-on-fill)}
+.nextbtn:disabled{border-color:var(--line-2);color:var(--txt-3);cursor:default}
+.nextbtn i{font-style:normal;font-family:var(--font-ui);text-transform:none;letter-spacing:0;color:var(--txt-3)}
+/* A/B slots: two slots stacked, each frame + slicing timeline, filling the pane */
+.slots{display:flex;flex-direction:column;gap:1px;height:100%;background:var(--line)}
+.slots .slot{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:var(--sp-1);padding:var(--sp-2);background:var(--surface-1);overflow:hidden}
+.slots .slot>*{flex:0 0 auto}
+.slots .slot .lbl{display:flex;gap:var(--sp-2);align-items:center;margin:0;font-size:11px}
+.slots .slot .lbl b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slots .slot>.frameview.slotframe{flex:1 1 0;min-height:40px;width:100%;aspect-ratio:auto;margin:0;background:#000;border:1px solid var(--line)}
+.slots .slot .clipzoom{margin-top:0}
+.slots .slot .clipzoom .zhead{flex-wrap:wrap;row-gap:2px}
+.slots .slot .zmeta{flex-wrap:wrap;row-gap:0}
+.slots .slot.empty{justify-content:center}
+/* Program preview: transport on top, the output filling the rest */
+.program{display:flex;flex-direction:column;height:100%;min-height:0}
+.ptransport{flex:none;display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-1) var(--sp-2);border-bottom:1px solid var(--line);background:var(--surface-2);flex-wrap:wrap;row-gap:4px}
+.ptransport .tbtn{height:24px}
+.ptransport .tbtn.on{color:var(--fn-interactive);border-color:var(--fn-interactive)}
+.ptransport .tro{display:inline-flex;align-items:baseline;gap:4px}
+.ptransport .tro i{font-style:normal;font-family:var(--font-ui);font-size:9px;letter-spacing:var(--track);color:var(--txt-3)}
+.ptransport .tro b{font-family:var(--font-mono);font-size:13px;font-weight:var(--fw-med)}
+.ptransport .tro em{font-style:normal;font-family:var(--font-mono);font-size:10px;color:var(--txt-3)}
+.ptransport .chip{font-family:var(--font-mono);font-size:10px;font-weight:var(--fw-bold);padding:0 calc(var(--chamfer) + 3px) 0 5px;line-height:16px;clip-path:polygon(0 0,calc(100% - var(--chamfer)) 0,100% var(--chamfer),100% 100%,0 100%)}
+.ptransport .chip.ok{background:var(--fn-valid);color:var(--txt-on-fill)}
+.ptransport .chip.warn{background:var(--fn-warn);color:var(--txt-on-fill)}
+.ptransport .chip.idle{border:1px solid var(--line-2);color:var(--txt-3)}
+.program>.pvcard{flex:1 1 0;min-height:0;display:flex;padding:var(--sp-2)}
+.program>.pvcard>.frameview{flex:1;min-height:0;width:100%;aspect-ratio:auto;max-height:none;margin:0;background:#000}
+.previewsel{display:inline-flex;gap:6px;align-items:center}
+.previewsel .quickbtn{height:24px;margin:0}
+.previewsel .seg button{height:22px;padding:0 8px;font-size:10px}
+.modeseg button{min-width:58px}
+/* Arrangement fills its pane: lanes stretch, the toolbar docks at the bottom */
+.tl{display:flex;flex-direction:column;height:100%;min-height:0}
+.tl>.tlview{flex:1 1 0;min-height:64px;display:flex;flex-direction:column}
+.tl .tlinner{flex:1 1 0;min-height:0;display:flex}
+.tl .tlinner .track{flex:1;height:100%;padding-bottom:0}
+.tl .blk{display:flex;flex-direction:column;justify-content:flex-start}
+.tl>.tlnav,.tl>.bpm{flex:none}
+/* Node graph in Compose */
+.ws-mosh .canvaspane{position:relative;height:100%;min-height:0}
+.ws-mosh .canvaspane .react-flow{height:100%}
+/* Inspector: Block · Effect · Output */
+.itabs{display:flex;flex-direction:column;height:100%;min-height:0}
+.itabbar{flex:none;display:flex;align-items:stretch;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.itabbar button{border:0;background:transparent;color:var(--txt-2);font-family:var(--font-ui);font-size:10px;letter-spacing:var(--track);text-transform:uppercase;padding:0 12px;height:24px;cursor:pointer;border-bottom:2px solid transparent}
+.itabbar button.on{color:var(--txt-1);border-bottom-color:var(--fn-interactive)}
+.itabctx{margin-left:auto;align-self:center;padding-right:8px;font-size:var(--fs-micro);color:var(--txt-3)}
+.itabbody{flex:1 1 0;min-height:0;overflow:auto}
+.blocktab,.effecttab,.outputtab{display:flex;flex-direction:column;gap:var(--sp-3);padding:var(--sp-3)}
+.srcrange{display:flex;flex-direction:column;gap:2px;padding:var(--sp-2);border:1px solid var(--line);background:var(--surface-2)}
+.srcrange i{font-style:normal;font-family:var(--font-ui);font-size:9px;letter-spacing:var(--track);color:var(--txt-3)}
+.srcrange b{font-size:var(--fs-md)}
+.srcrange .m{font-family:var(--font-mono);font-size:11px;color:var(--fn-warn)}
+.blocktab .blockprops{flex-wrap:wrap;row-gap:6px;padding:0;border:0;background:none}
+.blockacts,.effacts{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.effrecipes .reclist{max-height:none}
+.effrecipes .recipe{padding:4px 6px}
+.effecttab .inspector-body{border-top:1px solid var(--line);padding-top:var(--sp-2)}
+.outputtab .exprow{flex-direction:column;align-items:stretch}
+/* History drawer reuses the add-effect drawer's frame */
+.historydrawer .history{padding:var(--sp-2)}
+/* Source: the selection column */
+.convbar .sendbtns{flex-wrap:wrap;row-gap:4px}
+/* Render: the settings column holds the export form vertically */
+.ws-render .exprow{flex-direction:column;align-items:stretch}
+/* Source's Selection pane: the readout and Send first, the conform settings after. */
+.convbar .selread{order:-2}
+.convbar .sendbtns{order:-1}
+/* Render: the main action at the top of the settings column, never below the fold */
+.ws-render .exprow .btn-run{order:-1;align-self:stretch;height:32px;font-size:12px}
+/* A short arrangement (Process mode, small windows) drops its footer row instead of overlapping. */
+.tl{container-type:size;overflow:hidden}
+/* Shorter arrangement (presentation pass): the footer — BPM, grid, length — stays until the lane is truly cramped. */
+@container (max-height:80px){.tl>.bpm{display:none}}
+.exprow .fld.small{align-self:flex-start}
+/* F1: arrangement edge trim (UX round 2) */
+.tl .blk .trimh{position:absolute;top:0;bottom:0;width:7px;cursor:ew-resize;z-index:3}
+.tl .blk .trimh.l{left:-1px}
+.tl .blk .trimh.r{right:-1px}
+.tl .blk:hover .trimh,.tl .blk .trimh:active{background:color-mix(in srgb,var(--txt-1) 22%,transparent)}
+.blocktrim,.blockplay{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:6px 0}
+.blocktrim>i,.blockplay>i{font-style:normal;font-size:9px;letter-spacing:.4px;color:var(--txt-3,var(--txt-3));width:100%}
+.blocktrim .npm,.blockplay .npm{min-width:150px;flex:1 1 150px}
+.blocktrim .m,.blockplay .m{font-size:10px;color:var(--txt-3);width:100%}

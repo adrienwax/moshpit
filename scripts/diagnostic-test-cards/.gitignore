@@ -1,0 +1,7 @@
+*.mp4
+*.png
+*.jpg
+*-hashes.json
+*-decoded-hashes.json
+generation-info.json
+__pycache__/

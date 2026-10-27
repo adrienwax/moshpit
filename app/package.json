@@ -1,0 +1,25 @@
+{
+  "name": "@moshpit/app",
+  "version": "3.2.0-codex.11",
+  "private": true,
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@xyflow/react": "^12.12.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0"
+  },
+  "scripts": {
+    "dev": "node build.mjs dev",
+    "web": "node ../scripts/run-tool.mjs vite --config app/vite.config.mts --configLoader runner",
+    "build": "node build.mjs",
+    "pack": "node pack.mjs",
+    "start": "node build.mjs start",
+    "test": "node ../scripts/run-tool.mjs vitest run --config app/vitest.config.mjs --configLoader runner"
+  },
+  "main": "dist/main.cjs"
+}

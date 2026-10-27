@@ -1,0 +1,7 @@
+.mkrange{position:absolute;bottom:1px;height:15px;transform:translateX(-50%);z-index:3;border:1px solid var(--line-2);border-radius:3px;padding:0;background:var(--surface-2);color:var(--txt-2);cursor:grab;touch-action:none;line-height:12px;max-width:calc(100% - 4px)}
+.mkrange:hover,.mkrange:focus-visible{color:var(--txt-1);border-color:var(--fn-interactive);outline:none}
+.mkrange>span{pointer-events:none}
+body.dragging-range,body.dragging-range *{cursor:grabbing!important;user-select:none!important}
+/* A separate bottom grip lane leaves endpoint hit targets available even for a single frame. */
+:is(.scrub,.ztrack):has(.mkrange) .mkh,:is(.scrub,.ztrack):has(.mkrange) .mkband,:is(.scrub,.ztrack):has(.mkrange) .mkdim{bottom:18px}
+.scrub:has(.mkrange) .ph{pointer-events:none}

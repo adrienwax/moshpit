@@ -1,0 +1,111 @@
+/* Focused A candidate: same image box and transport position in IN, MOSH and OUT.
+   Fit/Fill changes image geometry inside this box, never the surrounding controls. */
+.wsview{--main-picture-height:clamp(130px,calc((100vh / var(--ui-zoom,1) - 260px) * .52),460px)}
+.focused-program{overflow:auto}
+.focused-program>.program-monitors,.source-picture{height:var(--main-picture-height);min-height:var(--main-picture-height);flex:0 0 var(--main-picture-height);padding:4px;box-sizing:border-box}
+.source-picture{display:flex}
+.source-picture>.es-viewer{width:100%;min-width:0}
+.source-preview.fitpane{overflow:auto}
+.source-preview.fitpane>.scopestrip{display:none} /* Shared top-bar scopes remain available. */
+.source-preview .es-viewer-picture>.frameview{position:absolute;inset:0;width:100%;height:100%;max-height:none;margin:0;aspect-ratio:auto}
+.source-preview .es-viewer-picture canvas{object-fit:contain}
+.source-preview .slicefoot{flex-wrap:wrap}
+.preview-source-title{font-size:12px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:50%}
+.program-options{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 10px;border-top:1px solid var(--line);font-size:11px}
+.program-options .preview-quality{margin-left:auto}
+.program-options .preview-resolution{margin-left:0}
+.source-tools{padding:0 10px 8px}
+.source-tools>summary,.prepare-media>summary,.folder-index>summary{cursor:pointer;color:var(--txt-2);padding:7px 0;font-size:11px}
+.source-tools .transport{flex-wrap:wrap}
+.source-mark-actions{display:flex;align-items:center;gap:6px;padding:6px 10px;flex-wrap:wrap}
+.source-mark-actions .tbtn{min-height:28px}
+.source-mark-actions .snappick{margin-left:auto}
+.prepare-media{width:100%;border-top:1px solid var(--line);margin-top:8px}
+.prepare-media-body{display:flex;flex-wrap:wrap;gap:8px}
+.convbar>.selection-summary{width:100%}
+.convbar>.sendbtns{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;margin:6px 0}
+.convbar>.sendbtns>.add-range{grid-column:1/-1;grid-row:1;min-height:36px;font-size:12px}
+.convbar>.sendbtns>button{min-height:30px;white-space:normal}
+.convbar>.sendbtns>.select-entire{grid-column:1/-1}
+.folder-index{border-top:1px solid var(--line);padding:0 6px}
+.browse-folder-navigation{max-height:35%}
+.ws-browse .wcol[data-col="browser"] .places{max-height:150px;overflow:auto}
+.ws-mosh .program .pvcard{flex:1 1 0}
+.focused-program .auditionbar{flex:none}
+@media(max-width:1200px){
+  .ws-browse .wcol[data-col="browser"],.ws-mosh .wcol[data-col="dock"],.ws-render .wcol[data-col="settings"]{flex-basis:240px!important}
+  .ws-browse .wcol[data-col="clip"],.ws-mosh .wcol[data-col="inspect"],.ws-render .wcol[data-col="jobs"]{flex-basis:260px!important}
+}
+
+.capture-tools{width:100%;min-width:0}
+.capture-tools>summary{cursor:pointer;font-size:11px;color:var(--txt-2)}
+.capture-tools .previewsel{flex-wrap:wrap;white-space:normal}
+.wsview .ws-browse .wcol[data-col="browser"],.wsview .ws-browse .wcol[data-col="clip"]{max-width:none}
+
+.ws-mosh .wcol[data-col="dock"],.ws-mosh .wcol[data-col="inspect"]{max-width:none;min-width:160px}
+.convbar>.selection-summary{order:-3;font-size:13px;overflow-wrap:anywhere}
+.preview-counters .timecode{font-size:inherit}
+.program-options .capture-tools .previewsel{display:flex;gap:6px;flex-wrap:wrap;white-space:normal;min-width:0}
+
+.focused-graph-workspace{display:grid;grid-template-columns:300px minmax(0,1fr) 320px;gap:4px;flex:1;min-height:0;min-width:0}
+.focused-graph-library{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;border:1px solid var(--line)}
+.focused-graph-library>header{flex:none}
+.focused-graph-library-content{flex:1;min-height:0;overflow:auto}
+.focused-graph-main{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:auto;border:1px solid var(--line)}
+.focused-graph-preview{flex:none;min-width:0}
+.focused-graph-preview>.focused-program{height:auto;overflow:visible}
+.focused-graph-preview>header,.focused-graph-library>header{height:20px;box-sizing:border-box;padding:3px 7px;font:600 11px var(--font-ui);text-transform:uppercase;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.focused-graph-canvas{flex:1;min-height:120px;position:relative}
+.focused-graph-main>.graphbar{flex:none;flex-wrap:wrap;height:auto;padding:4px;gap:4px}
+.focused-graph-main .graph-levels button{min-height:28px}
+@media(max-width:1200px){.focused-graph-workspace{grid-template-columns:240px minmax(0,1fr) 260px}}
+
+.expanded-overview .focused-graph-preview{display:none}
+
+.focused-graph-workspace{gap:2px}
+.focused-graph-preview>header,.focused-graph-library>header{height:22px}
+.focused-graph-canvas>.composition-canvas{min-height:0}
+
+.source-preview>.slicebar{padding:0}
+
+.viewer-mode{display:flex;align-items:center;gap:6px;padding:4px 8px;flex:none;font-size:10px}
+.viewer-mode button,.viewer-activate{font-size:11px;min-height:25px}
+.viewer-mode [aria-pressed=true]{color:var(--fn-interactive);border-color:var(--fn-interactive)}
+.program-monitor.controlled{outline:1px solid var(--fn-interactive);outline-offset:-1px}
+
+/* Docked desk: monitor, instrument console and source/edit tools form one bounded editor. */
+.ws-mosh .docked-program{overflow:auto;background:var(--surface-1)}
+.ws-mosh .docked-program>.program-monitors{flex:1 1 180px;height:auto;min-height:120px;padding:0;border-bottom:1px solid var(--line)}
+.ws-mosh .docked-program .preview-transport{display:grid;grid-template-columns:1fr;grid-template-areas:"target" "counters" "buttons" "seek" "detail";gap:0;padding:3px 8px 2px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.ws-mosh .preview-target{grid-area:target;min-height:16px;font-size:10px}
+.ws-mosh .preview-counters{grid-area:counters;gap:12px;min-height:24px;padding:2px 0;border-bottom:1px solid var(--line)}
+.ws-mosh .preview-counters b{font-size:16px}
+.ws-mosh .preview-buttons{grid-area:buttons;gap:1px;margin:2px 0}
+.ws-mosh .preview-buttons>button{min-height:28px;min-width:36px;padding:3px 6px;flex-direction:row;gap:3px}
+.ws-mosh .preview-buttons>button.preview-play{min-height:30px;min-width:72px}
+.ws-mosh .preview-buttons>button .ico{width:14px!important;height:14px!important}
+.ws-mosh .preview-seek-lane{grid-area:seek;background:var(--surface-1);border:1px solid var(--line)}
+.ws-mosh .preview-seek{height:16px;margin:0}
+.ws-mosh .preview-detail{grid-area:detail;margin:1px 0;font-size:9px}
+.ws-mosh .program-options{flex:none;padding:3px 8px;gap:6px;background:var(--surface-2);font-size:10px;align-items:center}
+.ws-mosh .program-options .preview-quality{margin-left:auto}
+.ws-mosh .capture-tools{width:auto;min-width:0;flex:1 1 150px}
+.ws-mosh .capture-tools>summary{padding:2px 0;font-size:10px}
+.ws-mosh .capture-tools[open]{flex-basis:100%}
+.ws-mosh .program-options .previewsel{max-width:100%;flex-wrap:wrap}
+.ws-mosh .source-desk{flex:none;border-bottom:1px solid var(--line);background:var(--surface-1);padding:3px 8px}
+.source-desk-tools{display:flex;align-items:center;flex-wrap:wrap;gap:5px;min-height:24px;font-size:10px}
+.source-desk-tools button{min-height:24px;display:inline-flex;align-items:center;gap:3px}
+.source-desk-tools .snappick{margin-left:auto}
+.compact-source-range.clipzoom{margin:0}
+.compact-source-range .zhead{margin-bottom:2px;flex-wrap:wrap;gap:4px}
+.compact-source-range .ztrack{height:28px}
+.compact-source-range .zmeta{flex-wrap:wrap;gap:2px 8px}
+.compact-source-range .ztools .tbtn{min-height:24px;font-size:10px}
+.starting-recipes{border-top:1px solid var(--line);margin-top:6px}
+.starting-recipes>summary{padding:8px;cursor:pointer;font-size:11px}
+.ws-mosh .effecttab>.inspector-body{flex:none}
+.ws-mosh .viewer-mode{padding:3px 5px;border-bottom:1px solid var(--line)}
+@media(max-width:1100px){.ws-mosh .wcol[data-col="dock"]{flex-basis:190px!important}.ws-mosh .wcol[data-col="inspect"]{flex-basis:240px!important}.ws-mosh .preview-counters{gap:7px}.ws-mosh .preview-counters b{font-size:14px}.ws-mosh .preview-counters em{font-size:10px}.ws-mosh .program-options .preview-quality{margin-left:0}}
+
+.ws-mosh .bgroup{flex-wrap:wrap;gap:4px}

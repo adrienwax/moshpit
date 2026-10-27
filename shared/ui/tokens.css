@@ -1,0 +1,120 @@
+/* Waxy Suite design tokens: the single source of truth (DESIGN-SYSTEM.md beside this file, v1.1).
+   Moshpit imports this file; CT and ATLAS reference it. Components name these tokens, never a colour
+   value: scripts/check-colour-tokens.mjs blocks new colour literals outside this file.
+   Layer 0 primitives (--p-*) → Layer 1 function (--fn-*) → components. A theme remaps Layer 0 + 1
+   only. Themes apply on :root and on any element carrying data-theme, so a Settings swatch previews
+   its theme. Crimson is caution only (D1): destructive, error, alert and armed all resolve to
+   --fn-caution, and no other red-family hue is defined. */
+
+:root,[data-theme]{
+  /* ---- SURFACES (theme-independent) ---- */
+  --surface-void:#08090c; --surface-bg:#0c0e13;
+  --surface-1:#12141b; --surface-2:#191c25; --surface-3:#22262f; --surface-3-hi:#2b303b;
+  /* ---- TEXT (theme-independent, all AA+) ---- */
+  --txt-1:#f2f4f8; --txt-2:#b4bdcc; --txt-3:#828d9f; --txt-on-fill:#0b0d11;
+  /* ---- DATA DOMAIN (node graph only) ---- */
+  --dom-enc:#d99a3c; --dom-pix:#4bb8c9; --dom-ctl:#8b98a5;
+  /* ---- LINES / TICKS / GEOMETRY ---- */
+  --line:#262b36; --line-2:#333a47; --line-hi:#465061;
+  --tick-major:#465061; --tick-minor:#333a47; --tick-sub:#262b36; --graticule:#1d212b;
+  --r:0px; --chamfer:6px;
+  /* ---- TYPE ---- */
+  --font-ui:"Inter Variable","Inter","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"JetBrains Mono Variable","JetBrains Mono",ui-monospace,monospace;
+  /* ---- DENSITY (4px base) ---- */
+  --sp-0:2px; --sp-1:4px; --sp-2:6px; --sp-3:8px; --sp-4:12px; --sp-5:16px; --sp-6:24px;
+  --header-h:20px; --row-h:26px; --ctl-h:22px;
+  /* ---- TYPE SCALE, WEIGHTS, TRACKING (§5) ---- */
+  --fs-micro:10px; --fs-sm:11px; --fs-base:12px; --fs-md:13px; --fs-lg:15px;
+  --fw-reg:450; --fw-med:550; --fw-bold:650; --track:0.08em;
+  /* ---- HUD furniture (§6) ---- */
+  --gutter:1px; --readout-h:34px; --gauge-stroke:2px; --bracket:#5bb8f0;
+  --hatch:repeating-linear-gradient(45deg,#e8b43f 0 2px,transparent 2px 6px);
+  /* ---- function rungs: hover and dimmed fills ---- */
+  --fn-interactive-hi:color-mix(in srgb,var(--fn-interactive) 80%,white);
+  --fn-interactive-dim:color-mix(in srgb,var(--fn-interactive) 60%,var(--surface-1));
+  --fn-select-hi:color-mix(in srgb,var(--fn-select) 80%,white);
+  /* ---- placeholder thumbnail art only (Browse .fA, .fmosh): the old coral, kept verbatim. Imagery,
+     not UI state; policy-partial pending an owner art palette. IN markers and motion blocks no longer
+     use it (R2: --fn-select and --dom-enc, pending owner sign-off). ---- */
+  --legacy-coral-a30:rgba(232,120,90,.3); --legacy-coral-a55:rgba(232,120,90,.55);
+  /* ---- scope panel traces (the scope panel declares --scope-trace-* from these; data colours) ---- */
+  --scope-panel-r:#f46c73; --scope-panel-g:#57cd8a; --scope-panel-b:#65a5f6;
+  /* ---- IDENTITY: IN/OUT range marks (owner decision 2026-10-12): purple, distinct from cyan
+     select/focus and teal commit; markers and flags only, the range band stays --fn-select ---- */
+  --ident-io:#b18cff;
+  /* ---- COMMIT (D1): teal in every theme; crimson is never a commit colour ---- */
+  --p-teal:#58cbbb;
+  /* ---- CATEGORY (node families, effect catalogue; palette and header strip only, §4) ----
+     No red-family hue: Decay & Corrupt / Degrade moved off the old salmon to chartreuse (MA8). */
+  --cat-melt:#e8b363; --cat-fracture:#72c9d6; --cat-stutter:#bba2ed; --cat-decay:#c5d468;
+  --cat-echo:#8dcda8; --cat-colour:#e5a2cc; --cat-utility:#aeb9c8;
+  /* ---- caution stripe (destructive only, §6.4) ---- */
+  --stripe:repeating-linear-gradient(45deg,var(--fn-destructive) 0 2px,transparent 2px 6px);
+}
+
+/* 1 · HUD (default) — Layer 0 + 1 */
+:root,[data-theme="hud"]{
+  --p-cyan:#3fe0f2; --p-crimson:#ff2e55; --p-amber:#ffb000; --p-green:#35e07a;
+  --fn-interactive:var(--p-cyan); --fn-select:var(--p-cyan); --fn-focus:var(--p-cyan);
+  --fn-commit:var(--p-teal); --fn-caution:var(--p-crimson);
+  --fn-transient:var(--p-amber); --fn-warn:var(--p-amber);
+  --fn-valid:var(--p-green); --fn-info:var(--p-cyan);
+  --fn-destructive:var(--fn-caution); --fn-error:var(--fn-caution); --fn-alert:var(--fn-caution); --fn-rec:var(--fn-caution);
+  --fn-disabled-bg:var(--surface-2); --fn-disabled-fg:var(--txt-3);
+}
+/* 2 · STUDIO */
+[data-theme="studio"]{
+  --p-violet:#8c83ff; --p-blue:#2dadf0; --p-amber:#e3ac55; --p-green:#48c5a2; --p-red:#e45b65;
+  --fn-interactive:var(--p-violet); --fn-select:var(--p-violet); --fn-focus:var(--p-violet);
+  --fn-commit:var(--p-teal); --fn-caution:var(--p-red);
+  --fn-transient:var(--p-amber); --fn-warn:var(--p-amber);
+  --fn-valid:var(--p-green); --fn-info:var(--p-blue);
+  /* studio selects in violet: IN/OUT moves to orchid so marks never read as selection */
+  --ident-io:#d58cf0;
+  --fn-destructive:var(--fn-caution); --fn-error:var(--fn-caution); --fn-alert:var(--fn-caution); --fn-rec:var(--fn-caution);
+}
+/* 3 · HERITAGE / MŒBIUS (§11.1 recommendation): coral builds and selects, acid-lime commits,
+   the house states as before. */
+[data-theme="heritage"]{
+  --p-coral:#f08a63; --p-lime:#c2f23d; --p-amber:#e8b43f; --p-green:#4fd08a; --p-red:#ff5d52; --p-sky:#5bb8f0;
+  --fn-interactive:var(--p-coral); --fn-select:var(--p-coral); --fn-focus:var(--p-coral);
+  --fn-commit:var(--p-teal); --fn-caution:var(--p-red);
+  --fn-transient:var(--p-amber); --fn-warn:var(--p-amber);
+  --fn-valid:var(--p-green); --fn-info:var(--p-sky);
+  --fn-destructive:var(--fn-caution); --fn-error:var(--fn-caution); --fn-alert:var(--fn-caution); --fn-rec:var(--fn-caution);
+}
+
+/* App identity (chrome only, §5): Moshpit's triple; one thin spine on the top bar. */
+:root{ --app-accent:#f08a63; --app-tile:#12141b; --app-deep:#0c0e13; }
+
+/* ---- the legacy names, re-pointed (so no older rule keeps a private palette) ---- */
+:root,[data-theme]{
+  --mp-void:var(--surface-void); --mp-bg:var(--surface-bg);
+  --mp-s1:var(--surface-1); --mp-s2:var(--surface-2); --mp-s3:var(--surface-3); --mp-s3-hi:var(--surface-3-hi);
+  --mp-txt:var(--txt-1); --mp-txt-2:var(--txt-2); --mp-txt-3:var(--txt-3); --mp-txt-on-pop:var(--txt-on-fill);
+  --mp-pop:var(--fn-interactive); --mp-pop-hi:color-mix(in srgb,var(--fn-interactive) 80%,white);
+  --mp-pop-dim:color-mix(in srgb,var(--fn-interactive) 60%,var(--surface-1));
+  --mp-accent:var(--fn-select); --mp-accent-hi:color-mix(in srgb,var(--fn-select) 80%,white);
+  --mp-ok:var(--fn-valid); --mp-warn:var(--fn-warn); --mp-danger:var(--fn-destructive); --mp-rec:var(--fn-rec);
+  --mp-info:var(--fn-info); --mp-focus:var(--fn-focus);
+  --mp-c-teal:var(--fn-interactive); --mp-c-gold:var(--fn-warn); --mp-c-lav:var(--fn-select); --mp-c-sky:var(--fn-info);
+  --mp-c-rose:var(--fn-info); --mp-c-mint:var(--fn-valid); --mp-c-coral:var(--fn-destructive);
+  --mp-line:var(--line); --mp-line-2:var(--line-2); --mp-line-hi:var(--line-hi); --mp-pane-edge:var(--line-2); --mp-gutter:1px;
+  --mp-header-h:var(--header-h); --mp-ctl-h:var(--ctl-h); --mp-row-h:var(--row-h);
+  --mp-font-ui:var(--font-ui); --mp-font-mono:var(--font-mono); --mp-font-display:var(--font-ui);
+  --mp-fw-reg:450; --mp-fw-med:550; --mp-fw-bold:650; --mp-track:0.08em;
+  --mp-pop-shadow:none; --shadow:none;
+  /* the prototype's own names (prototype.css :root and its old theme bodies) */
+  --bg:var(--surface-bg); --bg-2:var(--surface-2); --panel:var(--surface-1); --panel-2:var(--surface-2); --panel-3:var(--surface-3);
+  --txt:var(--txt-1);
+  --coral:var(--fn-select); --teal:var(--fn-interactive); --gold:var(--fn-warn); --lav:var(--fn-select);
+  --sky:var(--fn-info); --rose:var(--fn-info); --mint:var(--fn-valid);
+}
+
+/* Scope traces: the RGB parade's channels are data, not function (the red channel is the one
+   red-family hue allowed outside --fn-caution). */
+:root,[data-theme]{--scope-r:#ff5f5f;--scope-g:#45d47a;--scope-b:#4f9bff;--scope-luma:var(--txt-1)}
+
+/* Existing Moshpit scrub-field accents, now shared without changing their hues. */
+:root{--control-range:#81bdd0;--control-time:#c7aed9;--control-level:#8ebeb1}

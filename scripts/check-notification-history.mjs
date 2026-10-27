@@ -1,0 +1,112 @@
+// Isolated source fixture: no native app, engine worker, media, CT or owner profile.
+import { ensureScratch } from './build-scratch/bootstrap.mjs';
+const scratch = ensureScratch('build');
+import fs from 'node:fs';
+import path from 'node:path';
+import { createServer } from 'node:http';
+import { strict as assert } from 'node:assert';
+import { build } from 'esbuild';
+import { chromium } from 'playwright';
+const root = path.resolve(import.meta.dirname, '..');
+const out = path.join(scratch.artifacts, 'output/playwright');
+fs.mkdirSync(out, { recursive: true });
+const bundle = await build({ entryPoints: [path.join(root, 'app/test/notification-history.browser.tsx')], bundle: true, outfile: path.join(out, 'fixture.js'), format: 'esm', platform: 'browser', jsx: 'automatic', metafile: true,
+  alias: { '@moshpit/core': path.join(root, 'core/src/index.ts'), '@moshpit/engine': path.join(root, 'engine/src/index.ts') }, define: { 'process.env.NODE_ENV': '"development"' } });
+fs.writeFileSync(path.join(out, 'bundle-inputs.json'), JSON.stringify(bundle.metafile, null, 2));
+const html = '<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/fixture.css"><div id="root"></div><script type="module" src="/fixture.js"></script>';
+const server = createServer((req, res) => {
+  const name = ({ '/fixture.js': 'fixture.js', '/fixture.css': 'fixture.css' })[req.url];
+  if (req.url !== '/' && !name) { res.writeHead(404).end(); return; }
+  res.setHeader('Content-Type', name?.endsWith('js') ? 'text/javascript' : name ? 'text/css' : 'text/html');
+  res.end(name ? fs.readFileSync(path.join(out, name)) : html);
+});
+await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+let browser;
+const checks = [], errors = [];
+try {
+  browser = await chromium.launch({ headless: true, channel: 'msedge' });
+  const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+  page.on('pageerror', error => errors.push(error.message));
+  await page.addInitScript(() => {
+    window.copies = [];
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async text => { window.copies.push(text); } } });
+  });
+  await page.clock.install();
+  await page.goto(`http://127.0.0.1:${server.address().port}`);
+  const toggle = page.getByRole('button', { name: /Notifications/ });
+  await toggle.waitFor();
+  assert.equal(await toggle.getAttribute('aria-expanded'), 'false');
+  await page.getByRole('button', { name: 'Engine error', exact: true }).click();
+  assert.match(await toggle.textContent(), /1 new.*1 error/);
+  await page.evaluate(() => { navigator.clipboard.writeText = async () => { throw new Error('toast clipboard denied'); }; });
+  await page.locator('.toasts').getByRole('button', { name: 'Copy details', exact: true }).click();
+  assert.match(await page.locator('.toasts [role=status]').textContent(), /Could not copy/);
+  assert.equal((await page.evaluate(() => window.qa.state())).length, 1);
+  await page.evaluate(() => { Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined }); });
+  await page.locator('.toasts').getByRole('button', { name: 'Copy details', exact: true }).click();
+  assert.match(await page.locator('.toasts [role=status]').textContent(), /Could not copy/);
+  assert.equal((await page.evaluate(() => window.qa.state())).length, 1);
+  await page.evaluate(() => { Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async text => { window.copies.push(text); } } }); });
+  checks.push('Actual brief toast copy rejection and absent clipboard give local feedback with no recursive error');
+  await page.clock.fastForward(10_000);
+  assert.equal(await page.locator('.toast').count(), 0);
+  assert.equal((await page.evaluate(() => window.qa.state())).length, 1);
+  checks.push('Error history and unread/error badge survive toast expiration');
+  await page.getByRole('button', { name: 'Save notice' }).click();
+  await page.getByRole('button', { name: 'Change workspace' }).click();
+  await toggle.click();
+  assert.equal(await page.locator('.notification-entry').count(), 2);
+  await page.locator('.notification-entry.err summary').click();
+  const payload = await page.locator('.notification-entry.err pre').textContent();
+  assert.equal(JSON.parse(payload).context.frame, 125);
+  assert.deepEqual(await page.evaluate(() => window.copies), []);
+  await page.getByRole('button', { name: 'Copy details', exact: true }).click();
+  assert.deepEqual(await page.evaluate(() => window.copies), [payload]);
+  checks.push('Unrelated success and workspace switch preserve full selectable error; click copies exact JSON');
+  await page.evaluate(() => { navigator.clipboard.writeText = async () => { throw new Error('denied'); }; });
+  await page.getByRole('button', { name: 'Copy details', exact: true }).click();
+  assert.match(await page.locator('.notification-entry.err [role=status]').textContent(), /Could not copy/);
+  assert.equal(await page.locator('.notification-entry').count(), 2);
+  checks.push('Clipboard failure stays local with manual-copy fallback');
+  const grip = page.getByRole('separator', { name: 'Resize notification history' });
+  await grip.focus();
+  const before = (await page.locator('.notification-log').boundingBox()).height;
+  await page.keyboard.press('ArrowUp');
+  assert((await page.locator('.notification-log').boundingBox()).height > before);
+  const box = await grip.boundingBox();
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down(); await page.mouse.move(box.x + box.width / 2, box.y + 34); await page.mouse.up();
+  assert((await page.locator('.notification-log').boundingBox()).height < before);
+  checks.push('Keyboard and pointer resize both work');
+  for (const [width, height, scale] of [[1920,1080,1], [1280,720,1], [820,640,1], [1280,720,1.25], [1280,720,1.5], [640,480,1]]) {
+    await page.setViewportSize({ width, height });
+    await page.evaluate(scale => { document.body.style.zoom = String(scale); document.documentElement.style.setProperty('--ui-zoom', String(scale)); }, scale);
+    const measure = await page.evaluate(() => {
+      const pane = document.querySelector('.notification-history').getBoundingClientRect();
+      const workspace = document.querySelector('#workspace').getBoundingClientRect();
+      const header = document.querySelector('.notification-header');
+      return { bottom: pane.bottom, right: pane.right, workspaceBottom: workspace.bottom, paneTop: pane.top, headerOverflow: header.scrollWidth - header.clientWidth, workspaceHeight: workspace.height };
+    });
+    assert(measure.bottom <= height + 1 && measure.right <= width + 1, JSON.stringify(measure));
+    assert(measure.workspaceBottom <= measure.paneTop + 1 && measure.workspaceHeight > 100, JSON.stringify(measure));
+    assert(measure.headerOverflow < 2, JSON.stringify(measure));
+    await page.screenshot({ path: path.join(out, `history-${width}-${height}-${scale}.png`) });
+    checks.push(`Dock fits without workspace overlap at ${width}x${height}, UI scale ${scale}`);
+  }
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.evaluate(() => { document.body.style.zoom = '1'; document.documentElement.style.setProperty('--ui-zoom', '1'); });
+  await page.getByRole('region', { name: 'Notification history' }).getByRole('button', { name: 'Dismiss', exact: true }).click();
+  assert.equal(await page.locator('.notification-entry.err').count(), 0);
+  await page.getByRole('button', { name: 'Clear history' }).click();
+  assert.equal(await page.locator('.notification-entry').count(), 0);
+  await toggle.click();
+  await page.getByRole('button', { name: 'Engine error', exact: true }).click();
+  await page.getByRole('button', { name: 'Engine error', exact: true }).click();
+  assert.equal((await page.evaluate(() => window.qa.state()))[0].count, 2);
+  await toggle.click();
+  assert.match(await page.locator('.notification-count').textContent(), /2/);
+  checks.push('Explicit dismiss and clear, then a fresh repeated error gives one counted row');
+  assert.deepEqual(errors, []);
+  fs.writeFileSync(path.join(out, 'RESULT.json'), JSON.stringify({ status: 'PASS', checks, errors, evidence: 'Isolated source/headless browser fixture, mocked clipboard. No native/engine/media/physical CT acceptance.' }, null, 2));
+  console.log(JSON.stringify({ checks: checks.length, out }));
+} finally { await browser?.close(); await new Promise(resolve => server.close(resolve)); }

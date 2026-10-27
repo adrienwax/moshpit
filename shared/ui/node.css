@@ -1,0 +1,42 @@
+/* Canonical node geometry extracted from Moshpit prototype/app/design layers. */
+.mp-node-face.gnode{position:relative;width:168px;background:var(--surface-1);border:1px solid var(--line-2);border-left-width:3px;border-radius:4px;box-shadow:var(--shadow);color:var(--txt-1);font-family:var(--font-ui);cursor:default}
+.mp-node-face.gnode.sel{box-shadow:0 0 0 2px var(--fn-select),var(--shadow);border-color:var(--fn-select)}
+.mp-node-face.gnode.viewed{box-shadow:0 0 0 2px var(--fn-interactive),var(--shadow)}
+.mp-node-face.gnode.bypassed{opacity:.55}.mp-node-face.gnode.legacy{filter:grayscale(.8);border-style:dashed}
+.mp-node-face .gt{font-size:11px;padding:6px 9px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:6px;font-weight:600;cursor:grab}
+.mp-node-face[data-mode=inspect] .gt{cursor:default}
+.mp-node-face .gb{padding:7px 9px;position:relative;min-height:26px}
+.mp-node-face .pf{font-size:9px;color:var(--txt-3);display:flex;justify-content:space-between;margin:2px 0}
+.mp-node-face .cbadge{width:15px;height:15px;border-radius:3px;border:1px solid;display:inline-flex;align-items:center;justify-content:center;font-size:9px;flex:none}
+.mp-node-face .gname{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.mp-node-face .cattag{font-size:8px;letter-spacing:.5px;text-transform:uppercase;flex:none}
+.mp-node-face .gports{display:flex;flex-direction:column;padding:3px 0;border-bottom:1px solid var(--line)}
+.mp-node-face .prow{position:relative;height:18px;display:flex;align-items:center;margin:0 -1px 0 -3px;padding:0 10px 0 12px}
+.mp-node-face .prow.out{justify-content:flex-end}
+.mp-node-face .plabel{font:500 9px/1 var(--font-mono);letter-spacing:.04em;color:var(--txt-3);text-transform:uppercase;white-space:nowrap}
+.mp-node-face .plabel em{font-style:normal;opacity:.7}
+.mp-node-face .mp-node-diagnostic{white-space:normal;overflow-wrap:anywhere;color:var(--txt-2)}
+.mp-node-face .mp-param-slot{display:contents}
+.mp-port-face{display:block;width:12px;height:12px;box-sizing:border-box;border:1.5px solid var(--pc,var(--txt-3));background:var(--surface-2);pointer-events:none}
+.mp-port-face.pix{border-radius:50%}.mp-port-face.ctl{width:10px;height:10px;transform:rotate(45deg)}
+.mp-port-face.ring{background:transparent;border-style:dotted}
+.mp-port-anchor{position:absolute;top:50%;transform:translateY(-50%);width:12px;height:12px}.mp-port-anchor.in{left:-6px}.mp-port-anchor.out{right:-6px}
+.mp-node-face .react-flow__handle.mp-port-handle{width:12px;height:12px;min-width:0;min-height:0;border:0;background:none;border-radius:0;display:grid;place-items:center}
+.mp-node-face .react-flow__handle.mp-port-handle::after{display:none}
+.mp-node-face .react-flow__handle.mp-port-handle:hover .mp-port-face,.mp-node-face .react-flow__handle.can .mp-port-face{background:var(--pc)}
+.mp-node-face .react-flow__handle.cannot{opacity:.25}
+.mp-node-face .mp-port-handle[data-port-available=false]{opacity:.35}
+.mp-node-face .badge-baked,.mp-node-face .frzflag,.mp-node-face .bypflag{position:absolute;font-size:8px;background:var(--surface-1);border:1px solid var(--line-2);border-radius:3px;padding:0 4px;color:var(--txt-2)}
+.mp-node-face .badge-baked{top:-7px;right:6px}.mp-node-face .frzflag{bottom:-7px;right:6px}.mp-node-face .bypflag{bottom:-7px;left:6px}
+.mp-node-face.gnode.rf.container{width:188px;border:1.5px dashed var(--dom-ctl);background:color-mix(in srgb,var(--dom-ctl) 5%,var(--surface-1))}
+.mp-node-face.gnode.rf.container .prow{margin:0 -1.5px}.mp-node-face .ctrpath{font:600 9px/1.2 var(--font-mono);letter-spacing:.06em;color:var(--txt-2);text-transform:uppercase}
+.mp-node-face .ctrinner{font-size:10px;color:var(--txt-3);white-space:normal;line-height:1.3}.mp-node-face .ctrhint{font-size:9px;color:var(--txt-3)}
+.mp-node-face.reroute{width:46px;border-left-width:1px}.mp-node-face.reroute .prow{margin:0 -1px;padding:0;justify-content:center;height:20px}
+
+.mp-port-face[data-port-available=false]{opacity:.35;border-style:dashed}
+.mp-node-raw{font:10px/1.4 var(--font-mono);color:var(--txt-2)}
+.mp-node-raw pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:4px 0}
+
+.mp-node-face.gnode.rf.container .cbadge.ctr,.mp-node-face.gnode.rf.container .cattag{color:var(--dom-ctl);border-color:var(--dom-ctl)}
+
+.mp-node-face.gnode.sel.viewed{box-shadow:0 0 0 2px var(--fn-interactive),0 0 0 4px color-mix(in srgb,var(--fn-select) 50%,transparent),var(--shadow)}

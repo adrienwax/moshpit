@@ -1,0 +1,46 @@
+/* Standalone geometry: consumers need only shared tokens, never app global styles. */
+.mp-parameter-edit.npm{display:flex;align-items:center;gap:6px;margin:5px 0}
+.mp-parameter-edit.npm .pnm{font-size:9px;color:var(--txt-3);width:46px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp-parameter-edit .nslider{flex:1;position:relative;cursor:ew-resize;touch-action:none}
+.mp-parameter-edit .rng{position:relative;cursor:ew-resize;touch-action:none}
+.mp-parameter-edit .nfill,.mp-parameter-edit .fill{position:absolute;left:0;top:0;bottom:0}
+.mp-parameter-edit .nknob,.mp-parameter-edit .knob{position:absolute;top:50%;transform:translate(-50%,-50%)}
+.mp-parameter-edit .pval{font-size:9px;min-width:34px;text-align:right}
+.mp-parameter-edit .pval,.mp-parameter-edit .pv,.mp-number-field{cursor:ew-resize;touch-action:none;border-bottom:1px dotted var(--line-2);font-variant-numeric:tabular-nums;color:var(--txt-1)}
+.mp-parameter-edit.param{margin-bottom:13px;font-size:11px;color:var(--txt-2)}
+.mp-parameter-edit:has(>.enumbtn),.mp-parameter-edit:has(>.sw2){display:flex;align-items:center;justify-content:space-between}
+.mp-parameter-edit .enumbtn{background:var(--surface-3);border:1px solid var(--line-2);border-radius:3px;font-size:10px;color:var(--fn-interactive);padding:1px 7px;cursor:pointer;margin-left:auto}
+.mp-parameter-edit .sw2{width:14px;height:14px;border:1px solid var(--line-2);border-radius:3px;background:var(--surface-3);padding:0;margin-left:auto}
+.mp-parameter-edit .sw2.on{background:var(--fn-interactive);border-color:var(--fn-interactive)}
+.mp-parameter-edit .sw2::after{display:none}
+.mp-parameter-edit .utog{font-size:8px;color:var(--fn-interactive);border:1px solid var(--line-2);border-radius:3px;padding:0 4px;margin-left:6px;cursor:pointer;user-select:none}
+.mp-parameter-edit .help{cursor:help;color:var(--txt-3);border:1px solid var(--line);border-radius:50%;width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;margin-left:5px}
+.mp-parameter-edit .modtag{font-size:8px;color:var(--fn-interactive);margin-left:5px;white-space:nowrap}
+.mp-parameter-edit .typein{width:65px;box-sizing:border-box;background:var(--surface-2);color:var(--txt-1);border:1px solid var(--fn-interactive);font:inherit}
+.mp-parameter-edit .typein.bad{border-color:var(--fn-caution)}
+.mp-parameter-edit.locked{opacity:.5;pointer-events:none}
+.mp-parameter-edit [role=slider]:focus-visible{outline:2px solid var(--fn-select);outline-offset:3px}
+/* One generous relative-drag surface, inspired by the earlier ParamRow control. */
+.scrub-field,.scrub-field-mini{--scrub-ink:var(--fn-interactive)}
+.scrub-field[data-family=range],.scrub-field-mini[data-family=range]{--scrub-ink:var(--control-range)}
+.scrub-field[data-family=time],.scrub-field-mini[data-family=time]{--scrub-ink:var(--control-time)}
+.scrub-field[data-family=level],.scrub-field-mini[data-family=level]{--scrub-ink:var(--control-level)}
+.param.scrub-field{position:relative;padding:0;margin:5px 0;min-height:29px;isolation:isolate}
+.param.scrub-field>.pl{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;margin:0;padding:0 8px;gap:8px;pointer-events:none;z-index:2;font-size:11px}
+.scrub-field>.pl>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--txt-2)}
+.scrub-field>.pl>span:last-child{flex:none}
+.scrub-field .pv,.scrub-field .utog,.scrub-field .help,.scrub-field input{pointer-events:auto}
+.param.scrub-field>.rng{height:29px;border:1px solid var(--line-2);border-left:2px solid var(--scrub-ink);border-radius:3px;background:var(--surface-2);overflow:hidden}
+.param.scrub-field>.rng>.fill,.scrub-field-mini>.nslider>.nfill{background:var(--scrub-ink)!important;opacity:.16;border-radius:0}
+.param.scrub-field>.rng>.knob{height:100%;width:1px!important;background:var(--scrub-ink)!important;opacity:.5;border-radius:0;pointer-events:none}
+.param.scrub-field:hover>.rng,.param.scrub-field:focus-within>.rng{border-color:var(--scrub-ink)}
+.scrub-field-mini>.nslider{height:18px;min-width:35px;border:1px solid var(--line-2);border-left:2px solid var(--scrub-ink);border-radius:2px;overflow:hidden;background:var(--surface-2)}
+.scrub-field-mini>.nslider>.nknob{height:100%;width:1px!important;background:var(--scrub-ink)!important;opacity:.5;border-radius:0;pointer-events:none}
+.scrub-field-mini>.nslider:hover{border-color:var(--scrub-ink)}
+
+.mp-parameter-inspect{display:flex;gap:8px;align-items:baseline;justify-content:space-between;min-width:0}
+.mp-parameter-inspect .mp-param-readout{font-family:var(--font-mono);color:var(--txt-1);overflow-wrap:anywhere}
+.mp-parameter-inspect .pnm,.mp-parameter-inspect .pl{color:var(--txt-2);font-size:11px}
+
+.mp-parameter-inspect{flex-wrap:wrap}
+.mp-parameter-inspect .mp-param-unavailable{flex-basis:100%;font-size:9px;color:var(--txt-3)}

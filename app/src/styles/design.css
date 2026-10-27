@@ -1,0 +1,469 @@
+/* Waxy Suite design system, applied (shared/ui/DESIGN-SYSTEM.md, the source of truth).
+   Loaded last, right after shared/ui/tokens.css, which holds every token: Layer 0 primitives, the
+   --fn-* semantics per theme, and the legacy --mp-* and prototype names re-pointed at them so every
+   older rule follows the system. The rules below bind --fn-* / --surface-* / --txt-* directly. */
+
+body{background:var(--surface-void);color:var(--txt-1);font-family:var(--font-ui);font-size:12px;font-weight:450}
+
+/* ---- TYPE: every machine value is mono + tabular ---- */
+.mono,code,kbd,input[type=number],.pv,.pval,.scrubnum,.selread b,.selread em,.isheet dd,.tro b,.tro em,.zmeta,.zio,.brange,
+.statusstrip .st b,.rtable td.num,.logbox,.fn,.fx,.bro b,.sval,.chip{font-family:var(--font-mono);font-variant-numeric:tabular-nums lining-nums}
+
+/* ---- FUNCTION: focus, selection, disabled (never an opacity fade) ---- */
+:focus-visible{outline:2px solid var(--fn-focus)!important;outline-offset:0!important}
+button:disabled,.ghostbtn:disabled,.tbtn:disabled,.pop:disabled,.btn-run:disabled,.quickbtn:disabled{
+  background:var(--fn-disabled-bg)!important;color:var(--fn-disabled-fg)!important;border-color:transparent!important;opacity:1!important;cursor:not-allowed!important}
+
+/* ---- BUTTONS (§6.2): action fills: teal progression; red is reserved for destructive actions ---- */
+.pop,.btn.primary,.btn-pop,.lmenu .row button.pri{background:var(--fn-interactive)!important;color:var(--txt-on-fill)!important;border:0!important;font-weight:650}
+.pop:hover:not(:disabled),.btn.primary:hover{background:color-mix(in srgb,var(--fn-interactive) 82%,white)!important}
+.btn-run,.commit{background:var(--fn-commit)!important;color:var(--txt-on-fill)!important;border:0!important;font-weight:700;letter-spacing:.06em}
+.btn-run:hover:not(:disabled),.commit:hover:not(:disabled){background:color-mix(in srgb,var(--fn-commit) 82%,white)!important}
+.ghostbtn,.tbtn{background:var(--surface-3);border:1px solid var(--line-2);color:var(--txt-2);font-weight:550}
+.ghostbtn:hover:not(:disabled),.tbtn:hover:not(:disabled){background:var(--surface-3-hi);border-color:var(--fn-interactive);color:var(--txt-1)}
+.ghostbtn.act,.ghostbtn.on,.tbtn.on,.ghostbtn[aria-pressed=true]{background:var(--fn-interactive)!important;color:var(--txt-on-fill)!important;border-color:var(--fn-interactive)!important}
+/* Destructive: crimson text + the caution stripe on the left edge, so it is never a Render button. */
+.danger,.btn.danger,.ctxmenu button.danger,.lmenu .li .del{color:var(--fn-destructive)!important;border-color:var(--fn-destructive)!important;position:relative}
+button.danger,.ghostbtn.danger{background:var(--surface-3);padding-left:12px!important}
+button.danger::before,.ghostbtn.danger::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--stripe)}
+button.danger:hover:not(:disabled){background:var(--fn-destructive)!important;color:var(--txt-on-fill)!important}
+
+/* ---- PREVIEW uses an outlined action; RENDER uses the filled progression action ---- */
+.quickbtn{background:var(--surface-3)!important;color:var(--fn-interactive)!important;border:1px solid var(--fn-interactive)!important;font-weight:650;
+  height:var(--ctl-h);padding:0 10px;display:inline-flex;align-items:center;gap:6px;text-transform:uppercase;font-size:10px;letter-spacing:.08em}
+.quickbtn:hover:not(:disabled){background:var(--fn-interactive)!important;color:var(--txt-on-fill)!important}
+.quickbtn.busy{border-style:dashed!important;animation:mp-transient 1.2s steps(2,end) infinite}
+@keyframes mp-transient{50%{border-color:transparent}}
+.quickov .quickbox{outline:2px solid var(--fn-transient)}
+.quickov .quickhd b::after{content:" · CAPTURE";color:var(--fn-transient);font-family:var(--font-mono);letter-spacing:.06em}
+
+/* ---- STATES ---- */
+.toast.err,.frameview .frameerr span,.clip .tag.miss,.st.fail,.cbadge.fail,.banner.err,.banner.err .bic,.banner.err .bmsg b{color:var(--fn-error)!important;border-color:var(--fn-error)!important}
+.sheet.caution{border-color:var(--fn-caution)!important}
+.sheet.caution .btn.danger{background:var(--fn-destructive)!important;color:var(--txt-on-fill)!important}
+.toast.ok,.st.done{color:var(--fn-valid)}
+.toast.warn,.st.render{color:var(--fn-warn)}
+
+/* ---- PANE HEADER (§6.3): lean 20px, Inter micro caps, mono index ---- */
+.card>.hd{height:var(--header-h)!important;min-height:var(--header-h)!important;background:var(--surface-2)!important;border-bottom:1px solid var(--line)!important;padding:0 6px!important}
+.card>.hd .ttl{font:650 11px/1 var(--font-ui)!important;text-transform:uppercase;letter-spacing:.08em;color:var(--txt-1)}
+.card>.hd .paneno{font:600 10px/1 var(--font-mono)!important;color:var(--txt-3)!important}
+
+/* ---- SEGMENTED: 2px top spine on the chosen cell (§6.5) ---- */
+.seg button.on,.seg button[aria-checked=true],.ptabs button.on,.itabbar [role=tab][aria-selected=true]{
+  color:var(--txt-1)!important;background:var(--surface-3)!important;box-shadow:inset 0 2px 0 var(--fn-select)!important}
+.wsswitch button.on{box-shadow:inset 0 -2px 0 var(--app-accent)!important;color:var(--txt-1)!important}
+.topbar{box-shadow:inset 0 -1px 0 color-mix(in srgb,var(--app-accent) 70%,transparent)}
+
+/* ---- SELECTION: 2px square outline, never a glow ---- */
+.blk.sel{outline:2px solid var(--fn-select)!important;outline-offset:-2px;box-shadow:none!important}
+.react-flow__node.selected>*{outline:2px solid var(--fn-select);outline-offset:1px}
+
+/* ---- TOGGLES: square state cell, no pills ---- */
+.sw2{width:14px!important;height:14px!important;background:var(--surface-3)!important;border:1px solid var(--line-2)!important}
+.sw2::after{display:none!important}
+.sw2.on{background:var(--fn-interactive)!important;border-color:var(--fn-interactive)!important}
+
+/* ---- SLIDERS: flat rectangular, interactive fill, a 3px handle bar ---- */
+.rng .fill,.nslider .nfill{background:var(--fn-interactive)!important}
+.rng .knob,.nslider .nknob{background:var(--txt-1)!important;width:3px!important;border:0!important}
+
+/* ---- THE INFO-SHEET GRID (§6.1): uppercase muted labels, bright mono tabular values ---- */
+.isheet{display:grid;grid-template-columns:minmax(64px,max-content) 1fr auto;gap:4px 12px;align-items:baseline;
+  background:var(--surface-1);border:1px solid var(--line);padding:8px 12px;margin:0 0 8px}
+.isheet>.sec{grid-column:1/-1;font:650 10px/1.2 var(--font-ui);text-transform:uppercase;letter-spacing:.09em;color:var(--txt-2);
+  padding-top:4px;border-top:1px solid var(--line);margin-top:2px}
+.isheet>.sec:first-child{border-top:0;margin-top:0;padding-top:0}
+.isheet dt{font:550 10px/1.2 var(--font-ui);text-transform:uppercase;letter-spacing:.08em;color:var(--txt-3);margin:0}
+.isheet dd{margin:0;font:450 12px/1.2 var(--font-mono);color:var(--txt-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.isheet dd.big{font-size:15px;font-weight:500}
+.isheet dd.u{font:450 10px/1.2 var(--font-ui);color:var(--txt-3);text-transform:uppercase;letter-spacing:.06em}
+.isheet .warn{color:var(--fn-warn)!important}
+.isheet .name{grid-column:2/-1;font:500 13px/1.2 var(--font-ui);color:var(--txt-1)}
+.isheet .ctl{grid-column:2/-1;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.isheet .ctl .npm{min-width:140px;flex:1 1 140px}
+
+/* ======================= COMPOSE: the agreed 3-band grid (UX round 2) ======================= */
+.composews{flex:1 1 auto;display:flex;flex-direction:column;min-height:0;min-width:0;background:var(--surface-void)}
+.composews>.stage{flex:1 1 auto;min-height:0}
+.composetop{flex:0 0 auto;display:flex;flex-direction:column;background:var(--surface-1);border-bottom:1px solid var(--line)}
+
+/* the thin transport */
+.composetop .ptransport{display:flex;align-items:center;gap:14px;height:30px;padding:0 8px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.composetop .ptransport .tbtn{width:30px;height:22px;display:inline-flex;align-items:center;justify-content:center}
+.tro{display:inline-flex;align-items:baseline;gap:6px;white-space:nowrap}
+.tro i{font:550 10px/1 var(--font-ui);font-style:normal;text-transform:uppercase;letter-spacing:.08em;color:var(--txt-3)}
+.tro b{font:600 13px/1 var(--font-mono);color:var(--txt-1)}
+.tro em{font:450 11px/1 var(--font-mono);font-style:normal;color:var(--txt-3)}
+.composetop .spacer{flex:1}
+.chip{font:600 10px/1 var(--font-mono);letter-spacing:.06em;padding:4px 6px;border:1px solid var(--line-2);color:var(--txt-2);background:var(--surface-1)}
+.chip.ok{color:var(--fn-valid);border-color:var(--fn-valid)}
+.chip.warn{color:var(--fn-transient);border-color:var(--fn-transient)}
+
+/* PREVIEW EXTENT (V4) */
+.previewsel{display:inline-flex;align-items:center;gap:8px}
+.previewsel .pxlbl{font:550 10px/1 var(--font-ui);letter-spacing:.08em;color:var(--txt-3)}
+.previewsel .pxhint{font:450 11px/1 var(--font-ui);color:var(--txt-2);max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg{display:inline-flex;border:1px solid var(--line-2);background:var(--surface-2)}
+.seg button{height:20px;padding:0 8px;border:0;background:transparent;color:var(--txt-2);font:600 10px/1 var(--font-ui);letter-spacing:.06em;text-transform:uppercase}
+.seg button+button{border-left:1px solid var(--line)}
+
+/* the scopes band (V8, §6.6) */
+.scopesband{display:flex;flex-direction:column;gap:4px;padding:4px 8px 6px;height:184px}
+.scopesband .stargets{display:flex;align-items:center;gap:10px;height:22px}
+.scopesband .slbl{font:550 10px/1 var(--font-ui);letter-spacing:.08em;color:var(--txt-3)}
+.scopesband .shint{font:450 11px/1 var(--font-ui);color:var(--txt-2)}
+.scopesband .spanels{flex:1 1 auto;display:grid;grid-template-columns:1fr 1fr 1fr 150px;gap:6px;min-height:0}
+.spanel{position:relative;margin:0;background:var(--surface-bg);border:1px solid var(--line);overflow:hidden;min-width:0}
+.spanel canvas{position:absolute;inset:14px 4px 14px 30px;width:calc(100% - 34px);height:calc(100% - 28px);image-rendering:pixelated}
+.spanel.sq canvas{inset:14px 10px 14px 10px;width:auto;height:calc(100% - 28px);aspect-ratio:1;left:50%;transform:translateX(-50%)}
+.spanel .sgrat{position:absolute;inset:14px 4px 14px 30px;width:calc(100% - 34px);height:calc(100% - 28px)}
+.spanel.sq .sgrat{inset:14px 10px;left:50%;transform:translateX(-50%);width:auto;aspect-ratio:1;height:calc(100% - 28px)}
+.spanel .sgrat line,.spanel .sgrat circle{stroke:var(--graticule);stroke-width:1;fill:none;vector-effect:non-scaling-stroke}
+.spanel .stag{position:absolute;left:0;top:0;z-index:2;font:650 9px/1 var(--font-ui);letter-spacing:.09em;color:var(--txt-on-fill);
+  background:var(--txt-3);padding:3px 10px 3px 6px;clip-path:polygon(0 0,100% 0,calc(100% - var(--chamfer)) 100%,0 100%)}
+.spanel .saxis{position:absolute;z-index:2;font:450 9px/1 var(--font-mono);color:var(--txt-3)}
+.spanel .saxis.x{left:30px;right:4px;bottom:2px;text-align:center}
+.spanel .saxis.y{left:2px;top:14px;bottom:14px;width:26px;writing-mode:vertical-rl;transform:rotate(180deg);text-align:center}
+.spanel.sq .saxis.x{left:0;right:0}
+.spanel .sval{position:absolute;right:4px;top:3px;z-index:2;font:600 10px/1 var(--font-mono);color:var(--txt-2)}
+.spanel .sval.warn{color:var(--fn-warn)}
+.spanel .sempty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:450 11px/1 var(--font-ui);color:var(--txt-3)}
+
+/* PROGRAM fills its pane; the CONTEXT preview sits inside the graph, bottom-right, labelled (V4) */
+.ws-mosh .program{height:100%;display:flex;flex-direction:column;min-height:0}
+.ws-mosh .program .pvcard{flex:1 1 auto;min-height:0}
+.canvaspane{position:relative;height:100%}
+.canvaspane .ctxpv{position:absolute;right:8px;bottom:8px;width:300px;z-index:5;background:var(--surface-1);border:1px solid var(--line-2);padding:4px}
+.canvaspane .ctxpv:has(.empty){width:240px}
+.ctxlbl{display:flex;align-items:baseline;gap:6px;margin:0 0 4px;white-space:nowrap;overflow:hidden}
+.ctxlbl i{font:650 9px/1 var(--font-ui);font-style:normal;letter-spacing:.09em;color:var(--txt-on-fill);background:var(--fn-info);padding:2px 4px}
+.ctxlbl b{font:600 10px/1 var(--font-mono);color:var(--txt-1);overflow:hidden;text-overflow:ellipsis}
+.ctxlbl em{font:450 9px/1 var(--font-ui);font-style:normal;letter-spacing:.08em;color:var(--txt-3)}
+.ctxpv .viewnote{font:450 10px/1.3 var(--font-ui);color:var(--txt-3);margin-top:3px}
+
+/* BLOCK inspector: the info sheet, then grouped actions (V1, V5) */
+.blocktab{padding:6px;display:flex;flex-direction:column}
+.bgroups{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:2px 0}
+.bgroup{display:inline-flex;align-items:center;gap:4px;padding:4px 6px;border:1px solid var(--line);background:var(--surface-1)}
+.bgroup .glbl{font:550 9px/1 var(--font-ui);letter-spacing:.09em;color:var(--txt-3);margin-right:4px}
+.bgroups .ghostbtn{display:inline-flex;align-items:center;gap:5px}
+
+/* RENDER pane: small fields as inline field-sets, the path full width, Render the crimson commit (V2) */
+.renderpane{padding:6px}
+.renderpane .exprow,.outputtab .exprow{flex-direction:row!important;flex-wrap:wrap;align-items:flex-end!important;gap:6px 8px}
+.renderpane .exprow .fld{flex:0 0 auto;align-self:flex-end}
+.renderpane .exprow .fld.pathfld{flex:1 1 100%}
+.renderpane .exprow .btn-run{order:10;flex:1 1 100%;height:30px;font-size:12px}
+.fld label{font:550 10px/1 var(--font-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--txt-3)}
+.sel2{font-family:var(--font-mono);font-size:12px}
+
+/* ---- the legacy warm accent where it meant "interactive / here", re-bound to FUNCTION ---- */
+.enumbtn,.lchip2>button,.lchip button,.card .tbtn.snappick,.tbtn.snappick,.snap button.on,.preset.dice,.utog,.waveset button.on{color:var(--fn-interactive)!important;border-color:color-mix(in srgb,var(--fn-interactive) 55%,var(--line-2))!important}
+.bpmruler .tph,.ztrack .zph,.scrub .ph,.scrub .ph .head,.zoomnav .znph,.minitl .mph,.syncph{background:var(--fn-interactive)!important;border-color:var(--fn-interactive)!important;color:var(--fn-interactive)!important}
+.ztrack .win{border-color:var(--fn-interactive)!important}
+.rtable tr.cur td,.minitl .track .mb.cur,.syncblocks .sb.cur,.preset-item.on,.themecard.on{border-color:var(--fn-select)!important;color:var(--txt-1)!important}
+.rsect.cur path{stroke:var(--fn-select)!important}
+.param .pl .pv,.npm .pval,.selread .on b{color:var(--txt-1)!important}
+.gcell .stars,.rtable .stars,.thumb .stars,.stars.edit button{color:var(--txt-2)!important}
+.ticks.music .tk.major span{color:var(--txt-3)!important}
+.units-link{color:var(--fn-interactive)}
+
+/* ---- Block sheet: paired rows (IN | OUT side by side) so the whole inspector fits ---- */
+.isheet.pairs{grid-template-columns:auto 1fr auto 1fr}
+.isheet.pairs>.sec,.isheet.pairs .name{grid-column:1/-1}
+.isheet.pairs .name{grid-column:2/-1}
+.isheet.pairs dd.u{grid-column:auto}
+
+/* ---- the empty Context preview is one slim line, not a box over the graph ---- */
+.canvaspane .ctxpv:has(.emptystate){width:auto;max-width:360px;padding:4px 8px}
+.canvaspane .ctxpv .emptystate{min-height:0!important;height:auto!important;padding:0!important;display:flex!important;flex-direction:row!important;align-items:center;gap:6px;text-align:left}
+.canvaspane .ctxpv .emptystate .big,.canvaspane .ctxpv .emptystate .es-d{display:none!important}
+.canvaspane .ctxpv .emptystate .es-t{font:450 11px/1 var(--font-ui)!important;color:var(--txt-3)!important;margin:0!important}
+.canvaspane .ctxpv .emptystate::before{content:"CONTEXT";font:650 9px/1 var(--font-ui);letter-spacing:.09em;color:var(--txt-on-fill);background:var(--fn-info);padding:2px 4px}
+
+/* ---- the Render workspace: small fields as inline field-sets too (V2) ---- */
+.ws-render .exprow{flex-direction:row!important;flex-wrap:wrap;align-items:flex-end!important;gap:8px 10px}
+.ws-render .exprow .fld{flex:0 0 auto}
+.ws-render .exprow .fld.pathfld{flex:1 1 100%}
+.ws-render .exprow .btn-run{flex:1 1 100%}
+
+.isheet.pairs dd.wide{grid-column:2/-1}
+.isheet.pairs dt.rowstart{grid-column:1}
+
+/* CONTEXT beside the graph, never over it (an overlay hid the end of the chain); gone when no node is selected */
+.canvaspane.ctxsplit{display:flex;flex-direction:row;height:100%}
+.canvaspane.ctxsplit>.gwrap{position:relative;flex:1 1 auto;min-width:0;height:100%}
+.canvaspane.ctxsplit>.ctxpv{position:static;flex:0 0 240px;width:240px;border:0;border-left:1px solid var(--line);padding:6px;overflow:auto}
+.canvaspane.ctxsplit>.ctxpv:has(.emptystate){display:none}
+/* Compose's graph pane can be short (Arrange): the canvas fits it, or nodes slip under its own overflow */
+.ws-mosh .canvaswrap{min-height:0;height:100%}
+.themecard.on{outline:2px solid var(--fn-select)!important;outline-offset:-2px;box-shadow:none!important;border-color:var(--fn-select)!important}
+
+/* ---- no glow, ever ("aircraft MFD in daylight"); selection markers are crisp FUNCTION spines ---- */
+.pill.mock .lamp,.pill .lamp.gold,.nd.baked .run,.lfodot,.hitem.cur .dot{box-shadow:none!important}
+.bpmruler .tph,.ztrack .zph,.scrub .ph,.syncph{box-shadow:none!important}
+.minitl .track .mb.cur{box-shadow:0 0 0 2px var(--fn-select)!important}
+.rtable tr.cur td{box-shadow:inset 0 -1px 0 var(--fn-select)!important}
+.syncblocks .sb.cur{box-shadow:inset 0 -2px 0 var(--fn-select)!important}
+.lmenu .li.cur,.preset-item.on,.setnav .sitem.on{box-shadow:inset 2px 0 0 var(--fn-select)!important}
+.clip.sel{box-shadow:inset 3px 0 0 var(--fn-select)!important}
+.strip .sf.cur,.gcell.sel{box-shadow:0 0 0 2px var(--fn-select)!important}
+.mkband{box-shadow:inset 0 2px 0 var(--fn-select),inset 0 -2px 0 var(--fn-select)!important}
+
+/* ---- resize handles: subtle (Waxy, presentation pass): the 1px gutter is the only mark at rest;
+   a ±3px invisible hit area; hover lights a 1px line, dragging lights it full. No grip bar, no fill. ---- */
+.vsplit,.hsplit,.stacksplit{background:var(--surface-void)!important}
+.vsplit::before,.stacksplit.h::before{left:-3px!important;right:-3px!important}
+.hsplit::before,.stacksplit:not(.h)::before{top:-3px!important;bottom:-3px!important}
+.vsplit::after,.hsplit::after,.stacksplit::after{background:transparent!important;opacity:1!important}
+.vsplit::after,.stacksplit.h::after{top:0!important;bottom:0!important;height:auto!important;width:1px!important;transform:translateX(-50%)!important}
+.hsplit::after,.stacksplit:not(.h)::after{left:0!important;right:0!important;width:auto!important;height:1px!important;transform:translateY(-50%)!important}
+.vsplit:hover::after,.hsplit:hover::after,.stacksplit:hover::after{background:color-mix(in srgb,var(--fn-interactive) 55%,transparent)!important}
+.vsplit.drag::after,.hsplit.drag::after,.stacksplit.drag::after,.vsplit:active::after,.hsplit:active::after,.stacksplit:active::after{background:var(--fn-interactive)!important}
+.vsplit:hover,.hsplit:hover,.stacksplit:hover,.vsplit:active,.hsplit:active,.stacksplit:active,.vsplit.drag,.hsplit.drag,.stacksplit.drag{background:var(--surface-void)!important}
+
+/* ---- the arrangement is short (Waxy): blocks are dense one-liners that earn the height ---- */
+.tl .blk{padding:4px 7px!important}
+.tl .blk .bhead{display:flex;align-items:baseline;gap:6px}
+.tl .blk .bhead .kind{font:650 9px/1 var(--font-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--txt-3)}
+.tl .blk .bhead .rep{font:600 12px/1 var(--font-mono)}
+.tl .blk .chain{display:flex;align-items:center;gap:3px;margin-top:3px;flex-wrap:nowrap;min-width:0}
+.tl .blk .chain .cnames{font:450 10px/1 var(--font-ui);color:var(--txt-2);margin-left:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.tl .blk .bro{margin-top:3px}
+
+/* The transport row sheds detail as the window narrows, never the Preview button (audit: it fell off-screen at 1366) */
+
+/* Proportional on small windows (audit at 1280×700): the side columns cap against the viewport, so
+   Program and the graph keep the width; resizing still works under the caps. */
+.ws-mosh .wcol[data-col="dock"]{max-width:22vw;min-width:240px}
+.ws-mosh .wcol[data-col="inspect"]{max-width:28vw;min-width:300px}
+.canvaspane.ctxsplit>.gwrap{container-type:inline-size}
+@container (max-width:560px){ .blockcue{display:none!important} }
+@media (max-width:1500px){ .canvaspane.ctxsplit>.ctxpv{flex-basis:180px;width:180px} }
+.bpmfield{display:inline-flex;align-items:center;justify-content:flex-end;width:46px;height:20px;padding:0 4px;cursor:ew-resize;font:600 13px/1 var(--font-mono);font-variant-numeric:tabular-nums;color:var(--txt-1);background:var(--surface-3);border:1px solid var(--line-2)}
+.bpmfield:focus{border-color:var(--fn-focus);outline:none}
+.bpmfield.typein{cursor:text}
+
+/* ---- the Program monitor's own transport (Waxy), like Source's player ---- */
+.progctl{flex:0 0 auto;display:flex;align-items:center;gap:4px;height:28px;padding:0 6px;background:var(--surface-2);border-top:1px solid var(--line)}
+.progctl .tbtn{min-width:26px;height:20px;padding:0 6px;display:inline-flex;align-items:center;justify-content:center;font:600 12px/1 var(--font-mono)}
+.progctl .pseek{position:relative;flex:1 1 auto;height:14px;margin:0 6px;background:var(--surface-bg);border:1px solid var(--line-2);cursor:pointer;touch-action:none}
+.progctl .pseek .pfill{position:absolute;left:0;top:0;bottom:0;background:color-mix(in srgb,var(--fn-interactive) 22%,transparent);pointer-events:none}
+.progctl .pseek .phead{position:absolute;top:-2px;bottom:-2px;width:2px;margin-left:-1px;background:var(--fn-interactive);pointer-events:none}
+.progctl .pseek .pedge{position:absolute;top:0;bottom:0;width:1px;background:var(--tick-major);pointer-events:none}
+.progctl .ptc{display:inline-flex;align-items:baseline;gap:6px;white-space:nowrap}
+.progctl .ptc b{font:600 12px/1 var(--font-mono);color:var(--txt-1)}
+.progctl .ptc em{font:450 10px/1 var(--font-mono);font-style:normal;color:var(--txt-3)}
+@media (max-width:1500px){ .progctl .ptc em:last-child{display:none} }
+
+/* Phase 0.4: a folder setting that overlaps a media root */
+.pathnote{flex-basis:100%;margin-top:4px;font:450 11px/1.35 var(--font-ui);color:var(--txt-2)}
+.pathnote.err{color:var(--fn-rec)}
+/* Phase 0.4: the read-only source guarantee, stated where sources are read and renders written */
+.rosafe{font:600 9px/1 var(--font-mono);letter-spacing:.08em;color:var(--txt-3);border:1px solid var(--line);border-radius:3px;padding:3px 5px;white-space:nowrap;cursor:help}
+.rosafe.wide{font:450 11px/1.4 var(--font-ui);letter-spacing:0;white-space:normal;border:none;padding:0;margin:6px 0 0;cursor:default;flex-basis:100%}
+
+/* Phase 0.5: a value being typed stands in for its readout, same box, clearly editable */
+.typein{font:600 11px/1 var(--font-mono);font-variant-numeric:tabular-nums;color:var(--txt-1);background:var(--surface-3);border:1px solid var(--fn-focus);border-radius:2px;padding:1px 3px;width:7ch;min-width:0;outline:none;text-align:right}
+.typein.bad{border-color:var(--fn-rec)}
+/* Phase 0.6: a frame view waiting for its first frame */
+.framewait{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.framewait .loadingstate{background:transparent}
+
+/* Phase 1.2: sockets by domain, shape first (DESIGN-SYSTEM.md §2.5): encoded a square, picture a
+   circle (a mask a ring), control a diamond, each in its --dom-* colour (--pc, set per socket).
+   The shape is drawn by ::after so React Flow keeps its own transform on the handle. */
+.react-flow__handle.port{width:12px;height:12px;min-width:0;min-height:0;background:transparent;border:none;border-radius:0}
+/* Phase 1.3: the 24px hit area around the 12px socket (wires still meet the visible socket) */
+.react-flow__handle.port::before{content:'';position:absolute;inset:-6px}
+.react-flow__handle.port::after{content:'';position:absolute;inset:0;box-sizing:border-box;border:1.5px solid var(--pc);background:var(--surface-2);pointer-events:none;transition:opacity .08s}
+/* tokens.css squares every corner (!important); a picture socket is the design system's one circle */
+.react-flow__handle.port.dom-pix::after{border-radius:50%!important}
+.react-flow__handle.port.dom-enc::after{border-radius:0}
+.react-flow__handle.port.dom-ctl::after{inset:1px;transform:rotate(45deg)}
+.react-flow__handle.port.ring::after{background:transparent;border-style:dotted}
+.react-flow__handle.port:hover::after,.react-flow__handle.port.connectingfrom::after{background:var(--pc)}
+/* While a wire is dragged: sockets that would take it at full strength (2px), the rest at 25%. */
+.react-flow__handle.port.can::after{border-width:2px;background:var(--pc);box-shadow:0 0 0 2px var(--surface-void, #08090c)}
+.react-flow__handle.port.cannot{opacity:.25}
+/* The refused wire's reason, at the drop point */
+.wirerefusal{position:fixed;z-index:60;max-width:300px;display:flex;flex-direction:column;gap:4px;padding:8px 10px;background:var(--surface-3);border:1px solid var(--fn-destructive);font:450 11px/1.35 var(--font-ui);color:var(--txt-1);box-shadow:0 6px 18px rgba(0,0,0,.45)}
+.wirerefusal b{font:600 11px/1.2 var(--font-mono);color:var(--fn-destructive)}
+.wirerefusal .why{color:var(--txt-2)}
+.wirerefusal .acts{display:flex;gap:6px;margin-top:2px}
+
+/* Phase 1.3, Blender-style port rows: a socket per row, centred on the node's outer edge */
+.gnode.rf .gports{display:flex;flex-direction:column;padding:3px 0;border-bottom:1px solid var(--line)}
+.gnode.rf .prow{position:relative;height:18px;display:flex;align-items:center;margin:0 -1px 0 -3px;padding:0 10px 0 12px} /* reaches the outer edge: 3px accent border left, 1px right */
+.gnode.rf .prow.out{justify-content:flex-end}
+.gnode.rf .prow .plabel{font:500 9px/1 var(--font-mono);letter-spacing:.04em;color:var(--txt-3);text-transform:uppercase;white-space:nowrap}
+.gnode.rf .prow .plabel em{font-style:normal;color:var(--txt-3);opacity:.7}
+.gnode.rf .prow .react-flow__handle-left{left:0}
+.gnode.rf .prow .react-flow__handle-right{right:0;left:auto}
+/* Phase 1.4: a Reroute is a small dot-sized node on the wire */
+.gnode.rf.reroute{width:46px;border-left-width:1px;cursor:grab}
+.gnode.rf.reroute .prow{margin:0 -1px;padding:0;justify-content:center;height:20px}
+.gnode.rf.reroute .prow .plabel{color:var(--txt-3)}
+/* 3.2 containers: dashed, a different kind of thing from a node; the face shows contents and domain path, never inner params */
+.gnode.rf.container{width:188px;border:1.5px dashed var(--gold);border-left-width:1.5px;background:color-mix(in srgb,var(--gold) 5%,var(--panel))}
+.gnode.rf.container .prow{margin:0 -1.5px}
+.gnode.rf.container .cbadge.ctr{color:var(--gold);border-color:var(--gold)}
+.gnode.rf.container .ctrcount{color:var(--gold)}
+.gnode.rf.container .ctrpath{font:600 9px/1.2 var(--font-mono);letter-spacing:.06em;color:var(--txt-2);text-transform:uppercase}
+.gnode.rf.container .ctrhint{font-size:9px;color:var(--txt-3);opacity:.8}
+.canvaswrap .ctoolbar .cb.grp{border-color:var(--gold);color:var(--gold)}
+.gnode.rf.container .ctrinner{font-size:10px;color:var(--txt-3);white-space:normal;line-height:1.3}
+.blockcue .crumbs{display:inline-flex;align-items:center;gap:6px}
+.blockcue .crumb{background:none;border:1px solid var(--line);border-radius:4px;color:var(--txt-2);font:inherit;padding:1px 6px;cursor:pointer}
+.blockcue .crumb:hover{color:var(--txt-1);border-color:var(--gold)}
+.scopetag.ctr{color:var(--gold);border:1px dashed var(--gold)}
+/* 3.6 the browser's kind switch: All / Looks / Operators */
+.fxkinds{display:flex;gap:4px;padding:0 10px 6px}
+.fxkinds button{flex:1;background:none;border:1px solid var(--line);border-radius:4px;color:var(--txt-2);font:600 10px/1 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;padding:5px 0;cursor:pointer}
+.ownlook{display:flex;gap:6px;margin:6px 0 2px}
+/* the light tour: one small card, bottom right, never blocking */
+.tourcard{position:fixed;right:18px;bottom:18px;z-index:40;width:320px;background:var(--panel);border:1px solid var(--gold);border-radius:6px;padding:12px 14px;box-shadow:0 6px 24px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:6px;font-size:12px}
+.tourcard b{color:var(--txt-1);font-size:13px}
+.tourcard p{margin:0;color:var(--txt-2);line-height:1.4}
+.tourcard .tourn{font:600 10px/1 var(--font-mono);letter-spacing:.08em;color:var(--gold)}
+.tourcard .tourbtns{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px}
+/* Source folder navigation: where you are, up, browse, the subfolders */
+.navig{border-bottom:1px solid var(--line);padding:6px 8px 4px}
+.navig .navbar{display:flex;align-items:center;gap:6px}
+.navig .crumbs{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:2px;font-size:11px}
+.navig .crumbs>span{display:inline-flex;align-items:center;white-space:nowrap}
+.navig .crumb{display:inline-block;width:auto;height:auto;background:none;border:0;color:var(--txt-2);font:inherit;line-height:1.4;padding:1px 3px;cursor:pointer;border-radius:3px;text-transform:none;letter-spacing:0}
+.navig .crumb:hover{color:var(--txt-1);background:var(--panel-2)}
+.navig .crumb.on{color:var(--txt-1);font-weight:600}
+.navig .sep{color:var(--txt-3);padding:0 1px}
+.navig .navdirs{max-height:180px;overflow:auto;margin-top:4px}
+.navig .navdir{cursor:pointer}
+.navig .navnote{font-size:11px;color:var(--txt-3);padding:4px 2px}
+.ownlook input{flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:4px;color:var(--txt-1);font:inherit;padding:3px 6px}
+.fxkinds button.on{color:var(--txt-1);border-color:var(--gold);background:color-mix(in srgb,var(--gold) 10%,transparent)}
+/* 3.3 macros: a container's knobs; the inspector names, removes and exposes them */
+.inspector-body .macrorow{display:flex;flex-direction:column;gap:2px;margin-bottom:6px}
+.inspector-body .macrox{align-self:flex-end;font-size:10px;color:var(--txt-3)}
+.inspector-body .ctrname{display:flex;flex-direction:column;gap:3px;margin:4px 0 10px}
+.inspector-body .ctrname input{background:var(--panel-2);border:1px solid var(--line);border-radius:4px;color:var(--txt-1);font:inherit;padding:4px 6px}
+.inspector-body .exposerow{margin:10px 0 6px;display:flex;flex-direction:column;gap:4px}
+.inspector-body .exposerow select{background:var(--panel-2);border:1px dashed var(--gold);border-radius:4px;color:var(--txt-1);font:inherit;padding:4px 6px}
+/* Phase 1.5: project Values, beside the LFOs */
+.valuerow .vname{flex:1;min-width:0;background:transparent;border:1px solid transparent;color:var(--txt-1);font:600 12px/1 var(--font-mono);padding:3px 4px}
+.valuerow .vname:focus{border-color:var(--fn-focus);outline:none}
+.valuerow .vbadge,.valuetile .vbadge{color:var(--gold)}
+.valuerow .vlink{flex-wrap:wrap;gap:4px 8px}
+.valuerow .vcurve{background:var(--surface-3);border:1px solid var(--line-2);color:var(--txt-1);font:500 10px/1 var(--font-mono);padding:2px 3px}
+.valuerow .vnow{font:600 10px/1 var(--font-mono);color:var(--gold)}
+/* Dogfood U1: what a motion block does, under its kind */
+.kindnote{grid-column:1/-1;margin:2px 0 4px;font:450 10.5px/1.4 var(--font-ui);color:var(--txt-3)}
+
+/* ---------- Phase 2.1: the effect browser (the Add-effect drawer, browsed by look) ---------- */
+.fxpanel.fxbrowser{width:min(460px,96vw)}
+.fxbrowser .fxsearch input{width:100%}
+.fxtabs{display:flex;flex-wrap:wrap;gap:4px;padding:8px 14px 6px;border-bottom:1px solid var(--line)}
+.fxtabs button,.fxfacets button{font-size:10px;padding:2px 7px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--txt-2);border-radius:3px;cursor:pointer}
+.fxtabs button.on{background:var(--fn-interactive);border-color:var(--fn-interactive);color:var(--txt-on-fill)}
+.fxfacets{display:flex;flex-wrap:wrap;gap:4px;padding:6px 14px 8px;border-bottom:1px solid var(--line)}
+.fxfacets button{display:inline-flex;align-items:center;gap:5px}
+.fxfacets button.on{border-color:var(--fn-interactive);color:var(--txt-1)}
+.fxfacets button.clear{border-style:dashed}
+.fxfacets .od{width:7px;height:7px;border-radius:2px}
+.fxbrowser .op{cursor:pointer}
+.fxbrowser .op.sel{background:var(--surface-2);border-left-color:var(--fn-interactive)}
+.fxbrowser .op .side{margin-left:auto;font:600 8px var(--font-mono);letter-spacing:.5px;color:var(--txt-3);border:1px solid var(--line-2);padding:0 4px;border-radius:2px}
+.fxbrowser .op .ob{white-space:normal;overflow:visible;line-height:1.35}
+.fxbrowser .op.sel .ob{color:var(--txt-1)}
+.fxbrowser .explain{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:8px 0 0;font-size:11px;line-height:1.4}
+.fxbrowser .explain dt{color:var(--txt-3);font-size:9px;text-transform:uppercase;letter-spacing:.5px;padding-top:2px}
+.fxbrowser .explain dd{margin:0;color:var(--txt-2)}
+.fxbrowser .explain.chain{display:block;color:var(--txt-2);font-family:var(--font-mono);font-size:10px}
+.fxbrowser .trylinks{display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:3px}
+.fxbrowser .trylink{display:inline-block;margin:0;font-size:10px;background:none;border:none;color:var(--fn-interactive);padding:0;cursor:pointer}
+.fxbrowser .opacts{display:flex;gap:6px;margin-top:8px}
+.fxbrowser .op .add,.fxbrowser .opacts button{opacity:1;align-self:auto}
+
+/* ---------- Phase 2.2: audition (the Program shows an effect that is not applied) ---------- */
+.pvcard.auditioning canvas{outline:1px dashed var(--fn-transient);outline-offset:-1px}
+.pvcard.auditioning,.program>.pvcard.auditioning{flex-direction:column}
+.pvcard.auditioning>:first-child{flex:1 1 0;min-height:0}
+.fxbrowser .fxlist{user-select:none}
+.auditionbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:5px 8px;border-top:1px solid var(--fn-transient);background:color-mix(in srgb,var(--fn-transient) 10%,var(--surface-1));font-size:11px}
+.auditionbar .atag{font:700 9px var(--font-mono);letter-spacing:.6px;color:var(--txt-on-fill);background:var(--fn-transient);padding:1px 5px}
+.auditionbar .alabel{flex:1;min-width:160px;color:var(--txt-2)}
+.auditionbar .alabel b{color:var(--txt-1)}
+.auditionbar .shortlist{flex-basis:100%;display:flex;flex-wrap:wrap;gap:4px}
+.auditionbar .chip{display:inline-flex;border:1px solid var(--line-2);background:var(--surface-2)}
+.auditionbar .chip.on{border-color:var(--fn-transient)}
+.auditionbar .chip button{background:none;border:none;color:var(--txt-2);font-size:10px;padding:1px 6px;cursor:pointer}
+.auditionbar .chip.on button{color:var(--txt-1)}
+.fxbrowser .op .listed{color:var(--fn-transient);font-size:9px}
+
+/* ---------- Phase 2.3: live previews in the effect browser ---------- */
+.fxbrowser .fxthumb{position:relative;flex:none;width:96px;height:54px;background:var(--surface-void);border-left:2px solid var(--line-2);overflow:hidden}
+.fxbrowser .fxthumb.moving{outline:1px solid var(--fn-interactive)}
+.fxbrowser .fxthumb .frameview,.fxbrowser .fxthumb>div{width:100%;height:100%}
+.fxbrowser .fxthumb canvas{width:100%;height:100%;object-fit:cover;display:block}
+.fxbrowser .fxthumb .prep{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;font:500 8px var(--font-mono);color:var(--txt-3);padding:2px}
+.fxbrowser .fh .thumbtoggle{font-size:10px;padding:2px 6px}
+.fxbrowser .op .lk{font:500 9px var(--font-mono);letter-spacing:.3px;color:var(--fn-interactive);text-transform:uppercase;margin:1px 0}
+
+/* ---------- Phase 2.6: before / after, favourites, the user's tags ---------- */
+.pvcard.revealing canvas{outline-color:var(--txt-3)}
+.wipe{position:relative;flex:1 1 0;min-height:0}
+.wipe .wunder,.wipe .wover{position:absolute;inset:0;display:flex}
+.wipe .wunder>*,.wipe .wover>*{flex:1 1 auto;min-width:0}
+.wipe .wover{clip-path:inset(0 0 0 var(--wipe))}
+.wipe .wline{position:absolute;top:0;bottom:0;left:var(--wipe);width:14px;margin-left:-7px;cursor:ew-resize;display:flex;justify-content:center;touch-action:none}
+.wipe .wline::before{content:"";width:2px;background:var(--fn-transient)}
+.wipe .wline span{position:absolute;bottom:6px;white-space:nowrap;font:600 8px var(--font-mono);letter-spacing:.5px;color:var(--txt-on-fill);background:var(--fn-transient);padding:1px 4px}
+.fxbrowser .op .fav{background:none;border:none;color:var(--txt-3);font-size:12px;line-height:1;padding:0 2px;cursor:pointer}
+.fxbrowser .op .fav.on{color:var(--fn-rec)}
+.fxbrowser .utag{display:inline-flex;align-items:center;gap:2px;font:500 9px var(--font-mono);color:var(--fn-info);border:1px solid var(--line-2);padding:0 4px}
+.fxbrowser .utag button{background:none;border:none;color:var(--txt-3);padding:0;font-size:10px;cursor:pointer}
+.fxbrowser .tagedit{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:8px}
+.fxbrowser .tagedit input{width:110px;font-size:10px;padding:1px 5px}
+.fxfacets.usertags button{color:var(--fn-info)}
+
+/* ---------- C5: master (byte-identical) vs delivery export formats ---------- */
+.fmtrole{display:inline-block;margin-top:3px;font:600 8.5px var(--font-mono);letter-spacing:.5px;padding:1px 5px;border:1px solid var(--line-2)}
+.fmtrole.master{color:var(--fn-valid);border-color:color-mix(in srgb,var(--fn-valid) 50%,var(--line-2))}
+.fmtrole.delivery{color:var(--fn-warn);border-color:color-mix(in srgb,var(--fn-warn) 50%,var(--line-2))}
+
+/* ---------- Polish 4: status and meaning on function / domain tokens ----------
+   The prototype's legacy names (--coral, --rose) collapse onto the selection / info cyan in the HUD
+   theme, so these drew in cyan: an error toast's border and icon, a failed store dot, a warning icon,
+   an encoded wire, and both block kinds alike. Selection, active and primary uses keep the cyan. */
+.toast.err{border-color:var(--fn-destructive)}
+.toast.err .ticon{color:var(--fn-destructive)}
+.toast.warn .ticon{color:var(--fn-warn)}
+.toast.ok .ticon{color:var(--fn-valid)}
+.setnav .store2 i.off,.lmenu .store i.off{background:var(--fn-warn)}
+.sheet.sm .sb .warnicon{color:var(--fn-warn)}
+.sheet.caution .warnicon{color:var(--fn-destructive)}
+.nodestrip .wire.enc{background:var(--dom-enc)}
+.nodestrip .wire.enc::after{border-left-color:var(--dom-enc)}
+/* A picture block holds its clip's pictures; a motion block carries the stream (the mosh). */
+.blk.pic .kind{color:var(--dom-pix)}
+.blk.mot .kind{color:var(--dom-enc)}
+.fxbrowser .explain .how{margin-top:6px;font:450 11px/1.4 var(--font-ui);color:var(--fn-warn)}
+
+/* Review shelf: picture first, recall alongside, export in one compact footer. */
+.review-render-pane{display:flex;flex-direction:column;gap:6px;padding:6px;height:100%;min-height:0;box-sizing:border-box}
+.preview-shelf{display:grid;grid-template-columns:minmax(100px,1fr) minmax(150px,1fr);gap:8px;flex:1;min-height:70px}
+.preview-shelf-media{min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;background:var(--surface-void)}
+.preview-shelf-media video{width:100%;height:100%;max-height:230px;object-fit:contain}
+.preview-empty{padding:10px;color:var(--txt-2);font-size:11px;line-height:1.5}
+.preview-shelf-tools{display:flex;flex-direction:column;gap:5px;min-width:0;overflow:auto;font-size:10px}
+.preview-shelf-tools label{display:flex;flex-direction:column;gap:4px;font-size:11px}
+.preview-shelf-tools select,.compact-export select{min-width:0;max-width:100%;background:var(--surface-2);border:1px solid var(--line-2);color:var(--txt-1);padding:3px;font:11px var(--font-ui)}
+.preview-actions{display:flex;flex-wrap:wrap;gap:4px}
+.preview-actions button,.compact-export button{font:11px var(--font-ui);padding:3px 6px;white-space:nowrap}
+.preview-actions button,.compact-export button:not(.btn-run){background:var(--surface-2);color:var(--txt-2);border:1px solid var(--line-2)}
+.compact-export{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border-top:1px solid var(--line);padding-top:6px;flex:none}
+.compact-export label{display:flex;align-items:center;gap:6px;font-size:11px;min-width:0;flex:1}
+.compact-export .btn-run{height:25px;flex:none}
+
+/* Audio metadata is a quiet status beside the export switches, not a warning banner. */
+.exprow .export-audio-status{align-self:flex-end;max-width:26ch;padding-bottom:6px;color:var(--txt-3);font-size:11px;line-height:1.3;overflow-wrap:anywhere}

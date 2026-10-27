@@ -1,0 +1,22 @@
+node_modules/
+dist/
+out/
+*.log
+test-results/
+playwright-report/
+fixtures/*
+!fixtures/README.md
+coverage/
+.vite/
+*.tsbuildinfo
+*.tmp
+Thumbs.db
+.DS_Store
+# engine scratch if a cacheDir ever lands outside out/
+*.f32
+*.h264
+library.db
+# the HD test clips (61 MB of video, app/src/lib/testClips.ts): local media, never committed
+test-footage/
+# Local browser fixture bundles and screenshots; retain evidence outside Git.
+/output/

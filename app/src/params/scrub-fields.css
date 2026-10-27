@@ -1,0 +1,4 @@
+.blocktab .blocktrim .npm>.pnm,.blocktab .isheet:last-child .npm>.pnm{display:none}
+.blocktab .isheet{padding:8px 10px;margin-top:8px}
+.blocktab .isheet>.sec{font-size:10px;margin-bottom:5px}
+.blocktab .kindnote{white-space:normal;overflow:visible;font:10px/1.45 var(--font-ui);color:var(--txt-3)}

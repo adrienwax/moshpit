@@ -1,0 +1,6 @@
+/* A ruler, rather than repeated full transport timecodes. */
+.ticks .tk{font-style:normal}
+.ticks .tk.major{height:16px;background:var(--txt-2);opacity:1}
+.ticks .tk.major span{font-size:11px;font-style:normal;font-weight:500;color:var(--txt-2);top:1px;padding-left:4px;background:var(--surface-1)}
+.ticks .tk.minor{height:8px;opacity:.65}
+.ticks .tk.fine{height:4px;opacity:.32}

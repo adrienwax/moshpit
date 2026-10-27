@@ -1,0 +1,44 @@
+// Fresh headless source fixture only. No native app, media, owner profile or engine worker.
+import { ensureScratch } from './build-scratch/bootstrap.mjs';
+const scratch=ensureScratch('build');
+const { default:fs }=await import('node:fs');
+const { default:path }=await import('node:path');
+const { createServer }=await import('node:http');
+const { strict:assert }=await import('node:assert');
+const { build }=await import('esbuild');
+const { chromium }=await import('playwright');
+const root=path.resolve(import.meta.dirname,'..'),out=path.join(scratch.artifacts,'output/playwright');
+fs.mkdirSync(out,{recursive:true});
+const result=await build({entryPoints:[path.join(root,'app/test/shared-presentation.browser.tsx')],bundle:true,outfile:path.join(out,'fixture.js'),format:'esm',platform:'browser',jsx:'automatic',metafile:true,alias:{'@moshpit/core':path.join(root,'core/src/index.ts'),'@moshpit/engine':path.join(root,'engine/src/index.ts')},define:{'process.env.NODE_ENV':'"development"'}});
+fs.writeFileSync(path.join(out,'bundle-inputs.json'),JSON.stringify(result.metafile,null,2));
+const html=`<!doctype html><link rel="stylesheet" href="/fixture.css"><style>body{background:var(--surface-bg);color:var(--txt-1);font:14px var(--font-ui);padding:36px}h1{font-size:18px}h2{font-size:14px}section{display:flex;gap:36px;margin:36px 0;align-items:start}#edit{display:block;width:400px}#inspect>.mp-parameter-inspect{width:250px}</style><div id="root"></div><script type="module" src="/fixture.js"></script>`;
+const server=createServer((req,res)=>{const name=req.url==='/'?null:({'/fixture.js':'fixture.js','/fixture.css':'fixture.css'})[req.url];if(req.url!=='/'&&!name){res.writeHead(404).end();return;}res.setHeader('Content-Type',name?.endsWith('js')?'text/javascript':name?'text/css':'text/html');res.end(name?fs.readFileSync(path.join(out,name)):html)});
+await new Promise(r=>server.listen(0,'127.0.0.1',r));
+let browser;const checks=[],errors=[];
+try{
+ browser=await chromium.launch({headless:true,channel:'msedge'});
+ const page=await browser.newPage({viewport:{width:1200,height:760}});
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(`http://127.0.0.1:${server.address().port}`);await page.waitForFunction(()=>!!window.qa);
+ const state=()=>page.evaluate(()=>window.qa.state());
+ const reset=async()=>{await page.evaluate(()=>window.qa.reset());await page.waitForFunction(()=>window.qa.state().value===50)};
+ const slider=page.locator('#edit [role=slider]');
+ const point=async()=>{const b=await slider.boundingBox();assert(b&&b.width>200&&b.height>=29,'standalone canonical scrub geometry');return{x:b.x+b.width/2,y:b.y+b.height/2}};
+ const check=(name)=>checks.push(name);
+ assert.equal(await page.locator('#inspect button,#inspect input,#inspect [role=slider]').count(),0);
+ const original=await state();await page.locator('#inspect [data-node-id=original] .gt').click();
+ await page.locator('#inspect [data-node-id=unknown] summary').click();
+ assert.match(await page.locator('#inspect [data-node-id=unknown] pre').textContent(),/retained/);
+ await page.locator('#inspect output').first().click({button:'right'});await page.keyboard.press('ArrowRight');
+ const inspected=await state();assert.equal(inspected.raw,original.before);assert.equal(inspected.callbacks,0);assert.equal(inspected.past,0);check('inspect selection/raw disclosure/context-key interaction leaves source and history unchanged');
+ let p=await point();await page.mouse.move(p.x,p.y);await page.mouse.down();await page.mouse.move(p.x+22,p.y,{steps:4});await page.waitForTimeout(1600);await page.mouse.move(p.x+44,p.y,{steps:4});await page.mouse.up();
+ let s=await state();assert.equal(s.value,70);assert.equal(s.past,1);await page.evaluate(()=>window.qa.undo());assert.equal((await state()).value,50);await page.evaluate(()=>window.qa.redo());assert.equal((await state()).value,70);check('slow multi-move drag = one undo; redo restores final value');
+ await reset();await slider.focus();await page.keyboard.press('ArrowRight');assert.equal((await state()).value,50.5);await page.keyboard.press('Shift+ArrowRight');assert.equal((await state()).value,50.55);check('keyboard step and fine modifier preserve parameter units');
+ await reset();await page.locator('#edit .pv').click();let input=page.locator('#edit input');await input.fill('62.75');await input.press('Enter');assert.equal((await state()).value,62.75);assert.equal((await state()).past,1);await slider.click({button:'right'});assert.equal((await state()).value,50);check('typed precision and reset-to-initial');
+ await reset();await page.locator('#edit .pv').click();await input.fill('80');await input.press('Escape');assert.equal((await state()).value,50);assert.equal((await state()).past,0);check('Escape discards typed draft without undo entry');
+ await page.locator('#edit .pv').click();await input.fill('91');await page.locator('#switch').click();assert.equal(await input.count(),0);assert.equal((await state()).value,50);check('field switch rejects stale typed draft');
+ await reset();p=await point();await page.mouse.move(p.x,p.y);await page.mouse.down();await page.mouse.move(p.x+22,p.y);await page.evaluate(()=>window.dispatchEvent(new Event('blur')));const stopped=(await state()).value;await page.mouse.move(p.x+60,p.y);await page.mouse.up();assert.equal((await state()).value,stopped);assert.equal((await state()).cursor,'');check('window blur releases scrub listeners/cursor; existing last-value commit semantics preserved');
+ await reset();await slider.focus();await page.keyboard.press('ArrowRight');await page.evaluate(()=>window.qa.undo());assert.equal((await state()).future,1);await page.locator('#edit .pv').click();await input.press('Enter');assert.equal((await state()).future,1);check('no-op typed commit preserves redo branch');
+ await page.screenshot({path:path.join(out,'shared-presentation.png'),fullPage:true});assert.deepEqual(errors,[]);check('no browser page errors');
+ fs.writeFileSync(path.join(out,'RESULT.json'),JSON.stringify({status:'PASS',checks,errors,evidence:'source/headless browser + actual ParamControl/history using mock engine; not native/worker/CT/media',artifacts:out},null,2));console.log(JSON.stringify({checks:checks.length,out}));
+}finally{await browser?.close();await new Promise(r=>server.close(r));}

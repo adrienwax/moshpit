@@ -1,0 +1,261 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "b4817ee48e946da617492da3bf23b0290c62ab4f",
+  "registrySha256": "c88d87258b565ad58c38cc8ddb1e64746ebec12508982314c7227bfb2781b629",
+  "sectionVersions": {
+    "project": 1,
+    "graph": 2,
+    "nodeDefs": 1,
+    "components": 1,
+    "resources": 1
+  },
+  "definitions": [
+    {
+      "kind": "source.clip",
+      "defVersion": 1,
+      "creationEligible": false
+    },
+    {
+      "kind": "decode.webcodecs",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "seam.mosh",
+      "defVersion": 1,
+      "creationEligible": false
+    },
+    {
+      "kind": "mosh.reorder",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.plane-desync",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.feedback",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "route.mix",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "route.delay",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "output.sink",
+      "defVersion": 1,
+      "creationEligible": false
+    },
+    {
+      "kind": "route.reroute",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "route.reroute-stream",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "route.null",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "route.switch",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "group.in",
+      "defVersion": 1,
+      "creationEligible": false
+    },
+    {
+      "kind": "group.out",
+      "defVersion": 1,
+      "creationEligible": false
+    },
+    {
+      "kind": "group.container",
+      "defVersion": 1,
+      "creationEligible": false
+    },
+    {
+      "kind": "fx.saturation",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.contrast",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.brightness",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.hue-rotate",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.invert",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.sepia",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.posterize",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.channel-isolation",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.chroma-drift",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.mirror",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.transform",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.row-displacement",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.pixel-stretch",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.resolution-crush",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.soft-blur",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.salt-pepper",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.plane-desync-temporal",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.field-desync",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.feedback-trail",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.chroma-trail",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.drift-trail",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.breath-trail",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "fx.echo-taps",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "mosh.hold",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "mosh.stride",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "mosh.reverse",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "mosh.pingpong",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "mosh.stride-slip",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "mosh.speed",
+      "defVersion": 1,
+      "creationEligible": true
+    },
+    {
+      "kind": "mosh.speed-ramp",
+      "defVersion": 1,
+      "creationEligible": true
+    }
+  ],
+  "canonicalInputs": {
+    "core/src/nodedef.ts": "2fa524cbae2c52d0d689698c4b14c6005bcdc6653f54897efcf176ef1b0199b5",
+    "core/src/project.ts": "e2a12c42e16e464d5db4dffe65ca014e6e70acc264dc75c87df3db5b1a1e1012",
+    "core/src/ids.ts": "0484f8a47e9002430be6ac8ed260c7e3a7664f36a352339824e589cd5417793c",
+    "engine/src/nodes/defs.ts": "fe9bebffa8df0db5b787c504d23c73b1e9531ff2d8b20f69a41dce5d9f91622e",
+    "engine/src/nodes/ops/spec.ts": "5378ea78a163c5eae43879abc0f6e1fecdff624d068695aa24f7b37ec9074973",
+    "engine/src/nodes/ops/stateless.ts": "b262d8c430b5f3802637e9a10ab770df792241ef9362e4f8fca9b6c77a318c81",
+    "engine/src/nodes/ops/temporal.ts": "1a05a62f4eafc74be36b41aa5c7d17f26cabc03ff78eef481c87747a4399e391",
+    "engine/src/nodes/ops/bitstream.ts": "f0252824ce4972055083c11cb8881590076428c56d25fbd1a6f48cb56d9ee47b",
+    "engine/src/project/io.ts": "996645c89256a97275747968610da6c2af6ab9d651fd754aec08dc13598ec0fe"
+  },
+  "ioCompatibility": {
+    "status": "requires-consumer-fixture-receipt",
+    "expectedSourceCommit": "b4817ee48e946da617492da3bf23b0290c62ab4f",
+    "note": "Section versions and source hashes alone do not prove cross-revision IO or raw-byte export compatibility."
+  },
+  "toolchain": "Consumer must separately seal and verify every executed bootstrap/build input before execution."
+}

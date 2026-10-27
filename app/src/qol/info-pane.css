@@ -1,0 +1,10 @@
+.info-pane{flex:0 0 160px;min-height:0;display:flex;flex-direction:column;border:1px solid var(--line);border-top:2px solid var(--fn-info);background:var(--surface-1);color:var(--txt-1);overflow:hidden}
+.info-pane>header{display:flex;align-items:center;justify-content:space-between;flex:none;padding:3px 7px;border-bottom:1px solid var(--line);font-size:10px;font-weight:700;letter-spacing:.6px}
+.info-pane>header button{border:0;background:transparent;color:var(--txt-2);cursor:pointer;padding:1px 5px}
+.info-content{overflow:auto;padding:8px;font-size:11px;line-height:1.45;white-space:pre-line;overflow-wrap:anywhere;user-select:text;-webkit-user-select:text}
+.info-content strong{font-size:11px;color:var(--fn-info)}
+.info-content p{margin:5px 0 0}
+.info-pane.collapsed{flex-basis:25px}
+.info-pane.collapsed .info-content{display:none}
+.inspector-body .ih[tabindex]{cursor:help}
+@media(max-height:750px){.info-pane:not(.collapsed){flex-basis:125px}}

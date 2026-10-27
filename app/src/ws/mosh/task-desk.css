@@ -1,0 +1,113 @@
+/* Task desk A: useful concurrent context; ordinary sequence never stretches into a giant block. */
+.task-desk{display:flex;flex-direction:column;min-height:0;flex:1 1 0;height:auto}
+.desk-tools{display:flex;flex:none;gap:3px;flex-wrap:wrap;padding:4px 6px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.desk-tools button,.detail-tabs button,.context-actions button,.inspect-result{font:500 11px var(--font-ui);min-height:28px;padding:4px 7px}
+.task-desk>.ws-mosh{container-name:moshspace;container-type:size;flex:1 1 0;min-height:0}
+.desk-context{display:flex;align-items:center;gap:5px 12px;flex-wrap:wrap;padding:4px 8px;flex:none;border-bottom:1px solid var(--line);font:11px var(--font-ui);color:var(--txt-2)}
+.desk-context b{color:var(--txt-1);font-weight:600}.inspect-result{margin-left:auto}.inspect-result.suggested{border-color:var(--fn-interactive);color:var(--fn-interactive)}
+.selected-block-context{padding:7px;background:var(--surface-2);border:1px solid var(--line)}
+.selected-block-context header,.block-range,.context-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.selected-block-context header{justify-content:space-between;font-size:11px}.selected-block-context header span{color:var(--txt-2)}
+.selected-source{margin:5px 0;font:11px var(--font-ui);overflow-wrap:anywhere}.block-range{font:12px var(--font-mono)}.block-range strong{margin-left:auto}.context-actions{margin-top:6px}
+.task-desk .effecttab{gap:6px}.task-desk .effacts .dim{display:none}
+.task-detail{min-height:0;max-height:100%;overflow:auto;font:12px var(--font-ui)}
+.detail-tabs{display:flex;flex-wrap:wrap;gap:2px;padding:3px 6px;border-bottom:1px solid var(--line);background:var(--surface-2);position:sticky;top:0;z-index:6}
+.detail-tabs [aria-pressed=true],.applied-nodes [aria-pressed=true],.block-index [aria-pressed=true]{color:var(--fn-interactive);border-color:var(--fn-interactive)}
+.processing-summary{padding:6px 8px}.processing-summary>.dim{font-size:10px}.applied-nodes{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:5px}.applied-nodes button{min-height:28px;padding:3px 8px;border-left:3px solid var(--dom-pix);font:12px var(--font-ui)}
+.detail-actions,.task-capture{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:6px 8px}.task-capture .previewsel{flex-wrap:wrap;white-space:normal}
+.task-routing{height:210px;min-height:140px;position:relative}.task-routing>.canvaswrap{height:100%}
+.task-desk .lane:not(.h)>.card:has(>.pbody>.tl){flex:0 0 auto!important;max-height:48%;min-height:145px}
+.task-desk .tl{height:auto;container-type:normal;overflow:auto;padding:5px 7px}
+.task-desk .tl>.tlview{flex:0 0 auto;height:94px;min-height:94px}
+.task-desk .tl .tlinner{flex:0 0 76px;height:76px;min-height:76px}
+.task-desk .tl .tlinner .track{height:76px;align-items:stretch}
+.task-desk .tl .blk{height:76px;min-height:76px;box-sizing:border-box;min-width:0;overflow:hidden;border-radius:0}
+.task-desk .tl .blk .trimh{width:7px}.task-desk .tl>.bpm{margin-top:1px;font-size:10px}
+.block-index{display:flex;align-items:center;gap:3px;padding:3px 0;flex:none;overflow:auto;min-height:30px}
+.block-index>span{font:10px var(--font-ui);color:var(--txt-2);margin-right:3px}.block-index button{min-width:28px;min-height:26px;flex:none;font:12px var(--font-mono);padding:2px 5px}
+.task-desk.animating .card:has(>.pbody>.tl.has-animation){flex:1 1 260px!important;min-height:250px;max-height:58%}
+.task-desk .tl.has-animation{height:100%;overflow:hidden}.task-desk .tl.has-animation>.tlview{height:62px;min-height:62px}.task-desk .tl.has-animation .tlinner,.task-desk .tl.has-animation .track,.task-desk .tl.has-animation .blk{height:44px;min-height:44px}.task-desk .tl.has-animation .bro{display:none}
+.task-desk .card:has(>.pbody>.task-detail){min-height:96px}
+.task-desk .ws-mosh .docked-program{overflow:hidden}
+@media(max-width:1200px){.task-desk .wcol[data-col="dock"]{flex-basis:190px!important}.task-desk .wcol[data-col="inspect"]{flex-basis:300px!important}.desk-context{gap:3px 7px}.desk-context .inspect-result{margin-left:0}}
+@media(max-height:850px){.task-desk .viewer-mode{padding:1px 5px}.task-desk .preview-counters{min-height:20px;padding:0}.task-desk .preview-detail{font-size:9px}.task-desk .program-options{padding:2px 6px}}
+
+.task-desk .desk-tools button,.task-desk .detail-tabs button,.task-desk .context-actions button,.task-desk .inspect-result,.task-desk .block-index button,.task-desk .applied-nodes button,.task-desk .detail-actions button{background:var(--surface-2);border:1px solid var(--line);color:var(--txt-1);cursor:pointer}
+.task-desk button:disabled{opacity:.45;cursor:default}
+
+.task-desk .tl:not(.has-animation)>.bpm,.task-desk .tl:not(.has-animation)>.animation-open{display:none}
+
+.task-desk .detail-source .zmeta>span:nth-child(2){display:none}
+.task-desk .detail-source .source-desk-tools{min-height:24px}
+
+.task-desk .card:has(>.pbody>.detail-capture),.task-desk .card:has(>.pbody>.detail-source),.task-desk .card:has(>.pbody>.detail-block),.task-desk .card:has(>.pbody>.detail-modulation),.task-desk .card:has(>.pbody>.detail-graph){max-height:clamp(150px,28cqh,260px)!important}
+.task-desk .card:has(>.pbody>.docked-program){min-height:365px!important}
+.task-desk .ws-mosh .docked-program>.program-monitors{min-height:135px}
+
+.task-desk .detail-tabs button[aria-pressed=true],.task-desk .applied-nodes button[aria-pressed=true],.task-desk .block-index button[aria-pressed=true]{border-color:var(--fn-interactive);color:var(--fn-interactive);background:var(--surface-3)}
+
+.task-desk.animating .card:has(>.pbody>.detail-processing){min-height:80px!important;max-height:80px!important}
+
+/* Budget against the real stage after top bar, status and tool rows, including scaled UI. */
+@container moshspace (max-height:750px){
+  .task-desk:has(.task-detail:not(.detail-processing)) .lane:not(.h)>.card:has(>.pbody>.tl){flex:0 0 92px!important;min-height:92px!important;max-height:92px!important}
+  .task-desk:has(.task-detail:not(.detail-processing)) .tl>.tlview{height:32px;min-height:32px}
+  .task-desk:has(.task-detail:not(.detail-processing)) .tl :is(.tlinner,.track,.blk){height:32px;min-height:32px;flex-basis:32px}
+  .task-desk:has(.task-detail:not(.detail-processing)) .tl :is(.chain,.bro,.tlnav,.bpmruler){display:none}
+  .task-desk.animating:has(.task-detail:not(.detail-processing)) :is(.parameter-timeline,.animation-empty){display:none}
+  .task-desk .card:has(>.pbody>.task-detail:not(.detail-processing)){min-height:176px!important;max-height:176px!important}
+  .task-desk.animating .card:has(>.pbody>.tl.has-animation){flex:1 1 270px!important;min-height:270px!important;max-height:none!important}
+  .task-desk.animating:has(.task-detail:not(.detail-processing)) .card:has(>.pbody>.tl.has-animation){flex:0 0 92px!important;min-height:92px!important;max-height:92px!important}
+  .task-desk.animating .card:has(>.pbody>.detail-processing){display:none}
+  .task-desk.animating .tl>.tlview{height:32px;min-height:32px}
+  .task-desk.animating .tl :is(.tlinner,.track,.blk){height:32px;min-height:32px;flex-basis:32px}
+  .task-desk.animating .tl :is(.bpmruler,.tlnav){display:none}
+  .task-desk .preview-counters{gap:7px;font-size:11px}.task-desk .preview-counters b{font-size:14px}
+}
+.curve-return{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--txt-2)}
+
+.compact-sequence-return{display:none}
+@container moshspace (max-height:750px){.compact-sequence-return{display:inline-block}}
+
+/* Bounded transport: controls and clocks share space without stretching with the viewer. */
+.task-desk .viewer-mode{gap:8px;flex-wrap:wrap}
+.task-desk .viewer-mode>.program-options{flex:1 1 auto;min-width:0;border:0;padding:0;gap:6px}
+.task-desk .ws-mosh .docked-program{container-type:inline-size;container-name:playbackdesk}
+.task-desk .ws-mosh .docked-program .preview-target{display:none}
+.task-desk .ws-mosh .docked-program .preview-transport{display:grid;width:100%;max-width:900px;align-self:center;box-sizing:border-box;grid-template-columns:max-content minmax(0,1fr);grid-template-areas:"buttons counters" "seek seek";gap:4px 10px;padding:5px 8px}
+.task-desk .preview-counters{display:flex;flex-wrap:wrap;justify-content:center;gap:3px 12px;min-height:30px;padding:0;border:0;align-items:center}
+.task-desk .preview-counters>div{justify-content:center;min-width:max-content;font-variant-numeric:tabular-nums;gap:4px}
+.task-desk .ws-mosh .preview-counters b{display:inline-block;min-width:6ch;font-size:13px;text-align:right}
+.task-desk .preview-counters>div:first-child b{min-width:11ch}
+.task-desk .preview-counters .preview-bars b{min-width:5ch}
+.task-desk .preview-counters em{min-width:6ch}
+.task-desk .preview-buttons{margin:0!important;padding:0;border:0;align-self:center;gap:2px}
+.task-desk .ws-mosh .preview-buttons>button,.task-desk .ws-mosh .preview-buttons>button.preview-play{min-height:32px}
+.task-desk .ws-mosh .preview-detail{display:none}
+@container playbackdesk (max-width:760px){
+  .task-desk .ws-mosh .docked-program .preview-transport{grid-template-columns:minmax(0,1fr);grid-template-areas:"buttons" "counters" "seek"}
+  .task-desk .preview-counters{min-height:20px}
+}
+.inspector-chain{border-bottom:1px solid var(--line);padding:6px 0}
+.inspector-chain header{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px}
+.inspector-chain .applied-nodes{display:flex;flex-direction:column;align-items:stretch;flex-wrap:nowrap;gap:4px;max-height:180px;overflow:auto}
+.task-desk .inspector-chain .applied-nodes button{display:flex;align-items:center;text-align:left;gap:7px;border-left-width:4px;flex:none}
+.inspector-chain .chain-position{font:11px var(--font-mono);color:var(--txt-2);min-width:2ch}
+.inspector-chain .chain-label{flex:1;min-width:0;overflow-wrap:anywhere}
+.inspector-chain small{font-size:10px;color:var(--txt-2)}
+.inspector-chain .chain-routing{font:10px var(--font-ui);margin-top:4px}
+.processing-summary{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* Routing claims working space; compact its neighbours instead of clipping the canvas. */
+.task-desk:has(.detail-graph) .wcol[data-col="main"]>.lane{overflow-y:auto}
+.task-desk:has(.detail-graph) .card:has(>.pbody>.docked-program){flex:0 0 330px!important;min-height:330px!important;max-height:330px!important}
+.task-desk:has(.detail-graph) .docked-program{overflow-y:auto}
+.task-desk:has(.detail-graph) .ws-mosh .docked-program>.program-monitors{flex:1 0 130px;min-height:130px}
+.task-desk:has(.detail-graph) .lane:not(.h)>.card:has(>.pbody>.tl){flex:0 0 88px!important;min-height:88px!important;max-height:88px!important}
+.task-desk:has(.detail-graph) .tl>.tlview{height:30px;min-height:30px}
+.task-desk:has(.detail-graph) .tl :is(.tlinner,.track,.blk){height:30px;min-height:30px;flex-basis:30px}
+.task-desk:has(.detail-graph) .tl :is(.chain,.bro,.tlnav,.bpmruler){display:none}
+.task-desk:has(.detail-graph) .card:has(>.pbody>.detail-graph){flex:1 0 350px!important;min-height:350px!important;max-height:none!important}
+.task-desk .task-detail.detail-graph{display:flex;flex-direction:column;min-height:100%;height:100%;overflow:auto}
+.task-desk .detail-graph>.detail-tabs,.task-desk .detail-graph>.detail-actions{flex:none}
+.task-desk .detail-graph>.task-routing{flex:1 0 260px;min-height:260px;height:auto}
