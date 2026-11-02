@@ -49,6 +49,6 @@ Generated `node_modules/`, caches, outputs, test footage and installers are igno
 
 ## Packaging and contributions
 
-Use [Windows packaging](WINDOWS-PACKAGING.md) and the [controlled FFmpeg recipe](../scripts/ffmpeg/README.md). Unsigned local candidates are not public downloads. The binary, corresponding sources and notices must match; the original app’s MIT licence does not replace dependency licences.
+Use [Windows packaging](WINDOWS-PACKAGING.md) and the [controlled FFmpeg recipe](../scripts/ffmpeg/README.md). The [unsigned test prerelease](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.2-test) is for Sandbox evaluation; it is not a signed or accepted stable release. The binary, corresponding sources and notices must match; the original app’s MIT licence does not replace dependency licences.
 
 Keep changes focused. Run checks for the affected path and document any native behaviour not exercised. Discuss major feature changes in [Issues](https://github.com/adrienwax/moshpit/issues) first. Use [private security reporting](https://github.com/adrienwax/moshpit/security/advisories/new) for vulnerabilities.

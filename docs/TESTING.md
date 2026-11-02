@@ -2,7 +2,7 @@
 
 [← Moshpit](../README.md) · [Illustrated first project](first-project.md)
 
-For someone trying a candidate supplied by the maintainer. There is no public signed installer yet. Use the supplied clean-Windows/Sandbox kit when available; **do not disable Windows security or install on your main editing setup just to get past a warning**. Report the exact warning instead.
+Download the [unsigned Sandbox test kit](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.2-test), extract it fully, and run **START-CLEAN-TEST.cmd**. There is no signed stable installer yet; **do not disable Windows security or install on your main editing setup just to get past a warning**. Report the exact warning instead.
 
 ## One useful session
 
