@@ -12,7 +12,7 @@ const managed = ensureScratch('package');
 const unpackedOnly = process.argv.includes('--unpacked');
 const candidate = process.argv.includes('--candidate');
 const installer = process.argv.includes('--installer');
-const productName = candidate ? 'Moshpit KRAB Candidate' : 'Moshpit KRAB';
+const productName = candidate ? 'Moshpit Preview' : 'Moshpit';
 configureToolCaches(managed);
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -60,17 +60,18 @@ const stage = fs.mkdtempSync(path.join(tmp, 'moshpit-stage-'));
     directories: { app: stage, output }, files: ['dist/**', 'package.json'], asar: true, npmRebuild: false,
     extraResources: [{ from: ffmpegDir, to: 'ffmpeg', filter: ['ffmpeg.exe', 'ffprobe.exe'] },
       {from:root,to:'legal',filter:['LICENSE','THIRD-PARTY-NOTICES.txt','ASSET-NOTICES.txt','LOCAL-CANDIDATE-NOTICE.txt','third-party/**/*']},
-      {from:path.join(root,'third-party-binary'),to:'legal/binary',filter:['**/*']}],
+      {from:path.join(root,'third-party-binary'),to:'legal/binary',filter:['FFMPEG-BUILD.txt','FFMPEG-HASHES.json','MPL-SOURCE.txt','mediabunny-source.zip','NOTICE-HASHES.json','SOURCE-BUNDLE.json','notices/**/*']}],
     win: { target: [{ target: installer ? 'nsis' : 'portable', arch: ['x64'] }], icon: path.join(here, 'build', 'icon.png'), signAndEditExecutable: true },
-    portable: { artifactName: 'Moshpit-${version}-portable.${ext}' },
-    nsis: {oneClick:true,perMachine:false,runAfterFinish:false,deleteAppDataOnUninstall:false,artifactName:'Moshpit-KRAB-${version}-Setup-x64.${ext}'},
+    // Pinned builder 26.15.3: true keeps NSIS's unique per-launch $PLUGINSDIR.
+    portable: { artifactName: candidate ? 'Moshpit-Preview.${ext}' : 'Moshpit.${ext}', unpackDirName: true },
+    nsis: {oneClick:true,perMachine:false,runAfterFinish:false,deleteAppDataOnUninstall:false,artifactName:candidate ? 'Moshpit-Preview-Setup.${ext}' : 'Moshpit-Setup.${ext}'},
   };
   const configFile = path.join(stage, 'electron-builder.json');
   fs.writeFileSync(configFile, JSON.stringify(config, null, 2));
   // Direct Node invocation preserves Windows paths with spaces and needs no shell/npx.
   execFileSync(process.execPath, [builder, '--publish', 'never', '--win', ...(unpackedOnly ? ['--dir'] : []), '--projectDir', stage, '--config', configFile], { stdio: 'inherit', cwd: root, env, windowsHide: true });
   fs.copyFileSync(path.join(root, 'docs', 'QUICKSTART.md'), path.join(output, 'QUICKSTART.md'));
-  const exe = unpackedOnly ? path.join(output, 'win-unpacked', `${productName}.exe`) : path.join(output, installer ? `Moshpit-KRAB-${appPkg.version}-Setup-x64.exe` : `Moshpit-${appPkg.version}-portable.exe`);
+  const exe = unpackedOnly ? path.join(output, 'win-unpacked', `${productName}.exe`) : path.join(output, installer ? (candidate ? 'Moshpit-Preview-Setup.exe' : 'Moshpit-Setup.exe') : (candidate ? 'Moshpit-Preview.exe' : 'Moshpit.exe'));
   const build = JSON.parse(fs.readFileSync(path.join(buildOut, 'build-info.json'), 'utf8'));
   fs.writeFileSync(path.join(output, 'BUILD-MANIFEST.json'), JSON.stringify({ ...build, electron: electronVersion, builder: builderVersion, mediaTools, candidate, unsigned:true, packageKind: unpackedOnly ? 'unpacked-runtime' : installer ? 'nsis-installer' : 'portable', [unpackedOnly ? 'executable' : 'portable']: { file: path.basename(exe), bytes: fs.statSync(exe).size, sha256: sha256(exe) } }, null, 2) + '\n');
   console.log(`pack: ${output}`);

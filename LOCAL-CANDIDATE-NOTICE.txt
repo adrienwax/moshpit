@@ -1,5 +1,6 @@
-UNSIGNED LOCAL TEST CANDIDATE - NOT FOR PUBLIC DISTRIBUTION
-This build is for isolated local testing. It does not replace an existing release.
-Signing, fresh-Windows acceptance and complete binary redistribution review remain open.
-Every bundled media-tool binary needs matching source, build materials and notices.
+WINDOWS BUILD NOTICE
+This executable is unsigned. Read its release page for the exact test status.
+No signing-service approval or compatibility with every Windows/GPU configuration is claimed.
+Bundled media tools carry separate licences. Their notices and corresponding-source
+information are included under resources/legal/binary and linked on the release page.
 No personal projects, profiles, media or private companion library are bundled.

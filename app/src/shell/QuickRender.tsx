@@ -82,7 +82,7 @@ export function PreviewSelection() {
         <button role="radio" aria-checked={resolution === 'fast'} className={resolution === 'fast' ? 'on' : ''} onClick={() => setResolution('fast')} title="Smaller saved preview, fitted within 960×540">Small</button>
       </span>
       <span className="hdnote">{size.w}×{size.h}</span>
-      <button className={'quickbtn' + (run ? ' busy' : '')} disabled={!blocks || !!run} onClick={() => void previewSelection(scope)} title={!blocks ? 'Nothing to preview: add a block to the arrangement first' : run ? 'A preview is rendering' : `Capture this version at ${size.w}×${size.h} through the export engine; replay it in Previews & export`}>
+      <button className={'quickbtn' + (run ? ' busy' : '')} disabled={!blocks || !!run} onClick={() => void previewSelection(scope)} title={!blocks ? 'Nothing to preview: add a block to the arrangement first' : run ? 'A preview is rendering' : `Capture this version at ${size.w}×${size.h} through the export engine; replay it in the Captures monitor`}>
         <Icon name="play" size={14} />
         {run ? progressLabel(run) : <>Capture preview</>}
       </button>

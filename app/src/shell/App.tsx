@@ -7,7 +7,7 @@ import { QolLayer, toastError } from '../qol/qol';
 import { NotificationHistory } from '../qol/NotificationHistory';
 import { engine } from '../engine';
 import { droppedPaths, isOsDrop, openDropped } from '../lib/osDrop';
-import { blocksProjectHistoryTarget, blocksShortcutTarget } from '../lib/keyboard';
+import { blocksProjectHistoryTarget, blocksShortcutTarget, blocksTransportTarget } from '../lib/keyboard';
 import { TourLayer } from './TourLayer';
 import { RadialLayer } from '../radial/Radial';
 import { setWs, uiStore, useSettings, useUi, WS_KEYS } from '../state/ui';
@@ -84,17 +84,21 @@ export function App() {
         return;
       }
       // Ordinary buttons retain focus after a click but do not own edit history.
-      // Text/value editors keep their local undo; Space still belongs to buttons.
+      // Text/value editors keep their local undo.
       if (mod && !e.altKey && (k === 'z' || k === 'y')) {
         if (blocksProjectHistoryTarget(e.target)) return;
         e.preventDefault();
         stepHistory(k === 'z' && !e.shiftKey);
         return;
       }
-      if (protectedTarget) return;
-      if (e.key === ' ' && uiStore.get().ws !== 'settings') {
+      if (e.code === 'Space' && !mod && !e.altKey && !e.shiftKey && ['mosh', 'node', 'browse', 'render'].includes(uiStore.get().ws)) {
+        if (blocksTransportTarget(e.target) || document.querySelector('[role="dialog"], [role="menu"], .command-menu[open]')) return;
         e.preventDefault();
-        uiStore.set((s) => ({ ...s, playing: !s.playing }));
+        if (e.repeat) return;
+        const captured = document.querySelector<HTMLVideoElement>('.capture-monitor video');
+        if (document.querySelector('.capture-monitor')) {
+          if (captured) { if (captured.paused) void captured.play().catch(toastError); else captured.pause(); }
+        } else uiStore.set((s) => ({ ...s, playing: !s.playing }));
       }
     };
     window.addEventListener('keydown', key);

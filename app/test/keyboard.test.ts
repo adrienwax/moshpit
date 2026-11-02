@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { blocksProjectHistoryTarget, blocksShortcutTarget } from '../src/lib/keyboard';
+import { blocksProjectHistoryTarget, blocksShortcutTarget, blocksTransportTarget } from '../src/lib/keyboard';
 
 function element(tagName: string, attrs: Record<string, string> = {}, parentElement: unknown = null): EventTarget {
   return { tagName, getAttribute: (name: string) => attrs[name] ?? null, parentElement } as unknown as EventTarget;
@@ -42,5 +42,13 @@ describe('project history focus boundaries', () => {
   });
   it('retains project history on canvas and non-control surfaces', () => {
     for (const target of [element('canvas'), element('div'), null]) expect(blocksProjectHistoryTarget(target)).toBe(false);
+  });
+});
+
+describe('transport focus boundaries', () => {
+  it('plays after an ordinary toolbar click but preserves control and menu keyboard use', () => {
+    expect(blocksTransportTarget(element('svg', {}, element('button')))).toBe(false);
+    for (const tag of ['input', 'textarea', 'select', 'summary', 'video', 'audio']) expect(blocksTransportTarget(element(tag))).toBe(true);
+    for (const role of ['dialog', 'menu', 'menuitem', 'radio', 'slider', 'combobox', 'tab']) expect(blocksTransportTarget(element('button', {}, element('div', {role})))).toBe(true);
   });
 });

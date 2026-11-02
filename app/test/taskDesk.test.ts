@@ -56,3 +56,29 @@ it('requested graph detail expands centrally while the applied inspector remains
   expect(cols[2].stacks.map(s => s.panes)).toEqual([['effects']]);
   expect(uiStore.get()).toBe(clocks);
 });
+
+it('captures occupy the monitor and close shallow detail without changing project or source positions', () => {
+  layoutStore.set({current:{mosh:structuredClone(DEFAULT_LAYOUTS.mosh)},saved:[]});
+  openDeskDetail('graph');
+  setUi({playing:true}); setSlotPlayback('A', 2);
+  const doc=projectStore.get().doc, loupes=uiStore.get().loupes;
+  openDeskDetail('capture');
+  expect(readSticky('program.captures')).toBe(true);
+  expect(layoutStore.get().current.mosh![1].stacks[2].collapsed).toBe(true);
+  expect(uiStore.get().playing).toBe(false); expect(slotPlayback.get().rate).toBe(0);
+  expect(projectStore.get().doc).toBe(doc); expect(uiStore.get().loupes).toBe(loupes);
+  openDeskDetail('processing');
+  expect(readSticky('program.captures')).toBe(false);
+  expect(layoutStore.get().current.mosh![1].stacks[2].collapsed).toBe(true);
+});
+
+it('keeps the monitor visible when a custom layout tabs it with detail', () => {
+  layoutStore.set({current:{mosh:[{id:'main',stacks:[{id:'joined',panes:['detail','program'],active:0,f:4}]}]},saved:[]});
+  openDeskDetail('capture');
+  let stack=layoutStore.get().current.mosh![0].stacks.find(s=>s.id==='joined')!;
+  expect(stack.panes[stack.active]).toBe('program');expect(stack.collapsed).toBe(false);
+  openDeskDetail('graph');
+  openDeskDetail('processing');
+  stack=layoutStore.get().current.mosh![0].stacks.find(s=>s.id==='joined')!;
+  expect(stack.panes[stack.active]).toBe('program');expect(stack.collapsed).toBe(false);
+});

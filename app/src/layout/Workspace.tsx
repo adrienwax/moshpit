@@ -208,7 +208,7 @@ function Stack({ s, col, panes, update, drop, drag }: { s: StackLayout; col: str
         </div>
       )}
       header={<div className={'hd' + (canTab && drag?.over === tabKey ? ' tabover' : '')} data-drop={canTab ? tabKey : undefined}>
-        {tabbed ? (
+        {tabbed && !s.collapsed ? (
           <div className="ptabs" role="tablist">
             {s.panes.map((id, i) => (
               <button

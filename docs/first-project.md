@@ -21,12 +21,12 @@ Open **Home → Starter Mosh**, choose your folder if prompted, and wait for pre
 ![Moshpit editing workspace with a selected motion block and its effects.](images/moshpit-edit.png)
 <sub>Actual UI with synthetic demo content; this screenshot is a different illustrative edit, not the exact Starter Mosh result.</sub>
 
-- **Left:** clips available to the project; INFO explains the hovered control.
+- **Left:** Sources A/B for choosing ranges, Clips below, and Library folded at the bottom; INFO explains the hovered control.
 - **Centre:** the preview, Play/Pause, frame stepping and time/frame readouts.
 - **Below:** the sequence of blocks. Click a block to make it the editing target.
 - **Right:** that block’s applied effects and the selected effect’s controls.
 
-**Space** plays/pauses. The transport’s **Start**, **−1 frame**, **+1 frame** and **End** controls move the playhead. Start before a transition when comparing a temporal effect: the image may depend on what played before it.
+**Space** plays/pauses the edit; when Captures is active it controls the recorded preview. Text fields and interactive menus keep their normal keyboard behaviour. The transport’s **Start**, **−1 frame**, **+1 frame** and **End** controls move the playhead. Start before a transition when comparing a temporal effect: the image may depend on what played before it.
 
 ## 4 · Enable and compare the first recipe
 
@@ -36,6 +36,13 @@ Play, change one visible parameter, and compare with Bypass on/off. **Ctrl+Z** u
 
 You can explore **+ Effects / recipes** later. A recipe is a prepared group of effects, not a different file format. **Graph / routing** exposes the connections when you want to inspect how the chain works.
 
+### Compare a captured preview
+
+Choose **Captures** above the central monitor, select Block, Range or Full, then **Capture preview**. Play the recording there, use **Replay** to restart or **Expand** for a larger view. **Edit** returns to the working preview; effects and the timeline remain accessible.
+
+![Captures displayed in the main monitor, with effects and timeline alongside.](images/moshpit-captures.png)
+<sub>Actual UI with a synthetic playback fixture; this picture demonstrates the pane, not an exported effect result.</sub>
+
 ## 5 · Save the editable project
 
 Press **Ctrl+S**, choose a name and location, and save the `.mosh` file. Reopen it with **File → Open** or **Ctrl+O**.
@@ -44,7 +51,7 @@ Press **Ctrl+S**, choose a name and location, and save the `.mosh` file. Reopen 
 
 ## 6 · Export a video
 
-Open **OUT**, choose the **H.264** preset, set an **Output folder**, and click **Render · Add job**. Rendering starts through the queue; wait for the job to complete. Open the resulting file in a video player.
+Open **OUT**, choose the **H.264** preset, use **Browse…** beside **Output folder**, and click **Render · Add job**. Rendering starts through the queue; wait for the job to complete. Open the resulting file in a video player.
 
 ![H.264 export settings and render queue.](images/moshpit-export.png)
 <sub>Actual UI using the synthetic demonstration; no export has been queued in this screenshot.</sub>

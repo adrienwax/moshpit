@@ -1,12 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { ExportConfig } from '@moshpit/engine';
 import { PRESETS, RESOLUTIONS, resolveExportPreset, exportPresetMatches, exportPresetDescription, ROLE_TEXT, STAGES, queueRender, roleOf, cancelJob, clearDone, formatLabel, progressLabel, retryJob, runAll, stageOf, useRenders, type Job } from '../../state/render';
 import { FPS_OPTIONS, changeProjectFormat, getDoc, setExportConfig, useProject } from '../../state/project';
 import { host } from '../../host';
+import { getProjectSession } from '../../state/jobs';
 import { setUi, useSettings, useUi } from '../../state/ui';
 import { fmtFps, timecode } from '../../lib/time';
 import { exportAudioSummary } from '../../lib/exportAudio';
-import { Empty, confirmAction } from '../../qol/qol';
+import { Empty, confirmAction, toastError } from '../../qol/qol';
 import { createStore, useSticky, useStore } from '../../state/store';
 import { RadialPick } from '../../radial/RadialPick';
 import type { PickOption } from '../../radial/Radial';
@@ -71,6 +72,20 @@ export function ExportForm({ compact }: { compact?: boolean }) {
   }, [savedDir, setDir]);
   const mirror = ec.audioMirror !== false;
   const name = draft.trim() || `${project.replace(/\s+/g, '_')}_${ec.format}_${ec.width}x${ec.height}`;
+  const [picking, setPicking] = useState(false);
+  const browseFolder = async () => {
+    if (!host.files || picking) return;
+    const session = getProjectSession();
+    setPicking(true);
+    try {
+      const folder = await host.files.pickFolder('Choose export folder', dir);
+      if (folder && session === getProjectSession()) {
+        setDir(folder);
+        setExportConfig({ outDir: folder }, 'Export folder');
+      }
+    } catch (error) { toastError(error); }
+    finally { setPicking(false); }
+  };
   const commitDir = () => dir !== savedDir && setExportConfig({ outDir: dir }, 'Export folder');
   const queue = () => void queueRender(name, dir);
   return (
@@ -107,7 +122,10 @@ export function ExportForm({ compact }: { compact?: boolean }) {
       )}
       <div className="fld pathfld">
         <label>Output folder</label>
-        <input className="sel2" value={dir} onChange={(e) => setDir(e.target.value)} onBlur={commitDir} spellCheck={false} />
+        <div className="export-folder-picker">
+          <input className="sel2" aria-label="Output folder" value={dir} onChange={(e) => setDir(e.target.value)} onBlur={commitDir} spellCheck={false} />
+          <button className="ghostbtn" disabled={!host.files || picking} onClick={() => void browseFolder()} title={host.files ? 'Choose a folder for rendered files' : 'Folder browsing is available in the desktop app'}>{picking ? 'Choosing…' : 'Browse…'}</button>
+        </div>
       </div>
       {!compact && (
         <div className="fld">

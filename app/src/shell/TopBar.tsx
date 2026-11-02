@@ -38,7 +38,7 @@ export function TopBar() {
 
   return <header className="topbar command-shell">
     <div className="command-row">
-      <div className="brand"><span className="dot" aria-hidden /><b>Moshpit</b><span className="ver">KRAB v1.0</span></div>
+      <div className="brand"><span className="dot" aria-hidden /><b>Moshpit</b></div>
       <nav className="global-commands" aria-label="Application commands">
         <ProjectMenu />
         <CommandMenu label="Edit">
@@ -48,6 +48,7 @@ export function TopBar() {
         </CommandMenu>
         <LayoutMenu />
         <CommandMenu label="Help">
+          <button data-command onClick={() => { setUi({ settingsPage: 'about' }); setWs('settings'); }}>About Moshpit</button>
           <button data-command onClick={() => startTour()}>Show me around</button>
           <button data-command onClick={() => setWs('home')}>Start / keyboard guide</button>
         </CommandMenu>

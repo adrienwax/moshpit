@@ -22,7 +22,7 @@ bash /path/to/moshpit/scripts/ffmpeg/build-ucrt64.sh /c/BuildScratch/ffmpeg-01
 
 `KRAB_BUILD_JOBS` defaults to 4. All download hashes are checked before extraction. Build stages use archived inputs, disable optional test/example subprojects and Meson downloads, and produce `prefix/bin/ffmpeg.exe` and `ffprobe.exe`. zimg's documentation links are materialized from files within its own archive. Its runtime graphengine submodule is pinned separately; optional googletest and Snappy benchmark/test submodules are not built.
 
-Keep `archives/`, `sources.json`, this recipe, generated configuration/logs, notices, compiler/package inventory and binary hashes together as the corresponding-source/build record. Review imported DLLs and the notices for any statically linked toolchain runtime. Do not label source collection alone as binary clearance.
+Keep `archives/`, `sources.json`, this recipe, generated configuration (config.h and -version output), notices, compiler/package inventory and binary hashes together as the corresponding-source/build record. Review imported DLLs and the notices for any statically linked toolchain runtime. Do not label source collection alone as binary clearance. Raw `ffbuild/config.log` can contain environment variables and credentials: keep it private in the build tree and exclude it from source companions and release assets.
 
 ## Required checks before packaging
 

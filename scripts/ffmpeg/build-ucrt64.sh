@@ -53,7 +53,7 @@ bash "$root/sources/ffmpeg/configure" \
   --extra-libs='-lstdc++ -lwinpthread' --extra-version=krab-local-1
 make -j"$jobs"
 make install
-cp ffbuild/config.log "$root/ffmpeg-config.log"
+# ffbuild/config.log contains environment values; keep it private in the build tree.
 cp config.h "$root/ffmpeg-config.h"
 "$prefix/bin/ffmpeg.exe" -version > "$root/ffmpeg-version.txt"
 "$prefix/bin/ffprobe.exe" -version > "$root/ffprobe-version.txt"

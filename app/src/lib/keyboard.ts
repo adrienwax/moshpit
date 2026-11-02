@@ -15,6 +15,17 @@ export function blocksProjectHistoryTarget(target: EventTarget | null): boolean 
   return blocksTarget(target, false);
 }
 
+export function blocksTransportTarget(target: EventTarget | null): boolean {
+  if (blocksTarget(target, false)) return true;
+  let el = target as KeyElement | null;
+  while (el) {
+    if (['SUMMARY', 'VIDEO', 'AUDIO'].includes(el.tagName?.toUpperCase() ?? '')) return true;
+    if (['dialog', 'alertdialog', 'menu', 'menuitem', 'listbox', 'checkbox', 'switch', 'radio', 'tab'].includes(el.getAttribute?.('role') ?? '')) return true;
+    el = el.parentElement ?? null;
+  }
+  return false;
+}
+
 function blocksTarget(target: EventTarget | null, protectButtons: boolean): boolean {
   let el = target as KeyElement | null;
   let allowEditableAncestor = true;

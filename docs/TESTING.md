@@ -1,25 +1,18 @@
-# First-use check: Moshpit
+# Short Windows test: Moshpit
 
 [← Moshpit](../README.md) · [Illustrated first project](first-project.md)
 
-Download the [unsigned Setup EXE](https://github.com/adrienwax/moshpit/releases/download/v1.0.0-rc.2-test/Moshpit-KRAB-1.0.0-rc.2-Setup-x64.exe) and install it normally, then open **Moshpit KRAB Candidate** from Start. Sandbox is optional: use the separate test kit only if you want an isolated test environment. There is no signed stable installer yet; **do not disable Windows security or install on your main editing setup just to get past a warning**. Report the exact warning instead.
+Download [Moshpit.exe](https://github.com/adrienwax/moshpit/releases/download/v1.0.0-rc.3-test/Moshpit.exe). This is an unsigned portable Windows x64 prerelease. There is no installation step and Sandbox is optional. Do not disable Windows security to bypass a block; report the exact warning instead.
 
-## One useful session
+## One small project
 
-1. **Install and open.** Can you find the app and reach Home without developer tools? Record the version and any warning.
-2. **Bring footage.** Use three small clips you may use. Can you find Starter Mosh and understand when preparation is finished?
-3. **Make a change.** Play, select the middle block, enable Melt, change a parameter, then Undo. Is it clear what is selected and what changed?
-4. **Keep the work.** Save `.mosh`, close normally and reopen it. Are the clips and edits still there?
-5. **Share the result.** Export H.264 and play the file outside Moshpit. Does it contain the expected picture and audio?
-6. **Optional lifecycle check.** Only in a disposable test environment, check uninstall/reinstall and whether expected user data remains. Skip this on your regular setup; do not use your only copy of a project.
+1. **Open:** double-click the EXE. It should reach Home without asking for Node.js or FFmpeg.
+2. **Edit:** Home → Starter Mosh, choose three short clips you may use. Play, enable Melt on the middle motion block, change one value and Undo.
+3. **Keep:** Ctrl+S saves a `.mosh` project. Close normally, reopen the same EXE and open that project.
+4. **Export:** OUT → H.264, **Browse…** to an output folder, then Render. Play the finished video in your normal video player.
 
-## Tell us what was confusing
+Tell us whether all four worked; if not, report the first failing step and the message from Notifications. No controller test or uninstall/reinstall is needed for this portable release. Your original footage must remain available when reopening a project.
 
-- Which instruction first required guessing? Quote the button or paragraph.
-- What did you expect to happen, and what happened instead?
-- Could you distinguish a **project** from an **export**, and **browsing** from **adding a clip**?
-- Which error or waiting state did not explain what to do next?
+Developer checks already cover the new Captures pane, keyboard focus, saved layouts and folder selection. This laptop check addresses a different machine; it is not a request to repeat every automated test.
 
-For a failure, include app version, Windows version, numbered steps and copied notification details. Share a screenshot or small clip only after checking it for private paths and content. Use [Issues](https://github.com/adrienwax/moshpit/issues); vulnerabilities go to [private reporting](https://github.com/adrienwax/moshpit/security/advisories/new).
-
-A developer-machine pass does not establish clean-Windows compatibility. A clean-Windows pass does not establish performance on every GPU. Record what was actually tried.
+For bugs, include the internal version from **Help → About Moshpit**, Windows version and numbered steps. Remove personal paths from shared details. Use [Issues](https://github.com/adrienwax/moshpit/issues); vulnerabilities go to [private reporting](https://github.com/adrienwax/moshpit/security/advisories/new).

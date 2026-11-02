@@ -14,7 +14,7 @@ import { handleScheme, isAppUrl, registerScheme, rendererUrl } from './protocol'
 import { mediaRootsOf, previewDir, settingsPaths } from './engine-cache';
 
 // Own userData folder (%APPDATA%/Moshpit 3), not the generic "Electron" one.
-app.setName(app.isPackaged && app.getName() === 'Moshpit KRAB Candidate' ? 'Moshpit KRAB Candidate' : 'Moshpit 3');
+app.setName(app.isPackaged && ['Moshpit KRAB Candidate', 'Moshpit Preview'].includes(app.getName()) ? 'Moshpit KRAB Candidate' : 'Moshpit 3');
 // Explicit review profiles keep baseline preferences, recovery journals and CT endpoints separate.
 if (process.env.MOSHPIT_USER_DATA) {
   const profile = path.resolve(process.env.MOSHPIT_USER_DATA);

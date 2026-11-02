@@ -13,10 +13,9 @@ import { NumberField, ParamControl } from '../../params/Param';
 import { Empty, confirmAction, toast, toastError } from '../../qol/qol';
 import { setSettings as setProjectSettings, appendEffect, duplicateBlock, getDoc, isFrozen, removeBlock, removeNodes, setBlock, setMarks, sourceById, toggleFreeze, trimBlock, undoAction, useProject } from '../../state/project';
 import { setLoupe, setSettings, setUi, setWs, uiStore, useSettings, useUi } from '../../state/ui';
-import { setWsLayout, type WsLayout } from '../../layout/model';
 import { fmtFps, fpsValue, timecode } from '../../lib/time';
 import { blockFrames, blockStarts, timelineFrames } from '../../lib/timeline';
-import { RecentPreviews } from '../../shell/QuickRender';
+import { PreviewSelection, RecentPreviews } from '../../shell/QuickRender';
 import { applyPreset } from '../render/RenderPanes';
 import { PRESETS, exportPresetMatches, formatLabel, queueRender } from '../../state/render';
 import { ClipTimeline, HistoryPane, RecipesPane, useLoupeClip } from './MoshPanes';
@@ -152,8 +151,16 @@ function ComposeTop() {
 }
 
 /** PROGRAM: the final output at the playhead — the one monitor that shows the result — with its own transport. */
+export function MonitorMode() {
+  const [captures] = useSticky('program.captures', false);
+  return <div className="monitor-mode" role="group" aria-label="Monitor content">
+    <button aria-pressed={!captures} onClick={() => openDeskDetail('processing')}>Edit</button>
+    <button aria-pressed={captures} onClick={() => openDeskDetail('capture')}>Captures</button>
+  </div>;
+}
 type ViewerTarget = 'program' | 'A' | 'B';
 export function ProgramPane({ exportView = false }: { exportView?: boolean } = {}) {
+  const [captures] = useSticky('program.captures', false);
   const [dual, setDual] = useSticky('program.dual', false);
   const [left, setLeft] = useSticky<ViewerTarget>('program.left', 'program');
   const [right, setRight] = useSticky<ViewerTarget>('program.right', 'A');
@@ -180,6 +187,10 @@ export function ProgramPane({ exportView = false }: { exportView?: boolean } = {
     active={pane === activeSide} onActivate={() => activate(pane, value)}
     setTarget={exportView ? undefined : value => choose(pane, value)}
     reportState={pane === activeSide && value === 'program'} allowAudition={!exportView && pane === activeSide} />;
+  if (captures && !exportView) return <div className="program focused-program docked-program capture-monitor">
+    <section className="capture-controls" aria-label="Capture Edit preview"><PreviewSelection /></section>
+    <RenderPane />
+  </div>;
   return <div className="program focused-program docked-program">
     {!exportView && <div className="viewer-mode" role="group" aria-label="Viewer layout" title="Source positions are independent">
       <button className="ghostbtn" aria-pressed={!dual} onClick={() => { if (activeSide === 'right') activate('left', left); setDual(false); }}>Single</button>
@@ -432,38 +443,6 @@ export function HistoryDrawer() {
       <div className="fh"><b>History</b><span className="dim" style={{ fontSize: 10 }}>every edit, newest first</span><button className="x" onClick={() => setUi({ historyOpen: false })} title="Close (Esc)">✕</button></div>
       {open && <HistoryPane />}
     </aside>
-  );
-}
-
-// ---------- Arrange / Process ----------
-
-export type ComposeMode = 'arrange' | 'process';
-/** Stack weights per mode (the arrangement vs the graph); preview, inspector, selection, playhead stay. */
-// Task layouts switch working detail; legacy bands and graph stacks retain their sizing route.
-const MODE_F: Record<ComposeMode, { band: number; program: number; graph: number; edit: number }> = {
-  arrange: { band: 0.34, program: 3, graph: 2, edit: 0 },
-  process: { band: 0.20, program: 4, graph: 3, edit: 0 },
-};
-
-export function applyComposeMode(mode: ComposeMode, known: string[]) {
-  setSettings((s) => void (s.composeMode = mode));
-  openDeskDetail(mode === 'arrange' ? 'block' : 'processing');
-  const m = MODE_F[mode];
-  setWsLayout('mosh', (cols: WsLayout) => cols.map((c) => ({
-    ...c,
-    ...(c.band ? { h: m.band } : {}),
-    stacks: c.stacks.map((s) => (s.panes.includes('program') ? { ...s, f: m.program, collapsed: false } : s.panes.includes('edit') ? { ...s, f: m.edit, collapsed: false } : s.panes.includes('graph') ? { ...s, f: m.graph, collapsed: false } : s)),
-  })), known);
-}
-
-export function ModeToggle({ known }: { known: string[] }) {
-  const mode = useSettings((s) => s.composeMode);
-  return (
-    <span className="seg modeseg" role="radiogroup" aria-label="Compose mode" title="Arrange: block timing tools. Process: applied processing. Preview target and selection stay.">
-      {(['arrange', 'process'] as const).map((m) => (
-        <button key={m} role="radio" aria-checked={mode === m} className={mode === m ? 'on' : ''} onClick={() => applyComposeMode(m, known)}>{m === 'arrange' ? 'Arrange' : 'Process'}</button>
-      ))}
-    </span>
   );
 }
 

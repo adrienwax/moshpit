@@ -22,7 +22,7 @@ export function DeskTools() {
     <button disabled={!block} onClick={() => setUi({ fxPanel: true })}>＋ Effects / recipes</button>
     <button disabled={!block} onClick={() => openDeskDetail('graph')}>Graph / routing</button>
     <button onClick={() => openDeskDetail('modulation')}>Modulation</button>
-    <button onClick={() => openDeskDetail('capture')}>Capture / recent</button>
+    <button onClick={() => openDeskDetail('capture')}>Captures</button>
   </nav>;
 }
 
@@ -88,9 +88,8 @@ export function WorkingDetail() {
   const curveNode = curveBlock && animation ? nodesOf(curveBlock).find(n => n.id === animation.nodeId) : undefined;
   return <div className={'task-detail detail-' + detail}>
     <nav className="detail-tabs" aria-label="Working detail">
-      {(['source', 'processing', 'block', 'graph', 'modulation', 'capture'] as const).map(key => <button key={key} aria-pressed={detail === key} onClick={() => openDeskDetail(key)}>
-        {{ source: 'Source range', processing: 'Processing', block: 'Block timing', graph: 'Routing', modulation: 'Modulation', capture: 'Previews' }[key]}</button>)}
-      {!animation && detail !== 'processing' && <button className="compact-sequence-return" onClick={() => openDeskDetail('processing')}>Full sequence</button>}
+      <strong>{{ source: 'Source range', processing: 'Edit', block: 'Block timing', graph: 'Routing', modulation: 'Modulation', capture: 'Captures' }[detail]}</strong>
+      <button className="detail-close" onClick={() => openDeskDetail('processing')}>Close detail</button>
       {animation && detail !== 'processing' && <span className="curve-return">Curve retained <button disabled={!curveNode} title="Return to the retained parameter curve without seeking or changing transport" onClick={() => { if (!curveBlock || !curveNode) return; selectBlock(curveBlock.id); focusAnimation(curveBlock.id, curveNode.id, animation.key); }}>Resume curve</button></span>}
     </nav>
     {detail === 'source' && <SourceDesk which={source} />}

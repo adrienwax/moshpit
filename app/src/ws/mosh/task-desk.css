@@ -1,3 +1,21 @@
+/* Monitor-sized captures share the edit workspace, never the shallow detail shelf. */
+.monitor-mode{display:flex;gap:4px;flex:none}
+.task-desk .monitor-mode button{min-height:26px;padding:3px 12px;font:12px var(--font-ui);background:var(--surface-2);color:var(--txt-1);border:1px solid var(--line);cursor:pointer}
+.task-desk .monitor-mode [aria-pressed=true]{color:var(--fn-interactive);border-color:var(--fn-interactive)}
+.capture-monitor .capture-controls{flex:none;padding:4px 6px;border-bottom:1px solid var(--line)}
+.capture-monitor .previewsel{display:flex;flex-wrap:wrap;white-space:normal;gap:5px}
+.capture-monitor .pxhint,.capture-monitor .pxlbl{display:none}
+.capture-monitor>.review-render-pane{flex:1;min-height:0;height:auto}
+.capture-monitor .preview-shelf{display:flex;flex-direction:column;min-height:0;gap:4px}
+.capture-monitor .preview-shelf-media{flex:1;min-height:120px;overflow:hidden}
+.capture-monitor .preview-shelf-media video{max-height:none;height:100%;object-fit:contain}
+.capture-monitor .preview-shelf-tools{flex:none;overflow:visible;gap:4px}
+.capture-monitor .preview-shelf-tools>label{flex-direction:row;align-items:center;gap:8px}
+.capture-monitor .preview-shelf-tools select{flex:1;min-width:0}
+.capture-monitor .preview-shelf-tools>span.dim{display:none}
+.detail-tabs{align-items:center}.detail-tabs .detail-close{margin-left:auto}
+.task-desk .wcol[data-col=dock] .slots{gap:5px}
+.task-desk .wcol[data-col=dock] .slotframe{max-height:100px}
 /* Task desk A: useful concurrent context; ordinary sequence never stretches into a giant block. */
 .task-desk{display:flex;flex-direction:column;min-height:0;flex:1 1 0;height:auto}
 .desk-tools{display:flex;flex:none;gap:3px;flex-wrap:wrap;padding:4px 6px;border-bottom:1px solid var(--line);background:var(--surface-2)}

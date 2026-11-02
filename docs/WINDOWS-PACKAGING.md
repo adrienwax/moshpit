@@ -1,32 +1,32 @@
 # Windows packaging
 
-The source includes a Windows x64 NSIS installer recipe. An [unsigned Windows installer](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.2-test) is available; the Sandbox test kit is optional. Stable binary publication still requires signing, clean-Windows acceptance and review of the exact bundled third-party inputs.
+The default Windows x64 package is one **Moshpit.exe** portable download. It bundles Electron, FFmpeg, FFprobe, fonts and licence notices; no installer or separate runtime download is needed. Source companions are supplied separately for licence compliance, not as a prerequisite to running the app.
 
-## Local unsigned candidate
+## Build locally
 
-Install Node 24/npm, the lockfile-pinned Electron and electron-builder 26.15.3. Icon generation also requires Python with `Pillow==9.5.0` from `scripts/requirements-icons.txt` (only a build dependency). `npm ci` runs the dependency installation scripts; review them before installing.
+Use Node.js 24/npm, the lockfile-pinned Electron and electron-builder 26.15.3, and Python 3.13 with `Pillow==12.3.0` from `scripts/requirements-icons.txt` for icon generation. `npm ci` runs dependency installation scripts; review them before installing.
 
-Provide a reviewed directory containing both `ffmpeg.exe` and `ffprobe.exe`. Do not copy an arbitrary FFmpeg download into a public release: its notices and corresponding source/build inputs must match. Keep binary notices/source material in ignored `third-party-binary/`; the packager copies that directory into `resources/legal/binary`.
+Provide a reviewed folder containing `ffmpeg.exe` and `ffprobe.exe`. Populate ignored `third-party-binary/` with the matching notices, hashes, source-companion metadata and Mediabunny source archive. Do not substitute an arbitrary FFmpeg binary: notices and corresponding source must match. Raw configure/environment logs must never go into public artifacts.
 
 ```powershell
 npm ci
+python -m pip install -r scripts/requirements-icons.txt
 $env:KRAB_SCRATCH_ROOT = 'C:/BuildScratch/Moshpit'
 $env:MOSHPIT_FFMPEG_DIR = 'C:/BuildInputs/ffmpeg'
-# Choose a new output directory under KRAB_SCRATCH_ROOT for every build.
-$env:MOSHPIT_PACK_OUT = 'C:/BuildScratch/Moshpit/candidate-01'
-node app/pack.mjs --candidate --installer
+$env:MOSHPIT_PACK_OUT = 'C:/BuildScratch/Moshpit/portable-01'
+node app/pack.mjs
 ```
 
-The candidate has its own application ID, shortcuts, settings and control endpoint. Installation does not automatically launch it. Uninstallation retains application data. No step uploads artifacts; electron-builder uses `--publish never`.
+Use a fresh output directory for each build. `--candidate` creates **Moshpit-Preview.exe** with separate preview settings; `--installer` creates **Moshpit-Setup.exe** (or **Moshpit-Preview-Setup.exe**). Neither packaging nor installer completion launches the app automatically. No command uploads files: electron-builder uses `--publish never`.
 
-The build manifest records source state and hashes of both media tools. Keep that manifest with the exact installer. Do not call a dirty-source build a reproducible release.
+The portable EXE extracts to a fresh temporary location per launch and cleans it after normal exit. User settings are retained in `%APPDATA%/Moshpit 3` for compatibility. A local installed launcher may use a different internal filename to preserve existing CT routes; publish the full portable artifact, never that small launcher by itself.
 
-## Release gates
+## Release checks
 
-1. Freeze a clean source commit and lockfile; run typecheck, release tests and portability checks.
-2. Verify the exact runtime dependency notices and FFmpeg source/build bundle; exclude personal configuration, footage, caches and development fixtures.
-3. Test installation, import/edit, save/reopen, export, close/relaunch and uninstall on clean Windows. Preserve user data on upgrade/uninstall.
-4. Integrate and verify signing of the owned app, generated uninstaller and final installer. Current candidates are unsigned; no signing-service acceptance is implied.
-5. Publish the matching source/tag, approved installer, checksums, source materials and accurate release notes together.
+1. Freeze a clean source commit and lockfile; run typecheck, release regressions and portability checks.
+2. Match runtime dependencies to notices, verify FFmpeg/FFprobe hashes and the privacy-reviewed corresponding-source companion. Exclude personal profiles, media, caches, tests and diagnostic logs from runtime assets.
+3. Test the actual outer EXE: import, playback, save/reopen, export and normal close. Test the exact download on another Windows PC; record which checks were actually completed.
+4. Current packages are **unsigned**. Publish only with that status explicit. If a signed release is later prepared, verify its signature; signing is a separate distribution decision, not evidence of functional correctness.
+5. Publish the matching source/tag, executable, SHA256 sums, source materials and accurate release notes together. Keep the older release available for rollback.
 
-The controlled FFmpeg recipe under `scripts/ffmpeg/` is local build preparation, not proof that any existing binary is cleared or feature-equivalent. Run its capability checks before choosing a replacement.
+The manifest records the source commit, dirty state and media-tool hashes. A dirty-source build is not a frozen release. The controlled FFmpeg recipe is in `scripts/ffmpeg/`; its GPL-enabled build has separate obligations described by [FFmpeg](https://ffmpeg.org/legal.html). Its source archive is an optional download for users who want source, not an installation requirement.

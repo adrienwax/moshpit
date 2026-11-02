@@ -4,14 +4,15 @@ import { NodeViewer, useActive } from '../../components/nodes';
 import { setUi, setWs } from '../../state/ui';
 import { ClipsPane, EditTimeline } from './MoshPanes';
 import { FxPanel } from './EffectBrowser';
-import { BlockPane, EffectsPane, ProgramPane, RenderPane, SlotsPane, SnapPick, useSlotKeys, ModeToggle } from './ComposePanes';
+import { BlockPane, EffectsPane, MonitorMode, ProgramPane, SlotsPane, SnapPick, useSlotKeys } from './ComposePanes';
 import { WorkingDetail } from './TaskDesk';
+import { openDeskDetail } from '../../state/desk';
 import { useUi } from '../../state/ui';
 import './task-desk.css';
 import { GraphCanvas } from '../node/GraphCanvas';
 
 // MOSH keeps source navigation left, the docked monitor and edit timeline central, selected properties right.
-// Existing panes remain dockable; Arrange/Process changes sizing without replacing saved layouts.
+// Existing panes remain dockable; saved custom layouts are retained.
 /** The graph header's Add effect: like the Effects pane's, it needs a block and says so. */
 function AddEffectButton() {
   const { block } = useActive();
@@ -23,8 +24,8 @@ function AddEffectButton() {
 const PANES: Record<string, PaneDef> = {
   slots: { title: 'Sources · A / B', help: 'The two clips you are cutting from, A over B. Click one to slice it: I / O mark, J / K / L shuttle, , . step, ⤓ block adds its IN→OUT to the arrangement.', extra: <SnapPick />, body: () => <SlotsPane /> },
   clips: { title: 'Clips', help: "The project's clips. Click: show in slot A · Shift-click: slot B · right-click for more.", body: () => <ClipsPane /> },
-  library: { title: 'Library', help: 'The IN library without leaving MOSH. A raw clip is marked in IN, then sent here.', body: () => <LibraryStrip /> },
-  program: { title: 'Edit preview', help: 'PROGRAM — the final output at the playhead, after every block and graph. The one monitor that shows the result.', extra: <button className="ghostbtn" onClick={() => setWs('node')}>Open graph</button>, body: () => <ProgramPane /> },
+  library: { title: 'Library', minor: true, help: 'The IN library without leaving MOSH. A raw clip is marked in IN, then sent here.', body: () => <LibraryStrip /> },
+  program: { title: 'Preview', help: 'PROGRAM — the final output at the playhead, after every block and graph. The one monitor that shows the result.', extra: <MonitorMode />, body: () => <ProgramPane /> },
   graph: {
     title: 'Node graph', minor: true,
     help: "The selected block's effect chain. Its CONTEXT preview (right) shows the picture at the selected node — a point inside the chain, not the final output.",
@@ -44,10 +45,10 @@ const PANES: Record<string, PaneDef> = {
   block: { title: 'Block', minor: true, help: 'The selected block as an info sheet: source and clip ranges, frames, rate; trim, playback, kind, repeat; block actions and audio.', body: () => <BlockPane /> },
   effects: { title: 'Applied effects & parameters', help: "The selected block's applied chain and complete effect controls. Add opens the catalogue explicitly.", body: () => <EffectsPane /> },
   detail: { title: 'Working detail', minor: true, body: () => <WorkingDetail /> },
-  edit: { title: 'Edit timeline', extra: <ComposeModes />, help: 'The blocks in order. Click to select (the graph and inspector follow), drag to reorder, drag an edge to trim, right-click for more, Delete removes. Wheel zooms, the bar below navigates.', body: () => <EditTimeline /> },
-  render: { title: 'Previews & export', minor: true, help: 'Replay earlier captures, compare a reference, or export. Full settings and the queue are in the Render workspace.', body: () => <RenderPane /> },
+  edit: { title: 'Edit timeline', extra: <button className="ghostbtn" onClick={() => openDeskDetail('block')}>Block timing</button>, help: 'The blocks in order. Click to select (the graph and inspector follow), drag to reorder, drag an edge to trim, right-click for more, Delete removes. Wheel zooms, the bar below navigates.', body: () => <EditTimeline /> },
+  render: { title: 'Previews & export', minor: true, help: 'Replay earlier captures, compare a reference, or export. Full settings and the queue are in the Render workspace.', body: () => <div className="detail-actions"><button onClick={() => openDeskDetail('capture')}>Open Captures in the monitor</button><button onClick={() => setWs('render')}>Export settings</button></div> },
 };
-function ComposeModes() { return <ModeToggle known={Object.keys(PANES)} />; }
+
 
 export function MoshWs() {
   const animation = useUi(s => !!s.animation);

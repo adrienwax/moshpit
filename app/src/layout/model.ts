@@ -59,7 +59,7 @@ export const DEFAULT_LAYOUTS: Record<WsId, WsLayout> = {
   // UX round 2 grid, proportioned to content (Waxy): a slim dock (A over B, clips below), the
   // Inspector desk A: resident chain/parameters right; requested detail claims centre space.
   mosh: [
-    col('dock', 240, [st(['clips', 'library', 'slots'])]),
+    col('dock', 260, [st('slots', 3), st('clips', 2), { ...st('library'), collapsed: true }]),
     col('main', undefined, [st('program', 3), st('edit', 0), { ...st(['detail', 'graph', 'block', 'render'], 1), collapsed: true }]),
     col('inspect', 340, [st('effects')]),
   ],

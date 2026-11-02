@@ -166,8 +166,8 @@ try{
   await page.setViewportSize({width:1440,height:900});
   await page.getByRole('button',{name:'Modulation',exact:true}).first().click();
   assert.ok(await page.getByRole('button',{name:/New LFO/}).isVisible());
-  await page.getByRole('button',{name:'Capture / recent',exact:true}).click();assert.ok(await page.getByLabel('Capture Edit preview').isVisible());
-  await page.getByRole('button',{name:'Processing',exact:true}).click();
+  await page.getByRole('navigation',{name:'MOSH tools',exact:true}).getByRole('button',{name:'Captures',exact:true}).click();assert.ok(await page.getByLabel('Capture Edit preview').isVisible());
+  await page.getByRole('group',{name:'Monitor content'}).getByRole('button',{name:'Edit',exact:true}).click();
   checks.push('Central graph/modulation/capture accessible while resident inspector remains');
   await page.evaluate(()=>{window.fixture.six();window.fixture.transform()});
   const rotate=page.locator('[data-col=inspect]').getByRole('slider',{name:'Rotate',exact:true});

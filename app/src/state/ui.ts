@@ -159,8 +159,6 @@ export interface AppSettings {
   gridCell: number;
   /** The workspace a launch opens on: HOME (default) or straight into Compose. */
   startOn: 'home' | 'compose';
-  /** Compose's preset: Arrange (big timeline) or Process (big graph). */
-  composeMode: 'arrange' | 'process';
   /** Phase 2.3: the effect browser renders each effect on the selected block (off: text only). */
   liveThumbs: boolean;
   /** Phase 2.6: favourite effects and recipes, by id (a node kind, or `recipe:<name>`). */
@@ -189,7 +187,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
   recentFolders: [],
   gridCell: 168,
   startOn: 'home',
-  composeMode: 'arrange',
   liveThumbs: true,
   effectFavs: [],
   effectTags: {},

@@ -14,11 +14,15 @@ A local Windows editor for arranging footage, combining effects and exporting th
 | What you want | Available today |
 | --- | --- |
 | Read the guide and see the interface | Right here—no installation needed. |
-| Download a Windows installer | [Download the Windows Setup EXE](https://github.com/adrienwax/moshpit/releases/download/v1.0.0-rc.2-test/Moshpit-KRAB-1.0.0-rc.2-Setup-x64.exe) — unsigned prerelease. **Sandbox is optional.** A signed stable installer is not available yet. |
+| Run Moshpit on Windows | [Download Moshpit.exe](https://github.com/adrienwax/moshpit/releases/download/v1.0.0-rc.3-test/Moshpit.exe) — one unsigned portable test download; no installer or Sandbox required. |
 | Run or modify the source | [Windows source setup](docs/DEVELOPMENT.md#run-from-source): Git, Node.js 24, npm and FFmpeg/FFprobe. |
 | Test the prerelease | Follow the [short first-use checklist](docs/TESTING.md). It is a test build, not a signed release. |
 
-**GitHub’s “Code → Download ZIP” downloads source code, not an installable app.** For normal use, download and run the **Setup EXE**, then open **Moshpit KRAB Candidate** from Start. The separate ZIP is an optional Sandbox test kit. Fresh-Windows acceptance and signing remain pending. Windows x64 is the current target; other platforms are not validated.
+**Download `Moshpit.exe`, keep it in a folder you can write to, and double-click it.** Electron, FFmpeg and FFprobe are included—no Node.js, codec-tool download or Sandbox is required. The EXE temporarily unpacks its runtime while running; settings persist in your Windows user profile. Keep using the same EXE to reopen the app.
+
+This is an **unsigned Windows x64 prerelease**, not a signed stable release. The [release page](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.3-test) records checks and known limitations. If Windows blocks it, record the warning rather than disabling protection. GitHub’s **Code → Download ZIP** is source code, not the app. Older installers remain under Releases for rollback.
+
+The bundled FFmpeg/x264 tools use GPLv2-or-later; their [matching source and build materials](https://github.com/adrienwax/moshpit/releases/download/v1.0.0-rc.2-test/FFmpeg-krab-local-1-corresponding-source.zip) are available separately and **are not an extra runtime download**.
 
 ## Make your first mosh
 
@@ -31,7 +35,7 @@ Bring **three short video clips you have permission to use**, together in one fo
 3. **Select the middle, MOTION block.** In **Applied effects & parameters**, select **Melt**. Turn **Bypass off** to enable the starter effect—it deliberately begins bypassed.
 4. **Change one control, then compare.** Play from before the middle block. Try Bypass on/off; use **Edit → Undo** or **Ctrl+Z** to reverse an edit.
 5. **Save the project with Ctrl+S.** Give the `.mosh` file a name. Keep the original clips where they are: the project references them.
-6. **Open OUT → H.264.** Choose the output folder, then **Render · Add job**. Watch the render queue for completion and open the resulting video.
+6. **Open OUT → H.264.** Use **Browse…** beside Output folder, then **Render · Add job**. Watch the render queue for completion and open the resulting video.
 
 You now have **two different things**: a `.mosh` project you can keep editing, and an exported video you can play or share. [The illustrated walkthrough](docs/first-project.md) explains each step and the common terms.
 
@@ -43,6 +47,7 @@ You now have **two different things**: a `.mosh` project you can keep editing, a
 | **MOSH** | Arrange picture/motion blocks, select effects and adjust their parameters. |
 | **Graph / routing** | Inspect the processing connections for more detailed editing. Start with the effects list if nodes are new to you. |
 | **OUT** | Choose a codec and output folder, render, and inspect the queue. H.264 is a useful first choice for sharing. |
+| **Captures**, above the MOSH monitor | Render and replay a preview in the main picture area; switch back with **Edit**. |
 | **INFO**, bottom left | Hover or focus a control for its explanation. |
 | **Notifications**, bottom right | Reopen messages after popups disappear; expand a message to copy its details. |
 
@@ -65,7 +70,8 @@ This is the same synthetic UI demonstration. A saved project is not an export, a
 | The effect seems absent | Select the intended block/effect, check Bypass, then play from before that block. |
 | A reopened project has missing footage | Restore the clips to their referenced paths. Saving `.mosh` does not collect the media. |
 | Import or export fails | Open Notifications and copy the error. Source builds need a suitable FFmpeg **and** FFprobe. |
-| You cannot find a control | Hover it for INFO; use the IN / MOSH / OUT workspace labels to orient yourself. |
+| You cannot find a control | Hover it for INFO; use IN / MOSH / OUT. Older saved layouts can adopt the new arrangement through **View → Reset current layout**; the previous layout is retained. |
+| A `.mosh.journal` appears beside a project | This is recovery data, not another project to open. Open the `.mosh` file; leave the journal while editing. |
 
 [Report a bug](https://github.com/adrienwax/moshpit/issues) with your version, steps and notification details. Remove personal paths and share footage only if you have permission. Report vulnerabilities through [private security reporting](https://github.com/adrienwax/moshpit/security/advisories/new).
 
@@ -76,4 +82,4 @@ This is the same synthetic UI demonstration. A saved project is not an export, a
 - [CTserver: optional Loupedeck CT control](https://github.com/adrienwax/ctserver)
 - [Source setup, checks and repository map](docs/DEVELOPMENT.md) · [Windows packaging](docs/WINDOWS-PACKAGING.md)
 
-Original code is **MIT**, copyright 2026 **ak wax**. [Dependencies](THIRD-PARTY-NOTICES.txt) and [assets](ASSET-NOTICES.txt) retain their own licences. FFmpeg is an external tool with separate licensing and source requirements; see [packaging](docs/WINDOWS-PACKAGING.md). [Security policy](SECURITY.md).
+Original code is **MIT**, copyright 2026 **ak wax**. [Dependencies](THIRD-PARTY-NOTICES.txt) and [assets](ASSET-NOTICES.txt) retain their own licences. The download bundles FFmpeg as a separate command-line tool, with its own licensing and source requirements; see [packaging](docs/WINDOWS-PACKAGING.md). [Security policy](SECURITY.md).
