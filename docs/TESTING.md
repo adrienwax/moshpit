@@ -2,7 +2,7 @@
 
 [← Moshpit](../README.md) · [Illustrated first project](first-project.md)
 
-Download the [unsigned Sandbox test kit](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.2-test), extract it fully, and run **START-CLEAN-TEST.cmd**. There is no signed stable installer yet; **do not disable Windows security or install on your main editing setup just to get past a warning**. Report the exact warning instead.
+Download the [unsigned Setup EXE](https://github.com/adrienwax/moshpit/releases/download/v1.0.0-rc.2-test/Moshpit-KRAB-1.0.0-rc.2-Setup-x64.exe) and install it normally, then open **Moshpit KRAB Candidate** from Start. Sandbox is optional: use the separate test kit only if you want an isolated test environment. There is no signed stable installer yet; **do not disable Windows security or install on your main editing setup just to get past a warning**. Report the exact warning instead.
 
 ## One useful session
 
@@ -11,7 +11,7 @@ Download the [unsigned Sandbox test kit](https://github.com/adrienwax/moshpit/re
 3. **Make a change.** Play, select the middle block, enable Melt, change a parameter, then Undo. Is it clear what is selected and what changed?
 4. **Keep the work.** Save `.mosh`, close normally and reopen it. Are the clips and edits still there?
 5. **Share the result.** Export H.264 and play the file outside Moshpit. Does it contain the expected picture and audio?
-6. **Finish safely.** In the disposable test environment, check uninstall/reinstall and whether expected user data remains. Do not use your only copy of a project for this.
+6. **Optional lifecycle check.** Only in a disposable test environment, check uninstall/reinstall and whether expected user data remains. Skip this on your regular setup; do not use your only copy of a project.
 
 ## Tell us what was confusing
 

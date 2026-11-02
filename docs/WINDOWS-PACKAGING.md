@@ -1,6 +1,6 @@
 # Windows packaging
 
-The source includes a Windows x64 NSIS installer recipe. An [unsigned Sandbox test kit](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.2-test) is available. Stable binary publication still requires signing, clean-Windows acceptance and review of the exact bundled third-party inputs.
+The source includes a Windows x64 NSIS installer recipe. An [unsigned Windows installer](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.2-test) is available; the Sandbox test kit is optional. Stable binary publication still requires signing, clean-Windows acceptance and review of the exact bundled third-party inputs.
 
 ## Local unsigned candidate
 

@@ -14,11 +14,11 @@ A local Windows editor for arranging footage, combining effects and exporting th
 | What you want | Available today |
 | --- | --- |
 | Read the guide and see the interface | Right here—no installation needed. |
-| Download a Windows installer | [Unsigned Windows test kit](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.2-test) — for Windows Sandbox. A signed stable installer is not available yet. |
+| Download a Windows installer | [Download the Windows Setup EXE](https://github.com/adrienwax/moshpit/releases/download/v1.0.0-rc.2-test/Moshpit-KRAB-1.0.0-rc.2-Setup-x64.exe) — unsigned prerelease. **Sandbox is optional.** A signed stable installer is not available yet. |
 | Run or modify the source | [Windows source setup](docs/DEVELOPMENT.md#run-from-source): Git, Node.js 24, npm and FFmpeg/FFprobe. |
 | Test the prerelease | Follow the [short first-use checklist](docs/TESTING.md). It is a test build, not a signed release. |
 
-**GitHub’s “Code → Download ZIP” downloads source code, not an installable app.** Download the unsigned test kit from Releases and extract it fully; start with **START-CLEAN-TEST.cmd**. Fresh-Windows acceptance and signing remain pending. Windows x64 is the current target; other platforms are not validated.
+**GitHub’s “Code → Download ZIP” downloads source code, not an installable app.** For normal use, download and run the **Setup EXE**, then open **Moshpit KRAB Candidate** from Start. The separate ZIP is an optional Sandbox test kit. Fresh-Windows acceptance and signing remain pending. Windows x64 is the current target; other platforms are not validated.
 
 ## Make your first mosh
 
