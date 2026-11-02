@@ -69,7 +69,7 @@ const stage = fs.mkdtempSync(path.join(tmp, 'moshpit-stage-'));
   fs.writeFileSync(configFile, JSON.stringify(config, null, 2));
   // Direct Node invocation preserves Windows paths with spaces and needs no shell/npx.
   execFileSync(process.execPath, [builder, '--publish', 'never', '--win', ...(unpackedOnly ? ['--dir'] : []), '--projectDir', stage, '--config', configFile], { stdio: 'inherit', cwd: root, env, windowsHide: true });
-  fs.copyFileSync(path.join(root, 'QUICKSTART.md'), path.join(output, 'QUICKSTART.md'));
+  fs.copyFileSync(path.join(root, 'docs', 'QUICKSTART.md'), path.join(output, 'QUICKSTART.md'));
   const exe = unpackedOnly ? path.join(output, 'win-unpacked', `${productName}.exe`) : path.join(output, installer ? `Moshpit-KRAB-${appPkg.version}-Setup-x64.exe` : `Moshpit-${appPkg.version}-portable.exe`);
   const build = JSON.parse(fs.readFileSync(path.join(buildOut, 'build-info.json'), 'utf8'));
   fs.writeFileSync(path.join(output, 'BUILD-MANIFEST.json'), JSON.stringify({ ...build, electron: electronVersion, builder: builderVersion, mediaTools, candidate, unsigned:true, packageKind: unpackedOnly ? 'unpacked-runtime' : installer ? 'nsis-installer' : 'portable', [unpackedOnly ? 'executable' : 'portable']: { file: path.basename(exe), bytes: fs.statSync(exe).size, sha256: sha256(exe) } }, null, 2) + '\n');

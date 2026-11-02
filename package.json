@@ -29,7 +29,8 @@
     "effects": "node scripts/build.mjs && electron harness/main.cjs effects",
     "audio": "node scripts/build.mjs && electron harness/main.cjs audio",
     "long": "node scripts/build.mjs && electron harness/main.cjs long",
-    "preview": "node scripts/build.mjs && electron harness/main.cjs preview"
+    "preview": "node scripts/build.mjs && electron harness/main.cjs preview",
+    "test:engine": "node scripts/run-tool.mjs vitest run --configLoader runner engine/test"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="174" viewBox="0 0 960 174" role="img" aria-labelledby="title desc">
+<title id="title">Footage to finished video</title>
+<desc id="desc">1  IN: Choose clips and ranges; 2  MOSH: Arrange, affect, compare; 3  OUT: Render a playable video. Save .mosh to keep editing. Export a video to play or share. Keep the source clips.</desc>
+<rect width="960" height="174" rx="8" fill="#101319"/>
+<rect x="18" y="18" width="294" height="104" rx="5" fill="#1c222c" stroke="#394350"/>
+<rect x="18" y="18" width="5" height="104" fill="#52d7e6"/>
+<text x="38" y="52" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="700" fill="#52d7e6">1  IN</text>
+<text x="38" y="88" font-family="Segoe UI,Arial,sans-serif" font-size="17" fill="#e4e8ef">Choose clips and ranges</text>
+<rect x="332" y="18" width="294" height="104" rx="5" fill="#1c222c" stroke="#394350"/>
+<rect x="332" y="18" width="5" height="104" fill="#ee9c7b"/>
+<text x="352" y="52" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="700" fill="#ee9c7b">2  MOSH</text>
+<text x="352" y="88" font-family="Segoe UI,Arial,sans-serif" font-size="17" fill="#e4e8ef">Arrange, affect, compare</text>
+<rect x="646" y="18" width="294" height="104" rx="5" fill="#1c222c" stroke="#394350"/>
+<rect x="646" y="18" width="5" height="104" fill="#69c7b6"/>
+<text x="666" y="52" font-family="Segoe UI,Arial,sans-serif" font-size="22" font-weight="700" fill="#69c7b6">3  OUT</text>
+<text x="666" y="88" font-family="Segoe UI,Arial,sans-serif" font-size="17" fill="#e4e8ef">Render a playable video</text>
+<text x="24" y="153" font-family="Segoe UI,Arial,sans-serif" font-size="16" fill="#bac3d1">Save .mosh to keep editing. Export a video to play or share. Keep the source clips.</text></svg>

@@ -1,85 +1,79 @@
 # Moshpit
 
-**Turn footage into datamoshed edits, broken motion and layered effects.**
+**Turn clips into motion trails, broken textures and deliberate video glitches.**
 
-Moshpit is a local video editor built around editable blocks, frame controls and processing graphs. Import your own footage, experiment with effects, then keep both a rendered video and an editable `.mosh` project.
+A local Windows editor for arranging footage, combining effects and exporting the result. Start with a ready-made sequence; explore individual nodes when you want more control. A Loupedeck CT is optional.
 
-**Free, open-source development release. Source is available now; public Windows installers are not available yet.** Local unsigned installer candidates are being checked for portability, dependency licences and signing. They have not passed a fresh-Windows acceptance test. The per-user installer recipe is included; see [Windows packaging](docs/WINDOWS-PACKAGING.md).
+[Get started](#get-moshpit) · [Make your first mosh](#make-your-first-mosh) · [User guide](docs/first-project.md) · [Help](#when-something-goes-wrong) · [Developers](docs/DEVELOPMENT.md)
 
-[Quick start](QUICKSTART.md) · [Report a bug](https://github.com/adrienwax/moshpit/issues) · [Report a vulnerability privately](https://github.com/adrienwax/moshpit/security/advisories/new) · [MIT licence](LICENSE)
+![Moshpit editing workspace: clips at left, preview and transport in the centre, effects at right and timeline below.](docs/images/moshpit-edit.png)
+<sub>Actual Moshpit interface, captured with the built-in synthetic demo. The image illustrates the workspace; it is not a render from supplied footage. Click any screenshot to enlarge it.</sub>
 
-## Make your first edit
+## Get Moshpit
 
-| Workspace | What to do |
+| What you want | Available today |
 | --- | --- |
-| **IN** | Import a clip and choose the section you want to use. |
-| **MOSH** | Arrange blocks, add effects, and play or step through the result. |
-| **GRAPH** | Inspect and adjust the selected block's processing connections. |
-| **OUT** | Choose a destination and export a video. |
+| Read the guide and see the interface | Right here—no installation needed. |
+| Download a Windows installer | **Not public yet.** An unsigned candidate is undergoing clean-Windows and signing checks. [Release status](https://github.com/adrienwax/moshpit/releases). |
+| Run or modify the source | [Windows source setup](docs/DEVELOPMENT.md#run-from-source): Git, Node.js 24, npm and FFmpeg/FFprobe. |
+| Try a candidate supplied by the maintainer | Follow the [short first-use checklist](docs/TESTING.md). It is a test build, not a signed release. |
 
-Save a **`.mosh` project** to return to an edit. Export a **video** to watch or share the result. Projects reference their source footage; saving a project does not collect that footage into the project file. Keep the original media available when reopening or transferring an edit.
+**GitHub’s “Code → Download ZIP” downloads source code, not an installable app.** Public installers will appear under Releases when ready. Windows x64 is the current target; other platforms are not validated.
 
-Moshpit works with a mouse and keyboard. [CTserver](https://github.com/adrienwax/ctserver) provides optional Loupedeck CT control. Neither a controller nor a private companion library is required. Personal projects and footage are not bundled. Starter Mosh works with footage you choose. An optional [local examples shelf](docs/EXAMPLE-PROJECTS.md) opens projects as unsaved copies, preserving their originals.
+## Make your first mosh
 
-## Run from source
+![Three stages: IN chooses footage, MOSH arranges and processes it, OUT exports a video.](docs/images/workflow.svg)
 
-The current target is **Windows x64**. Other operating systems and architectures have not been validated.
+Bring **three short video clips you have permission to use**, together in one folder. Moving subjects and textured backgrounds make changes easier to see. No personal footage or sample catalogue is bundled.
 
-You need Git, **Node.js 24 with npm**, and FFmpeg/FFprobe on PATH. Use the Electron version pinned in the lockfile. Codec availability depends on your FFmpeg build; a minimal build may not support every export/effect path.
+1. **Home → Starter Mosh.** Choose that folder when asked. Wait for preparation to finish; Moshpit creates three blocks, using up to ten seconds from each clip.
+2. **Press Play below the preview.** You are now in **MOSH**. The timeline is the sequence; the highlighted block is the part you are editing.
+3. **Select the middle, MOTION block.** In **Applied effects & parameters**, select **Melt**. Turn **Bypass off** to enable the starter effect—it deliberately begins bypassed.
+4. **Change one control, then compare.** Play from before the middle block. Try Bypass on/off; use **Edit → Undo** or **Ctrl+Z** to reverse an edit.
+5. **Save the project with Ctrl+S.** Give the `.mosh` file a name. Keep the original clips where they are: the project references them.
+6. **Open OUT → H.264.** Choose the output folder, then **Render · Add job**. Watch the render queue for completion and open the resulting video.
 
-```powershell
-git clone https://github.com/adrienwax/moshpit.git
-cd moshpit
-npm ci
-npm run build:app
-npm start
-```
+You now have **two different things**: a `.mosh` project you can keep editing, and an exported video you can play or share. [The illustrated walkthrough](docs/first-project.md) explains each step and the common terms.
 
-`npm ci` can run dependency installation scripts, including downloading Electron. Review them before installing. `npm start` builds and launches the desktop app. `npm ci --ignore-scripts` is useful for source-only checks, but does not install the Electron runtime needed to launch.
+## Know where you are
 
-If FFmpeg is not on PATH, set `MOSHPIT_FFMPEG` to its full executable path before starting. Build scratch files use `%LOCALAPPDATA%/KRAB/scratch`; set `KRAB_SCRATCH_ROOT` to an absolute path to choose another location. These are developer settings, not required application preferences.
-
-## If something does not work
-
-| Symptom | First check |
+| Area | What you do there |
 | --- | --- |
-| App does not launch after installing dependencies | Confirm Node 24 and that Electron's installation script completed. Keep the terminal error for a bug report. |
-| Import or export fails | Check FFmpeg/FFprobe availability and the selected codec. The Notifications pane retains error details for copying. |
-| A saved project cannot find its footage | Restore the source file at the referenced location; a `.mosh` file is not a media archive. |
-| A render differs on another machine | Compare encoder versions, codecs and graphics drivers. Byte-identical output across machines is not promised. |
+| **IN** | Browse clips, preview them and choose the range to use. |
+| **MOSH** | Arrange picture/motion blocks, select effects and adjust their parameters. |
+| **Graph / routing** | Inspect the processing connections for more detailed editing. Start with the effects list if nodes are new to you. |
+| **OUT** | Choose a codec and output folder, render, and inspect the queue. H.264 is a useful first choice for sharing. |
+| **INFO**, bottom left | Hover or focus a control for its explanation. |
+| **Notifications**, bottom right | Reopen messages after popups disappear; expand a message to copy its details. |
 
-## Development checks
-
-```powershell
-npm run typecheck
-npm test
-npm run test:app
-node --test scripts/build-scratch/bootstrap.test.mjs scripts/check-public-defaults.mjs
-```
-
-Some integration harnesses need separately prepared media fixtures. Use disposable scratch folders for tests. Passing source/unit tests is separate from native playback, GPU behaviour and physical-controller testing.
-
-The initial public source was checked on Windows with Node 24: dependency installation with scripts disabled, application build, typecheck and focused portability tests passed. That build produced Electron JavaScript and a renderer, not a public installer. Vite's upstream `use client` and chunk-size warnings were retained.
+**Picture** blocks introduce a fresh image. **Motion** blocks can carry changes from earlier images. A **recipe** groups several effects; a **parameter** is a setting within one. A **conform** is a prepared working copy of imported media. [More terms and examples](docs/first-project.md#the-small-glossary).
 
 <details>
-<summary>Packaging and optional test inputs</summary>
+<summary><strong>See the export workspace</strong></summary>
 
-The packaging script is `app/pack.mjs`. It supports an isolated per-user NSIS installer with `--candidate --installer`. [Windows packaging](docs/WINDOWS-PACKAGING.md) documents the pinned tools, media-tool inputs, retained settings and outstanding distribution checks. It does not publish artifacts automatically.
+![Moshpit OUT workspace with H.264 selected, output settings at left and render queue at right.](docs/images/moshpit-export.png)
 
-Optional preview benchmarks use explicit `PREVIEW_REAL` paths separated by semicolons. The long-render harness requires `LONG_SOURCE`; `LONG_DIR` selects a scratch parent. No personal test footage is supplied.
+This is the same synthetic UI demonstration. A saved project is not an export, and an empty render queue means no output job has been added yet.
 
 </details>
 
-## Licences and redistribution
+## When something goes wrong
 
-Original project code is **MIT**, copyright **2026 ak wax**. See [LICENSE](LICENSE), [third-party notices](THIRD-PARTY-NOTICES.txt), [asset notices](ASSET-NOTICES.txt) and the [third-party directory](third-party).
+| Symptom | Try this |
+| --- | --- |
+| Starter Mosh asks for more clips | Choose one folder with three distinct playable video files. |
+| The effect seems absent | Select the intended block/effect, check Bypass, then play from before that block. |
+| A reopened project has missing footage | Restore the clips to their referenced paths. Saving `.mosh` does not collect the media. |
+| Import or export fails | Open Notifications and copy the error. Source builds need a suitable FFmpeg **and** FFprobe. |
+| You cannot find a control | Hover it for INFO; use the IN / MOSH / OUT workspace labels to orient yourself. |
 
-Dependencies retain their own licences. In particular, Mediabunny is MPL-2.0, and FFmpeg's obligations depend on the exact build and linked libraries. MIT on this repository does not relicense those components. The current local FFmpeg candidate is GPL-enabled; complete corresponding source/build materials remain a gate before distributing that binary. This source repository does not include that FFmpeg binary.
+[Report a bug](https://github.com/adrienwax/moshpit/issues) with your version, steps and notification details. Remove personal paths and share footage only if you have permission. Report vulnerabilities through [private security reporting](https://github.com/adrienwax/moshpit/security/advisories/new).
 
-## Help and contributions
+## Explore further
 
-Use [GitHub Issues](https://github.com/adrienwax/moshpit/issues) for bugs and feature proposals. Include the commit/version, Windows version, steps, expected/actual behaviour, and relevant notification details. Use a small clip you have permission to share; remove private paths and credentials from logs.
+- [First-project guide](docs/first-project.md) · [Candidate test checklist](docs/TESTING.md)
+- [Optional local example-project shelf](docs/EXAMPLE-PROJECTS.md)
+- [CTserver: optional Loupedeck CT control](https://github.com/adrienwax/ctserver)
+- [Source setup, checks and repository map](docs/DEVELOPMENT.md) · [Windows packaging](docs/WINDOWS-PACKAGING.md)
 
-For contributions, discuss substantial changes in an issue first, keep patches focused, and include a reproducer or regression check. Do not commit footage, caches, generated installers or credentials.
-
-For security vulnerabilities, use [private reporting](https://github.com/adrienwax/moshpit/security/advisories/new), not a public issue. See [SECURITY.md](SECURITY.md) for scope and handling.
+Original code is **MIT**, copyright 2026 **ak wax**. [Dependencies](THIRD-PARTY-NOTICES.txt) and [assets](ASSET-NOTICES.txt) retain their own licences. FFmpeg is an external tool with separate licensing and source requirements; see [packaging](docs/WINDOWS-PACKAGING.md). [Security policy](SECURITY.md).
