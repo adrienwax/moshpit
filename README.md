@@ -1,73 +1,85 @@
 # Moshpit
 
-An offline video editor for datamoshing, frame manipulation and effect graphs.
+**Turn footage into datamoshed edits, broken motion and layered effects.**
 
-**Source release. Windows binary downloads are not included.**
+Moshpit is a local video editor built around editable blocks, frame controls and processing graphs. Import your own footage, experiment with effects, then keep both a rendered video and an editable `.mosh` project.
 
-## Workflow
+**Free, open-source development release. Source is available now; public Windows installers are not available yet.** Local unsigned installer candidates are being checked for portability, dependency licences and signing. They have not passed a fresh-Windows acceptance test. The installer changes are not yet on this public branch.
 
-1. **IN**: import your footage and choose a range.
-2. **MOSH**: arrange blocks, add effects and inspect the result.
-3. **GRAPH**: connect and adjust a block's processing graph.
-4. **OUT**: choose a destination and export. Save a `.mosh` project to keep an editable version.
+[Quick start](QUICKSTART.md) · [Report a bug](https://github.com/adrienwax/moshpit/issues) · [Report a vulnerability privately](https://github.com/adrienwax/moshpit/security/advisories/new) · [MIT licence](LICENSE)
 
-No personal footage, projects or companion knowledge base is supplied.
+## Make your first edit
 
-## Source setup
+| Workspace | What to do |
+| --- | --- |
+| **IN** | Import a clip and choose the section you want to use. |
+| **MOSH** | Arrange blocks, add effects, and play or step through the result. |
+| **GRAPH** | Inspect and adjust the selected block's processing connections. |
+| **OUT** | Choose a destination and export a video. |
 
-Windows x64 is the current target. Use Node 24 and the exact Electron version
-in `package.json`. Install locked dependencies with `npm ci`. Installation
-can run third-party build scripts; inspect them before running on a new machine.
-`npm run build:app` builds the app; `npm start` also opens it.
+Save a **`.mosh` project** to return to an edit. Export a **video** to watch or share the result. Projects reference their source footage; saving a project does not collect that footage into the project file. Keep the original media available when reopening or transferring an edit.
 
-Build output uses `%LOCALAPPDATA%/KRAB/scratch`, or an absolute directory supplied
-through `KRAB_SCRATCH_ROOT`. Set `MOSHPIT_FFMPEG` for an explicit FFmpeg executable;
-otherwise development uses PATH. Packaging additionally requires
-`MOSHPIT_FFMPEG_DIR` containing the reviewed FFmpeg and FFprobe binaries, and
-electron-builder 26.15.3 (via `MOSHPIT_BUILDER_CLI` or a local installation).
-These packaging requirements apply to future Windows downloads, not the source-only release.
-The PNG app icon must also be generated from the supplied SVG before packaging;
-a complete standalone packaging procedure remains unverified.
+Moshpit works with a mouse and keyboard. [CTserver](https://github.com/adrienwax/ctserver) provides optional Loupedeck CT control. Neither a controller nor a private companion library is required. Personal projects and footage are not bundled.
 
-## Checks
+## Run from source
 
-`npm test` runs engine tests; `npm run test:app` runs application unit tests.
-`node --test scripts/build-scratch/bootstrap.test.mjs scripts/check-public-defaults.mjs`
-checks portable defaults without launching the app. Set TEMP/TMP to a disposable
-test folder when running directly. These checks do not establish GPU, native
-playback or physical-controller acceptance.
+The current target is **Windows x64**. Other operating systems and architectures have not been validated.
 
-Some legacy integration harnesses still require separately prepared fixtures;
-they are not substitutes for a first-use test on another Windows machine.
+You need Git, **Node.js 24 with npm**, and FFmpeg/FFprobe on PATH. Use the Electron version pinned in the lockfile. Codec availability depends on your FFmpeg build; a minimal build may not support every export/effect path.
 
-## Verified source checks
+```powershell
+git clone https://github.com/adrienwax/moshpit.git
+cd moshpit
+npm ci
+npm run build:app
+npm start
+```
 
-In a fresh local dependency folder on Windows with Node 24, `npm ci --ignore-scripts`,
-`npm run build:app` and `npm run typecheck` passed. The build produced Electron
-JavaScript and the Vite renderer, not a distributable EXE. Eleven focused default,
-test-footage and cache tests also passed. The build reports an upstream `use client`
-directive warning and a large-chunk warning; neither was suppressed.
+`npm ci` can run dependency installation scripts, including downloading Electron. Review them before installing. `npm start` builds and launches the desktop app. `npm ci --ignore-scripts` is useful for source-only checks, but does not install the Electron runtime needed to launch.
 
-Install scripts were deliberately disabled for those checks. A desktop launch
-additionally needs Electron's runtime installation and FFmpeg. No clean-Windows,
-GPU/playback or hardware acceptance is claimed by these source results.
+If FFmpeg is not on PATH, set `MOSHPIT_FFMPEG` to its full executable path before starting. Build scratch files use `%LOCALAPPDATA%/KRAB/scratch`; set `KRAB_SCRATCH_ROOT` to an absolute path to choose another location. These are developer settings, not required application preferences.
 
-## Licence
+## If something does not work
 
-Original project code: MIT, copyright 2026 ak wax. Dependencies retain their
-licences; see `THIRD-PARTY-NOTICES.txt` and `third-party/`. Binary redistribution
-is still pending review. Outputs are not guaranteed byte-identical across
-encoders, operating systems or graphics drivers.
+| Symptom | First check |
+| --- | --- |
+| App does not launch after installing dependencies | Confirm Node 24 and that Electron's installation script completed. Keep the terminal error for a bug report. |
+| Import or export fails | Check FFmpeg/FFprobe availability and the selected codec. The Notifications pane retains error details for copying. |
+| A saved project cannot find its footage | Restore the source file at the referenced location; a `.mosh` file is not a media archive. |
+| A render differs on another machine | Compare encoder versions, codecs and graphics drivers. Byte-identical output across machines is not promised. |
 
-## Bugs and security
+## Development checks
 
-Report reproducible bugs in [GitHub Issues](https://github.com/adrienwax/moshpit/issues). Include the
-version or commit, steps, expected result and actual result. Remove personal
-paths, footage and credentials from attachments.
+```powershell
+npm run typecheck
+npm test
+npm run test:app
+node --test scripts/build-scratch/bootstrap.test.mjs scripts/check-public-defaults.mjs
+```
 
-For security vulnerabilities, use [private reporting](https://github.com/adrienwax/moshpit/security/advisories/new),
-not a public issue. See [SECURITY.md](SECURITY.md).
+Some integration harnesses need separately prepared media fixtures. Use disposable scratch folders for tests. Passing source/unit tests is separate from native playback, GPU behaviour and physical-controller testing.
 
-Optional preview benchmarks read only explicitly supplied `PREVIEW_REAL` paths
-(separated by semicolons). The long-render harness requires `LONG_SOURCE`;
-`LONG_DIR` selects a scratch parent, with each run using its own temporary subfolder.
+The initial public source was checked on Windows with Node 24: dependency installation with scripts disabled, application build, typecheck and focused portability tests passed. That build produced Electron JavaScript and a renderer, not a public installer. Vite's upstream `use client` and chunk-size warnings were retained.
+
+<details>
+<summary>Packaging and optional test inputs</summary>
+
+The public branch's packaging script is `app/pack.mjs`. It requires `MOSHPIT_FFMPEG_DIR` containing reviewed `ffmpeg.exe` and `ffprobe.exe`, electron-builder **26.15.3** installed locally or selected through `MOSHPIT_BUILDER_CLI`, and an icon PNG generated from the supplied SVG. The standalone public packaging procedure remains under review. Local installer fixes will be published separately after review; do not assume unpublished candidate flags exist here.
+
+Optional preview benchmarks use explicit `PREVIEW_REAL` paths separated by semicolons. The long-render harness requires `LONG_SOURCE`; `LONG_DIR` selects a scratch parent. No personal test footage is supplied.
+
+</details>
+
+## Licences and redistribution
+
+Original project code is **MIT**, copyright **2026 ak wax**. See [LICENSE](LICENSE), [third-party notices](THIRD-PARTY-NOTICES.txt), [asset notices](ASSET-NOTICES.txt) and the [third-party directory](third-party).
+
+Dependencies retain their own licences. In particular, Mediabunny is MPL-2.0, and FFmpeg's obligations depend on the exact build and linked libraries. MIT on this repository does not relicense those components. The current local FFmpeg candidate is GPL-enabled; complete corresponding source/build materials remain a gate before distributing that binary. This source repository does not include that FFmpeg binary.
+
+## Help and contributions
+
+Use [GitHub Issues](https://github.com/adrienwax/moshpit/issues) for bugs and feature proposals. Include the commit/version, Windows version, steps, expected/actual behaviour, and relevant notification details. Use a small clip you have permission to share; remove private paths and credentials from logs.
+
+For contributions, discuss substantial changes in an issue first, keep patches focused, and include a reproducer or regression check. Do not commit footage, caches, generated installers or credentials.
+
+For security vulnerabilities, use [private reporting](https://github.com/adrienwax/moshpit/security/advisories/new), not a public issue. See [SECURITY.md](SECURITY.md) for scope and handling.
