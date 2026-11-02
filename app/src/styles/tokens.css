@@ -671,3 +671,17 @@ body.dragging-mark,body.dragging-mark *{cursor:ew-resize!important;user-select:n
 .blocktrim>i,.blockplay>i{font-style:normal;font-size:9px;letter-spacing:.4px;color:var(--txt-3,var(--txt-3));width:100%}
 .blocktrim .npm,.blockplay .npm{min-width:150px;flex:1 1 150px}
 .blocktrim .m,.blockplay .m{font-size:10px;color:var(--txt-3);width:100%}
+
+/* Examples and recents share the existing Home dock; saved layouts remain intact. */
+.home-project-hub{height:100%;overflow:auto;min-width:0}
+.home-project-hub>.hprojects{height:auto;overflow:visible}
+.home-project-heading,.home-example-bar h3{font-size:var(--fs-md);margin:0;font-weight:600}
+.home-project-heading{padding:var(--sp-3)}
+.home-examples{border-bottom:1px solid var(--line);padding:var(--sp-3)}
+.home-example-bar{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2);flex-wrap:wrap;margin-bottom:var(--sp-3)}
+.home-example-bar [role=group]{display:flex;gap:4px;flex-wrap:wrap}
+.home-example-bar button[aria-pressed=true]{border-color:var(--fn-interactive);color:var(--fn-interactive)}
+.home-example-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:var(--sp-3);max-height:360px;overflow:auto}
+.home-example-grid .hcard:focus-visible{outline:2px solid var(--fn-interactive);outline-offset:-2px}
+.home-example-meta{display:flex;justify-content:space-between;gap:8px;color:var(--txt-2);font-size:var(--fs-micro)}
+.home-example-open{color:var(--fn-interactive);font-size:var(--fs-micro)}

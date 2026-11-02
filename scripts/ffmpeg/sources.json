@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "components": [
+    {
+      "component": "ffmpeg",
+      "commit": "ead437865214972624a047840c8e9b6660a2ec85",
+      "url": "https://codeload.github.com/FFmpeg/FFmpeg/zip/ead437865214972624a047840c8e9b6660a2ec85",
+      "sha256": "f0051f5dba20310cbff3e4ea3cc461347ba714e1ef22a93d400870fe3c58d52d",
+      "bytes": 24001035
+    },
+    {
+      "component": "snappy",
+      "commit": "747488a9f3d0daf9b639b6704d7188fba48af179",
+      "url": "https://codeload.github.com/google/snappy/zip/747488a9f3d0daf9b639b6704d7188fba48af179",
+      "sha256": "691e52c526b65d3401916d58587ff7eb9d31fbb9bd883e762103462596163687",
+      "bytes": 1186209
+    },
+    {
+      "component": "x264",
+      "commit": "0480cb05fa188d37ae87e8f4fd8f1aea3711f7ee",
+      "url": "https://code.videolan.org/videolan/x264/-/archive/0480cb05fa188d37ae87e8f4fd8f1aea3711f7ee/x264-0480cb05fa188d37ae87e8f4fd8f1aea3711f7ee.tar.gz",
+      "sha256": "d0967a1348c85dfde363bb52610403be898171493100561efa0dd05d5fd1ae50",
+      "bytes": 1040667
+    },
+    {
+      "component": "zlib",
+      "commit": "e3dc0a85b7032e98380dec011bc8f2c2ee0d8fca",
+      "url": "https://codeload.github.com/madler/zlib/zip/e3dc0a85b7032e98380dec011bc8f2c2ee0d8fca",
+      "sha256": "6fcfd53866f8ca2b63bcdef0bf5c588834718cb6cd6f5e674994638fd1456e16",
+      "bytes": 1701875
+    },
+    {
+      "component": "dav1d",
+      "commit": "54706fc6bc0cdecab7e9593974a4039cc038fca7",
+      "sha256": "dc03b230985bd990a7377c16fc558f2be80717d27fc9e791106ee697993d42e0",
+      "bytes": 2049927,
+      "url": "https://codeload.github.com/videolan/dav1d/zip/54706fc6bc0cdecab7e9593974a4039cc038fca7"
+    },
+    {
+      "component": "zimg",
+      "commit": "f6cc75ad23db1bb9c53673c15523e6b6e960ffc6",
+      "sha256": "f59d6cc4e0801fe6a44b7b6546e347969b481d92d28508bbc784bdf68fdd78c8",
+      "bytes": 441512,
+      "url": "https://codeload.github.com/sekrit-twc/zimg/zip/f6cc75ad23db1bb9c53673c15523e6b6e960ffc6"
+    },
+    {
+      "component": "graphengine",
+      "commit": "cb5b2ce13384ec2491f0c37256ea210034799f69",
+      "sha256": "17e3f2840edaeb63df58d6e9cbc5ff0bdd610aaca4358ed9c3755da6f317cbdc",
+      "bytes": 90823,
+      "url": "https://codeload.github.com/sekrit-twc/graphengine/zip/cb5b2ce13384ec2491f0c37256ea210034799f69",
+      "directory": "zimg/graphengine"
+    }
+  ]
+}

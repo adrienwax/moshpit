@@ -81,12 +81,12 @@ export function startProjectHost(win: BrowserWindow) {
     return file;
   });
 
-  ipcMain.handle('project:load', (_e, file: string) =>
+  ipcMain.handle('project:load', (_e, file: string, asExample = false) =>
     guard(async () => {
       const loaded = loadProjectFile(file);
       // A journal next to the file means the last session ended without saving or discarding.
-      const rec = recover(file);
-      await pushRecent(file);
+      const rec = asExample ? null : recover(file);
+      if (!asExample) await pushRecent(file);
       return {
         doc: rebaseCachePaths(loaded.doc, app.getPath('userData')),
         warnings: loaded.warnings.map((w) => w.toJSON()),

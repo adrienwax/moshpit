@@ -218,9 +218,26 @@ export const layoutStore = createStore<LayoutState>({ current: {}, saved: [] });
 export const useLayouts = <U>(sel: (s: LayoutState) => U) => useStore(layoutStore, sel);
 
 let timer: ReturnType<typeof setTimeout> | undefined;
-function persist() {
+let revision = 0, savedRevision = 0;
+let writes: Promise<void> = Promise.resolve();
+/** Serialize the shared layouts.json.tmp and drain pending changes before normal close. */
+export function flushLayouts(): Promise<void> {
   clearTimeout(timer);
-  timer = setTimeout(() => void host.writeConfig('layouts', { v: LAYOUT_VERSION, ...layoutStore.get() }).catch(toastError), 400);
+  timer = undefined;
+  const next = writes.catch(() => {}).then(async () => {
+    while (savedRevision !== revision) {
+      const saving = revision;
+      await host.writeConfig('layouts', { v: LAYOUT_VERSION, ...structuredClone(layoutStore.get()) });
+      savedRevision = saving;
+    }
+  });
+  writes = next;
+  return next;
+}
+function persist() {
+  revision++;
+  clearTimeout(timer);
+  timer = setTimeout(() => void flushLayouts().catch(toastError), 400);
 }
 
 export function setWsLayout(ws: WsId, fn: (cols: WsLayout) => WsLayout, known: string[]) {

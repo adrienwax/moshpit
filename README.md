@@ -4,7 +4,7 @@
 
 Moshpit is a local video editor built around editable blocks, frame controls and processing graphs. Import your own footage, experiment with effects, then keep both a rendered video and an editable `.mosh` project.
 
-**Free, open-source development release. Source is available now; public Windows installers are not available yet.** Local unsigned installer candidates are being checked for portability, dependency licences and signing. They have not passed a fresh-Windows acceptance test. The installer changes are not yet on this public branch.
+**Free, open-source development release. Source is available now; public Windows installers are not available yet.** Local unsigned installer candidates are being checked for portability, dependency licences and signing. They have not passed a fresh-Windows acceptance test. The per-user installer recipe is included; see [Windows packaging](docs/WINDOWS-PACKAGING.md).
 
 [Quick start](QUICKSTART.md) · [Report a bug](https://github.com/adrienwax/moshpit/issues) · [Report a vulnerability privately](https://github.com/adrienwax/moshpit/security/advisories/new) · [MIT licence](LICENSE)
 
@@ -19,7 +19,7 @@ Moshpit is a local video editor built around editable blocks, frame controls and
 
 Save a **`.mosh` project** to return to an edit. Export a **video** to watch or share the result. Projects reference their source footage; saving a project does not collect that footage into the project file. Keep the original media available when reopening or transferring an edit.
 
-Moshpit works with a mouse and keyboard. [CTserver](https://github.com/adrienwax/ctserver) provides optional Loupedeck CT control. Neither a controller nor a private companion library is required. Personal projects and footage are not bundled.
+Moshpit works with a mouse and keyboard. [CTserver](https://github.com/adrienwax/ctserver) provides optional Loupedeck CT control. Neither a controller nor a private companion library is required. Personal projects and footage are not bundled. Starter Mosh works with footage you choose. An optional [local examples shelf](docs/EXAMPLE-PROJECTS.md) opens projects as unsaved copies, preserving their originals.
 
 ## Run from source
 
@@ -64,7 +64,7 @@ The initial public source was checked on Windows with Node 24: dependency instal
 <details>
 <summary>Packaging and optional test inputs</summary>
 
-The public branch's packaging script is `app/pack.mjs`. It requires `MOSHPIT_FFMPEG_DIR` containing reviewed `ffmpeg.exe` and `ffprobe.exe`, electron-builder **26.15.3** installed locally or selected through `MOSHPIT_BUILDER_CLI`, and an icon PNG generated from the supplied SVG. The standalone public packaging procedure remains under review. Local installer fixes will be published separately after review; do not assume unpublished candidate flags exist here.
+The packaging script is `app/pack.mjs`. It supports an isolated per-user NSIS installer with `--candidate --installer`. [Windows packaging](docs/WINDOWS-PACKAGING.md) documents the pinned tools, media-tool inputs, retained settings and outstanding distribution checks. It does not publish artifacts automatically.
 
 Optional preview benchmarks use explicit `PREVIEW_REAL` paths separated by semicolons. The long-render harness requires `LONG_SOURCE`; `LONG_DIR` selects a scratch parent. No personal test footage is supplied.
 

@@ -3,8 +3,9 @@ import {_electron} from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-const root=path.resolve(process.env.KRAB_INSTALLER_TEST_ROOT);
-assert.ok(root.toLowerCase().startsWith('e:\\codexscratch\\krab-local-installers-'));
+import {requireScratchOutput} from './build-scratch/bootstrap.mjs';
+const root=requireScratchOutput(process.env.KRAB_INSTALLER_TEST_ROOT || '');
+const expectedVersion=process.env.KRAB_EXPECTED_VERSION || JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8')).version;
 const kind=process.argv[2];assert.ok(['moshpit','ctserver'].includes(kind));
 const name=kind==='moshpit'?'Moshpit KRAB Candidate':'CTserver KRAB Candidate';
 const executablePath=path.join(root,`installed-${kind}`,`${name}.exe`);
@@ -21,13 +22,13 @@ try {
  result.pid=app.process().pid;
  const state=await app.evaluate(({app})=>({name:app.getName(),version:app.getVersion(),userData:app.getPath('userData'),isPackaged:app.isPackaged}));
  result.state=state;
- assert.equal(state.name,name);assert.equal(state.version,'1.0.0-rc.1');assert.equal(state.isPackaged,true);
+ assert.equal(state.name,name);assert.equal(state.version,expectedVersion);assert.equal(state.isPackaged,true);
  assert.ok(state.userData.toLowerCase().startsWith(testRoot.toLowerCase()+path.sep));result.checks.push('packaged identity and isolated settings');
  const page=await app.firstWindow({timeout:30000});page.on('pageerror',error=>result.errors.push(error.message)); result.failedRequests=[]; page.on('requestfailed',request=>result.failedRequests.push({url:request.url(),failure:request.failure()}));
  await page.waitForLoadState('domcontentloaded');
  if(kind==='moshpit')await page.locator('.topbar').waitFor({timeout:30000});
  else await page.getByRole('tab',{name:'Map',exact:true}).first().waitFor({timeout:30000});
- if(kind==='ctserver')await page.waitForFunction(()=>document.querySelector('#ver')?.textContent?.includes('1.0.0-rc.1'),{},{timeout:20000}); result.title=await page.title();result.checks.push('renderer loaded and live version received');
+ if(kind==='ctserver')await page.waitForFunction(version=>document.querySelector('#ver')?.textContent?.includes(version),expectedVersion,{timeout:20000}); result.title=await page.title();result.checks.push('renderer loaded and live version received');
  if(kind==='ctserver'){
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(testRoot,'router.json'),'utf8')),{port:9994,hostAuto:false});
   const config=JSON.parse(fs.readFileSync(path.join(testRoot,'private-profile','config','apps.json'),'utf8'));

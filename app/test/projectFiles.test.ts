@@ -114,3 +114,14 @@ describe('public .mosh project files', () => {
   });
 
 });
+
+
+it('reads an example without changing its file, recovery journal or recent projects', async () => {
+  const file = path.join(ipc.root, 'Example.mosh'), doc = demoProject();
+  saveProjectFile(file, doc); new Autosaver(file, doc).commit({ ...doc, name: 'Unfinished original' });
+  const before = fs.readFileSync(file), journal = fs.readFileSync(file + '.journal');
+  const result = await call('project:load', file, true);
+  expect(result.ok).toBe(true); expect(result.value.doc.name).toBe(doc.name);
+  expect(result.value.recovery).toBeUndefined(); expect(await call('project:recents')).toEqual([]);
+  expect(fs.readFileSync(file)).toEqual(before); expect(fs.readFileSync(file + '.journal')).toEqual(journal);
+});

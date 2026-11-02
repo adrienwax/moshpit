@@ -50,7 +50,7 @@ contextBridge.exposeInMainWorld('moshpitHost', {
   project: {
     openDialog: () => ipcRenderer.invoke('project:open-dialog'),
     saveDialog: (suggested: string) => ipcRenderer.invoke('project:save-dialog', suggested),
-    load: (file: string) => ipcRenderer.invoke('project:load', file),
+    load: (file: string, asExample = false) => ipcRenderer.invoke('project:load', file, asExample),
     save: (file: string, doc: unknown) => ipcRenderer.invoke('project:save', file, doc),
     session: (file: string | null, saved: unknown, current: unknown) => ipcRenderer.invoke('project:session', file, saved, current),
     journal: (doc: unknown) => ipcRenderer.send('project:journal', doc),

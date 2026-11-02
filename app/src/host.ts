@@ -6,7 +6,7 @@ export interface HostBridge {
   testClipsDir?: string;
   /** Desktop only: a dropped File's path on disk (webUtils.getPathForFile); '' when it has none. */
   pathOf?(file: File): string;
-  readConfig(name: 'layouts' | 'settings' | 'previews'): Promise<unknown | null>;
+  readConfig(name: 'layouts' | 'settings' | 'previews' | 'examples'): Promise<unknown | null>;
   writeConfig(name: 'layouts' | 'settings' | 'previews', data: unknown): Promise<string>;
   /** Desktop only: the project lifecycle (electron/project-host.ts). */
   project?: ProjectBridge;
@@ -58,7 +58,7 @@ export interface PendingRecovery {
 export interface ProjectBridge {
   openDialog(): Promise<string | null>;
   saveDialog(suggested: string): Promise<string | null>;
-  load(file: string): Promise<IpcResult<LoadedProject>>;
+  load(file: string, asExample?: boolean): Promise<IpcResult<LoadedProject>>;
   save(file: string, doc: ProjectDoc): Promise<IpcResult<string>>;
   session(file: string | null, saved: ProjectDoc, current: ProjectDoc | null): Promise<IpcResult<string>>;
   journal(doc: ProjectDoc): void;

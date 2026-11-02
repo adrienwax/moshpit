@@ -14,6 +14,7 @@ import { asError, choose, toast, toastError } from '../qol/qol';
 import { checkConforms, resetConformStatus } from './conforms';
 import { resetProjectJobs } from './jobs';
 import { projectFileStem } from '../lib/projectFiles';
+import { flushLayouts } from '../layout/model';
 
 interface LifeState {
   file: string | null;
@@ -127,7 +128,8 @@ async function newProjectCurrent(): Promise<boolean> {
 }
 
 export const openProject = (file?: string): Promise<void> => withLifecycle(undefined, () => openProjectCurrent(file));
-async function openProjectCurrent(file?: string) {
+export const openExample = (file: string): Promise<void> => withLifecycle(undefined, () => openProjectCurrent(file, true));
+async function openProjectCurrent(file?: string, asExample = false) {
   const b = bridge();
   if (!b) return toast('Opening project files needs the desktop app', { kind: 'warn' });
   const previous = projectStore.get().doc, previousFile = lifeStore.get().file;
@@ -139,8 +141,18 @@ async function openProjectCurrent(file?: string) {
   if (projectStore.get().doc !== approved) return changedDuring('choosing a project');
   lifeStore.set((s) => ({ ...s, busy: 'opening' }));
   try {
-    const r = unwrap(await b.load(f));
+    const r = unwrap(await (asExample ? b.load(f, true) : b.load(f)));
     if (projectStore.get().doc !== approved) return changedDuring('opening a project');
+    if (asExample) {
+      // Start an unsaved session with a fresh identity: Ctrl+S must never target the example.
+      const doc = { ...r.doc, id: emptyDoc().id, name: `${r.doc.name} (copy)` };
+      adopt(doc, null, true);
+      await startSession(null, emptyDoc(), doc);
+      for (const w of r.warnings) toastError(w);
+      toast('Example opened as a copy. Save to keep your version.', { kind: 'ok' });
+      void checkConforms('open');
+      return;
+    }
     if (r.recovery) {
       const c = await choose(
         'Recover unsaved edits?',
@@ -251,9 +263,9 @@ export async function bootLifecycle() {
     const requested = projectStore.get().doc;
     const close = async (discard: boolean) => {
       const approved = projectStore.get().doc;
-      try { await flushSettings(); }
+      try { await flushSettings(); await flushLayouts(); }
       catch {
-        const c = await choose('Settings could not be saved', h('p', null, 'Keep Moshpit open to retry, or close using the previously saved settings.'), [
+        const c = await choose('Preferences could not be saved', h('p', null, 'Keep Moshpit open to retry, or close using the previously saved settings and layout.'), [
           { label: 'Keep open', value: 'cancel' as const, kind: 'primary' },
           { label: 'Close anyway', value: 'close' as const, kind: 'ghost' },
         ], 0);

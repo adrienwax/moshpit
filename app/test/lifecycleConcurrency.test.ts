@@ -11,11 +11,12 @@ vi.mock('../src/host', () => ({ host: {
 vi.mock('../src/qol/qol', async original => ({ ...await original<typeof import('../src/qol/qol')>(), choose: vi.fn(async () => 'cancel'), toast: vi.fn(), toastError: vi.fn() }));
 vi.mock('../src/state/conforms', () => ({ checkConforms: vi.fn(), resetConformStatus: vi.fn() }));
 import { host } from '../src/host';
+import { saveLayout } from '../src/layout/model';
 import { choose, toast, toastError } from '../src/qol/qol';
 import { parseProject, serializeProject } from '../../engine/src/project/io';
 import { MoshpitError } from '../../engine/src/errors';
 import { commit, emptyDoc, getDoc, projectStore } from '../src/state/project';
-import { bootLifecycle, isDirty, lifeStore, newProject, openProject, save } from '../src/state/lifecycle';
+import { bootLifecycle, isDirty, lifeStore, newProject, openProject, openExample, save } from '../src/state/lifecycle';
 
 function deferred<T>() { let resolve!: (x: T) => void; const promise = new Promise<T>(r => { resolve = r; }); return { promise, resolve }; }
 const loaded = () => ({ ok: true as const, value: { doc: { ...emptyDoc(), name: 'Loaded B' }, warnings: [], migrated: {} } });
@@ -175,6 +176,32 @@ describe('lifecycle concurrency', () => {
 });
 
 
+describe('layout persistence on close', () => {
+  it('flushes a just-saved layout before the 400ms debounce elapses', async () => {
+    await bootLifecycle();
+    saveLayout('Keep this desk', 'mosh');
+    const close = vi.mocked(host.project!.onCloseRequested).mock.calls.at(-1)![0] as () => Promise<void>;
+    await close();
+    expect(host.writeConfig).toHaveBeenCalledWith('layouts', expect.objectContaining({ saved: expect.arrayContaining([expect.objectContaining({ name: 'Keep this desk' })]) }));
+    expect(host.project!.closeNow).toHaveBeenCalledTimes(1);
+  });
+  it('keeps the app open on layout write failure and retries before closing', async () => {
+    await bootLifecycle();
+    saveLayout('Do not lose me', 'mosh');
+    vi.mocked(host.writeConfig).mockImplementation(async name => {
+      if (name === 'layouts') throw new Error('Layout disk full');
+      return 'settings.json';
+    });
+    const close = vi.mocked(host.project!.onCloseRequested).mock.calls.at(-1)![0] as () => Promise<void>;
+    await close();
+    expect(host.project!.closeNow).not.toHaveBeenCalled();
+    expect(choose).toHaveBeenCalledWith('Preferences could not be saved', expect.anything(), expect.anything(), 0);
+    vi.mocked(host.writeConfig).mockResolvedValue('saved.json');
+    await close();
+    expect(host.project!.closeNow).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('project migration notices', () => {
   it('reopens graph-1 compatible files twice without a false upgrade and preserves their saved format', async () => {
     const text = serializeProject(emptyDoc());
@@ -199,5 +226,32 @@ describe('project migration notices', () => {
     const upgrade = vi.mocked(toast).mock.calls.find(([message]) => message.includes('Upgraded'))!;
     expect(upgrade[0]).toContain('project v0→v1');
     expect(upgrade[0]).not.toContain('graph');
+  });
+});
+
+describe('example copies', () => {
+  it('opens an unsaved fresh-identity copy and saves only to a chosen new file', async () => {
+    const original = loaded(); vi.mocked(host.project!.load).mockResolvedValueOnce(original);
+    await openExample('C:/examples/demo.mosh');
+    expect(lifeStore.get().file).toBeNull(); expect(isDirty()).toBe(true);
+    expect(getDoc().id).not.toBe(original.value.doc.id);
+    expect(getDoc().name).toBe('Loaded B (copy)');
+    expect(host.project!.session).toHaveBeenCalledWith(null, expect.anything(), getDoc());
+    expect(host.project!.discardRecovery).not.toHaveBeenCalled();
+    vi.mocked(host.project!.saveDialog).mockResolvedValueOnce('C:/work/my-demo.mosh');
+    await save();
+    expect(host.project!.save).toHaveBeenCalledWith('C:/work/my-demo.mosh', getDoc());
+  });
+  it('keeps current unsaved work when opening an example is cancelled', async () => {
+    commit('Edit', d => { d.settings.bpm = 133; }); const current = getDoc();
+    await openExample('C:/examples/demo.mosh');
+    expect(getDoc()).toBe(current); expect(host.project!.load).not.toHaveBeenCalled();
+  });
+  it('does not replace work edited while an example is loading', async () => {
+    const wait = deferred<any>(); vi.mocked(host.project!.load).mockReturnValueOnce(wait.promise);
+    const opening = openExample('C:/examples/demo.mosh'); await Promise.resolve();
+    commit('Live edit', d => { d.settings.bpm = 139; }); const current = getDoc();
+    wait.resolve(loaded()); await opening;
+    expect(getDoc()).toBe(current); expect(host.project!.session).not.toHaveBeenCalled();
   });
 });

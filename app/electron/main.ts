@@ -73,7 +73,9 @@ function configPath(name: string): string {
 
 ipcMain.handle('config:read', async (_e, name: string) => {
   try {
-    return JSON.parse(await fs.readFile(configPath(name), 'utf8'));
+    const p = name === 'examples' ? path.join(app.getPath('userData'), 'config', 'examples.json') : configPath(name);
+    if (name === 'examples' && (await fs.stat(p)).size > 256 * 1024) throw new Error('Example index is too large');
+    return JSON.parse(await fs.readFile(p, 'utf8'));
   } catch (err: any) {
     if (err?.code === 'ENOENT') return null;
     throw err;

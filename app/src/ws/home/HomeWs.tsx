@@ -2,6 +2,7 @@
 // LEFT start (new / open / continue, then your folders) · CENTRE the work (recent projects, then
 // the workspaces with their live state) · RIGHT the machine (build, engine, GPU, CT, session).
 import { useEffect, useState } from 'react';
+import { ExamplesPane } from './ExamplesPane';
 import { APP_LABEL } from '../../../version';
 import { Workspace, type PaneDef } from '../../layout/Workspace';
 import { Icon, type IconName } from '../../components/Icon';
@@ -108,6 +109,9 @@ function useRecentPeeks() {
 }
 
 function ProjectsPane() {
+  return <div className="home-project-hub"><ExamplesPane /><h3 className="home-project-heading">Recent projects</h3><RecentProjectsPane /></div>;
+}
+function RecentProjectsPane() {
   const peeks = useRecentPeeks();
   const file = useLife((s) => s.file);
   const dirty = useDirty();
@@ -240,7 +244,7 @@ function KeysPane() {
 const PANES: Record<string, PaneDef> = {
   hstart: { title: 'Start', help: 'Continue the open project, start a new one, open a file, or go find footage.', body: () => <StartPane /> },
   hplaces: { title: 'Folders', help: 'Your IN favourites (★) and the folders you opened last. Click to open one in IN.', extra: <PlacesCount />, body: () => <PlacesHome /> },
-  hprojects: { title: 'Recent projects', help: 'The last projects you saved or opened, each with a picture of its first clip (move along it to scrub). Click to open in MOSH.', extra: <ProjectsCount />, body: () => <ProjectsPane /> },
+  hprojects: { title: 'Projects', help: 'The last projects you saved or opened, each with a picture of its first clip (move along it to scrub). Click to open in MOSH.', extra: <ProjectsCount />, body: () => <ProjectsPane /> },
   hjump: { title: 'Workspaces', help: 'Each workspace with what is in it right now.', body: () => <JumpPane /> },
   hsys: { title: 'System', help: 'This build, the render engine, the GPU and cache readouts, and the CT control link.', extra: <SysState />, body: () => <SystemPane /> },
   hsession: { title: 'Session', help: 'The open project: saved or not, its file, and how it is kept safe.', body: () => <SessionPane /> },
