@@ -1,8 +1,8 @@
 # Moshpit quick start
 
-## With the included example pack (rc4 candidate)
+## With the included example pack
 
-This workflow is for the upcoming candidate, not the current public rc3 download.
+Download the [unsigned rc4 test EXE](https://github.com/adrienwax/moshpit/releases/download/v1.0.0-rc.4-test/Moshpit.exe). Its examples and media are included; no clips of your own are needed. No stable release has been accepted yet.
 
 1. Home → **Browse projects** → **Texture carry / clean reset**. Play its recorded preview.
 2. Choose **Open a copy**. In MOSH, press Play beneath the main viewer.
@@ -10,7 +10,7 @@ This workflow is for the upcoming candidate, not the current public rc3 download
 4. **Ctrl+S** saves your editable `.mosh` copy; the example stays unchanged.
 5. **OUT → H.264**: use **Browse…** beside Output folder, then **Render · Add job**. Play the finished video.
 
-## With your own clips (also available in rc3)
+## With your own clips (optional)
 
 Put three short clips you may use in one folder. **Home → Starter Mosh** prepares a sequence. In MOSH, select the middle MOTION block and its Melt effect, turn Bypass off, change one parameter and compare. Ctrl+Z undoes an edit. Save and export as above.
 

@@ -2,7 +2,7 @@
 
 [← Moshpit](../README.md) · [Quick start](QUICKSTART.md)
 
-**The four included examples and Browse projects layout are in the upcoming rc4 candidate. The public rc3 download still uses Starter Mosh with your own clips.** No stable release has been accepted yet.
+**The [rc4 test download](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.4-test) includes four examples and their media.** You can start without your own clips. No stable release has been accepted yet.
 
 ## Watch → open a copy → make it yours
 

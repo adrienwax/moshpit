@@ -21,7 +21,7 @@ Build/test scratch defaults to `%LOCALAPPDATA%/KRAB/scratch`. Set `KRAB_SCRATCH_
 
 ## Include the public examples
 
-Source runs can start without an example pack, but Browse will report that built-in examples are unavailable. To exercise the same four examples as the upcoming rc4 package, generate a pack with the existing Electron runtime and reviewed FFmpeg, then set its path before starting the app:
+Source runs can start without an example pack, but Browse will report that built-in examples are unavailable. To exercise the same four examples as the rc4 test package, generate a pack with the existing Electron runtime and reviewed FFmpeg, then set its path before starting the app:
 
 ```powershell
 $env:KRAB_SCRATCH_ROOT = 'C:/BuildScratch/Moshpit'
@@ -66,6 +66,6 @@ Generated `node_modules/`, caches, outputs, test footage and installers are igno
 
 ## Packaging and contributions
 
-Use [Windows packaging](WINDOWS-PACKAGING.md) and the [controlled FFmpeg recipe](../scripts/ffmpeg/README.md). The current [unsigned rc3 test prerelease](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.3-test) is a portable EXE; no installer or Sandbox is required. The new Browse pack targets rc4 and is not yet publicly available. No stable release has been accepted. The binary, corresponding sources and notices must match; the original app’s MIT licence does not replace dependency licences.
+Use [Windows packaging](WINDOWS-PACKAGING.md) and the [controlled FFmpeg recipe](../scripts/ffmpeg/README.md). The current [unsigned rc4 test prerelease](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.4-test) is a portable EXE; no installer or Sandbox is required. The four-project Browse pack and its media are included. No stable release has been accepted. The binary, corresponding sources and notices must match; the original app’s MIT licence does not replace dependency licences.
 
 Keep changes focused. Run checks for the affected path and document any native behaviour not exercised. Discuss major feature changes in [Issues](https://github.com/adrienwax/moshpit/issues) first. Use [private security reporting](https://github.com/adrienwax/moshpit/security/advisories/new) for vulnerabilities.
