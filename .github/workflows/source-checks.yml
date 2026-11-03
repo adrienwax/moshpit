@@ -31,3 +31,25 @@ jobs:
         run: npm run test:release
       - name: Authored example and manifest checks
         run: node --test scripts/examples/checks.test.mjs
+      - name: Show isolated test failure details
+        if: failure()
+        shell: pwsh
+        run: |
+          if (Test-Path -LiteralPath $env:KRAB_SCRATCH_ROOT) {
+            Get-ChildItem -LiteralPath $env:KRAB_SCRATCH_ROOT -Directory | Where-Object { $_.Name -match '^[a-f0-9]{32}$' } | ForEach-Object {
+              $receiptPath = Join-Path $_.FullName 'receipt.json'
+              if (Test-Path -LiteralPath $receiptPath) {
+                $receipt = Get-Content -LiteralPath $receiptPath -Raw | ConvertFrom-Json
+                if ($receipt.Status -ne 'Succeeded') {
+                  Get-Content -LiteralPath $receiptPath
+                  foreach ($name in @('stdout.log', 'stderr.log')) {
+                    $logPath = Join-Path $_.FullName $name
+                    if (Test-Path -LiteralPath $logPath) {
+                      Write-Output "--- $name ---"
+                      Get-Content -LiteralPath $logPath -Tail 100
+                    }
+                  }
+                }
+              }
+            }
+          }
