@@ -1,6 +1,8 @@
 // A-1: moshpit:// serves nothing outside its roots, and answers media range requests exactly.
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import path from 'node:path';
+// These are pure path/range checks; importing Electron must not install its binary.
+vi.mock('electron', () => ({ protocol: {} }));
 import { inside, parseRange, mediaUrl } from '../electron/protocol';
 
 describe('moshpit:// (A-1)', () => {

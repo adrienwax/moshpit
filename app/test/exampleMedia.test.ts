@@ -1,5 +1,7 @@
-import { expect, it } from 'vitest';
+import { expect, it, vi } from 'vitest';
 import path from 'node:path';
+// These are pure path/range checks; importing Electron must not install its binary.
+vi.mock('electron', () => ({ protocol: {} }));
 import { resolveMediaRequest } from '../electron/protocol';
 it('serves only the preview root or an explicitly registered example preview',async()=>{
   const root=path.resolve('preview'), external=path.resolve('examples/demo.mp4');
