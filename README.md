@@ -16,7 +16,8 @@ A local Windows editor for arranging footage, combining effects and exporting th
 | Read the guide and see the interface | Right here—no installation needed. |
 | Run Moshpit on Windows | [Download Moshpit.exe](https://github.com/adrienwax/moshpit/releases/download/v1.0.0-rc.3-test/Moshpit.exe) — one unsigned portable test download; no installer or Sandbox required. |
 | Run or modify the source | [Windows source setup](docs/DEVELOPMENT.md#run-from-source): Git, Node.js 24, npm and FFmpeg/FFprobe. |
-| Test the prerelease | Follow the [short first-use checklist](docs/TESTING.md). It is a test build, not a signed release. |
+| Latest public test | [rc3 prerelease](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.3-test) · [short first-use checklist](docs/TESTING.md). |
+| Stable release | Not yet accepted. Use the test release with that limitation in mind. |
 
 **Download `Moshpit.exe`, keep it in a folder you can write to, and double-click it.** Electron, FFmpeg and FFprobe are included—no Node.js, codec-tool download or Sandbox is required. The EXE temporarily unpacks its runtime while running; settings persist in your Windows user profile. Keep using the same EXE to reopen the app.
 
@@ -24,11 +25,24 @@ This is an **unsigned Windows x64 prerelease**, not a signed stable release. The
 
 The bundled FFmpeg/x264 tools use GPLv2-or-later; their [matching source and build materials](https://github.com/adrienwax/moshpit/releases/download/v1.0.0-rc.2-test/FFmpeg-krab-local-1-corresponding-source.zip) are available separately and **are not an extra runtime download**.
 
+## Browse a ready-made project
+
+**Coming in the rc4 candidate; not included in the rc3 download above.** Home → **Browse projects** lets you select a recorded preview, then **Open a copy** to edit the real project. Four included studies use original procedural footage, so you need no clips of your own:
+
+| Project | Try changing |
+| --- | --- |
+| Replay one P-frame | Hold → Times: repeat a motion update. |
+| Texture carry / clean reset | The middle block: Motion versus Picture. |
+| Chroma ghost | Chroma trail → Back or Wet. |
+| Breathing feedback | Modulation → Breathing trail period. |
+
+Play in MOSH, change one control, then **Ctrl+S** to save your copy. **OUT → H.264 → Browse… → Render · Add job** creates a video to share. The examples stay unchanged. [Browse guide and media storage](docs/EXAMPLE-PROJECTS.md). Candidate checks are still separate from public release acceptance.
+
 ## Make your first mosh
 
 ![Three stages: IN chooses footage, MOSH arranges and processes it, OUT exports a video.](docs/images/workflow.svg)
 
-Bring **three short video clips you have permission to use**, together in one folder. Moving subjects and textured backgrounds make changes easier to see. No personal footage or sample catalogue is bundled.
+Bring **three short video clips you have permission to use**, together in one folder. Moving subjects and textured backgrounds make changes easier to see. The current rc3 download needs your own clips; the upcoming example pack contains original procedural media, not personal footage.
 
 1. **Home → Starter Mosh.** Choose that folder when asked. Wait for preparation to finish; Moshpit creates three blocks, using up to ten seconds from each clip.
 2. **Press Play below the preview.** You are now in **MOSH**. The timeline is the sequence; the highlighted block is the part you are editing.
@@ -78,7 +92,7 @@ This is the same synthetic UI demonstration. A saved project is not an export, a
 ## Explore further
 
 - [First-project guide](docs/first-project.md) · [Candidate test checklist](docs/TESTING.md)
-- [Optional local example-project shelf](docs/EXAMPLE-PROJECTS.md)
+- [Browse projects: included examples and your own shelf](docs/EXAMPLE-PROJECTS.md)
 - [CTserver: optional Loupedeck CT control](https://github.com/adrienwax/ctserver)
 - [Source setup, checks and repository map](docs/DEVELOPMENT.md) · [Windows packaging](docs/WINDOWS-PACKAGING.md)
 

@@ -2,8 +2,15 @@ SOURCE ASSETS AND THIRD-PARTY MATERIAL
 
 Project SVG artwork is shipped as source, under the project's licence where
 owned by the project author. App and hardware names do not imply endorsement.
-No personal footage, sample projects or bundled font binaries are in this
-source export. No marketplace icon pack is included.
+No personal footage or owner example catalogue is included. No marketplace
+icon pack is included. Generated media is not stored in this source export.
+
+The public starter pack is generated from scripts/examples/: original
+procedural footage, editable Moshpit projects and EngineService-rendered
+previews, copyright 2026 ak wax, under MIT. The pack includes the full notice
+in LICENSE.txt and authorship/generation details in PROVENANCE.json. No
+external footage, audio, fonts or image assets are used in these source clips.
+Pixelord-inspired entries are mechanism studies, not copies of external videos.
 
 Moshpit obtains Inter and JetBrains Mono through its locked Fontsource packages.
 Their SIL Open Font Licence texts and copyright notices are in third-party/;

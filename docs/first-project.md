@@ -8,7 +8,7 @@
 
 Put three short videos in one folder. Use clips you own or may use. Start with ordinary H.264 MP4 footage if possible; fast movement, texture and contrasting shots make the effect easier to recognise.
 
-Moshpit does not include the maintainer’s personal example footage. **Starter Mosh** builds a sequence from your files; the optional **Example projects** shelf appears only when a local example index has been configured.
+Moshpit does not include the maintainer’s personal example footage. In the current public rc3 download, **Starter Mosh** builds a sequence from your files. The upcoming rc4 candidate adds **Home → Browse projects** with four original procedural examples; watch a preview, then choose **Open a copy**. See [Browse projects](EXAMPLE-PROJECTS.md) for the examples and optional local index.
 
 ## 2 · Create the starter sequence
 

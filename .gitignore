@@ -28,3 +28,6 @@ test-footage/
 # Python packaging/check scripts.
 __pycache__/
 *.pyc
+
+# Generated public example media; recipes/generator remain in source.
+/examples/starter-pack/

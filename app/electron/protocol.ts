@@ -64,7 +64,13 @@ async function serveFile(file: string, req: Request): Promise<Response> {
 }
 
 /** After app ready. `dist` is app/dist; `previewDir` is asked per request (Settings can move it). */
-export function handleScheme(dist: string, previewDir: () => string): void {
+export async function resolveMediaRequest(want: string, previewRoot: string, allowExample: (file: string) => Promise<boolean>): Promise<string | null> {
+  if (!path.isAbsolute(want)) return null;
+  const preview = inside(previewRoot, path.relative(previewRoot, want));
+  return preview || (await allowExample(want) ? want : null);
+}
+
+export function handleScheme(dist: string, previewDir: () => string, allowExample: (file: string) => Promise<boolean> = async () => false): void {
   // The worker's page: Node-integrated, so it requires its bundle by absolute path (a relative
   // require has no file location to resolve against on a custom scheme).
   const workerPage = `<!doctype html><meta charset="utf-8"><title>moshpit render worker</title><script>require(${JSON.stringify(path.join(dist, 'worker.cjs'))})</script>`;
@@ -74,7 +80,7 @@ export function handleScheme(dist: string, previewDir: () => string): void {
     if (u.host !== 'app') return new Response('not found', { status: 404 });
     if (u.pathname.startsWith('/media/')) {
       const want = decodeURIComponent(u.pathname.slice('/media/'.length));
-      const f = path.isAbsolute(want) ? inside(previewDir(), path.relative(previewDir(), want)) : null;
+      const f = await resolveMediaRequest(want, previewDir(), allowExample);
       if (!f) return new Response('forbidden', { status: 403 });
       return serveFile(f, req);
     }

@@ -2,6 +2,7 @@
 // settings, recents live on disk, never in localStorage).
 import { app, BrowserWindow, dialog, ipcMain, Menu, shell } from 'electron';
 import { APP_LABEL } from '../version';
+import { createExampleLibrary } from './example-pack';
 import { promises as fs, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { startEngineHost } from './engine-host';
@@ -65,6 +66,10 @@ registerScheme();
 
 // Trust boundary: the renderer may only name these files, never a path.
 const CONFIG_FILES = new Set(['layouts', 'settings', 'previews']);
+const exampleLibrary = createExampleLibrary(
+  process.env.MOSHPIT_EXAMPLE_PACK || path.join(app.isPackaged ? process.resourcesPath : __dirname, 'examples'),
+  app.getPath('userData'),
+);
 
 function configPath(name: string): string {
   if (!CONFIG_FILES.has(name)) throw new Error(`config: unknown file ${name}`);
@@ -72,9 +77,9 @@ function configPath(name: string): string {
 }
 
 ipcMain.handle('config:read', async (_e, name: string) => {
+  if (name === 'examples') return exampleLibrary.read();
   try {
-    const p = name === 'examples' ? path.join(app.getPath('userData'), 'config', 'examples.json') : configPath(name);
-    if (name === 'examples' && (await fs.stat(p)).size > 256 * 1024) throw new Error('Example index is too large');
+    const p = configPath(name);
     return JSON.parse(await fs.readFile(p, 'utf8'));
   } catch (err: any) {
     if (err?.code === 'ENOENT') return null;
@@ -156,7 +161,7 @@ app.whenReady().then(() => {
   handleScheme(__dirname, () => {
     const ud = app.getPath('userData'), p = settingsPaths(ud);
     return previewDir(ud, p.cache, mediaRootsOf(p.media, app.getPath('videos')));
-  });
+  }, file => exampleLibrary.allowsPreview(file));
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

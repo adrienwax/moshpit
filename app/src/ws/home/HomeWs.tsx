@@ -244,7 +244,7 @@ function KeysPane() {
 const PANES: Record<string, PaneDef> = {
   hstart: { title: 'Start', help: 'Continue the open project, start a new one, open a file, or go find footage.', body: () => <StartPane /> },
   hplaces: { title: 'Folders', help: 'Your IN favourites (★) and the folders you opened last. Click to open one in IN.', extra: <PlacesCount />, body: () => <PlacesHome /> },
-  hprojects: { title: 'Projects', help: 'The last projects you saved or opened, each with a picture of its first clip (move along it to scrub). Click to open in MOSH.', extra: <ProjectsCount />, body: () => <ProjectsPane /> },
+  hprojects: { title: 'Projects', help: 'Browse example projects, play a preview and open an editable copy. Your recent projects are below.', extra: <ProjectsCount />, body: () => <ProjectsPane /> },
   hjump: { title: 'Workspaces', help: 'Each workspace with what is in it right now.', body: () => <JumpPane /> },
   hsys: { title: 'System', help: 'This build, the render engine, the GPU and cache readouts, and the CT control link.', extra: <SysState />, body: () => <SystemPane /> },
   hsession: { title: 'Session', help: 'The open project: saved or not, its file, and how it is kept safe.', body: () => <SessionPane /> },
