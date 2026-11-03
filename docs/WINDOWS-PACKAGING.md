@@ -1,6 +1,6 @@
 # Windows packaging
 
-The default Windows x64 package is one **Moshpit.exe** portable download. The upcoming rc4 package also includes four original procedural example projects and their media. It bundles Electron, FFmpeg, FFprobe, fonts and licence notices; no installer or separate runtime download is needed. Source companions are supplied separately for licence compliance, not as a prerequisite to running the app.
+The default Windows x64 package is one **Moshpit.exe** portable download. The rc4 test package includes four original procedural example projects and their media. It bundles Electron, FFmpeg, FFprobe, fonts and licence notices; no installer or separate runtime download is needed. Source companions are supplied separately for licence compliance, not as a prerequisite to running the app.
 
 ## Build locally
 

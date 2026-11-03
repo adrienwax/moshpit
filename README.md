@@ -14,20 +14,20 @@ A local Windows editor for arranging footage, combining effects and exporting th
 | What you want | Available today |
 | --- | --- |
 | Read the guide and see the interface | Right here—no installation needed. |
-| Run Moshpit on Windows | [Download Moshpit.exe](https://github.com/adrienwax/moshpit/releases/download/v1.0.0-rc.3-test/Moshpit.exe) — one unsigned portable test download; no installer or Sandbox required. |
+| Run Moshpit on Windows | [Download Moshpit.exe](https://github.com/adrienwax/moshpit/releases/download/v1.0.0-rc.4-test/Moshpit.exe) — one unsigned portable test download; no installer or Sandbox required. |
 | Run or modify the source | [Windows source setup](docs/DEVELOPMENT.md#run-from-source): Git, Node.js 24, npm and FFmpeg/FFprobe. |
-| Latest public test | [rc3 prerelease](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.3-test) · [short first-use checklist](docs/TESTING.md). |
+| Latest public test | [rc4 prerelease](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.4-test) · [short first-use checklist](docs/TESTING.md). |
 | Stable release | Not yet accepted. Use the test release with that limitation in mind. |
 
 **Download `Moshpit.exe`, keep it in a folder you can write to, and double-click it.** Electron, FFmpeg and FFprobe are included—no Node.js, codec-tool download or Sandbox is required. The EXE temporarily unpacks its runtime while running; settings persist in your Windows user profile. Keep using the same EXE to reopen the app.
 
-This is an **unsigned Windows x64 prerelease**, not a signed stable release. The [release page](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.3-test) records checks and known limitations. If Windows blocks it, record the warning rather than disabling protection. GitHub’s **Code → Download ZIP** is source code, not the app. Older installers remain under Releases for rollback.
+This is an **unsigned Windows x64 prerelease**, not a signed stable release. The [release page](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.4-test) records checks and known limitations. If Windows blocks it, record the warning rather than disabling protection. GitHub’s **Code → Download ZIP** is source code, not the app. Older installers remain under Releases for rollback.
 
-The bundled FFmpeg/x264 tools use GPLv2-or-later; their [matching source and build materials](https://github.com/adrienwax/moshpit/releases/download/v1.0.0-rc.2-test/FFmpeg-krab-local-1-corresponding-source.zip) are available separately and **are not an extra runtime download**.
+The bundled FFmpeg/x264 tools use GPLv2-or-later; their [matching source and build materials](https://github.com/adrienwax/moshpit/releases/download/v1.0.0-rc.4-test/FFmpeg-krab-local-1-corresponding-source.zip) are available separately and **are not an extra runtime download**.
 
 ## Browse a ready-made project
 
-**Coming in the rc4 candidate; not included in the rc3 download above.** Home → **Browse projects** lets you select a recorded preview, then **Open a copy** to edit the real project. Four included studies use original procedural footage, so you need no clips of your own:
+**Included in the rc4 test download.** Home → **Browse projects** lets you select a recorded preview, then **Open a copy** to edit the real project. Four included studies use original procedural footage, so you need no clips of your own:
 
 | Project | Try changing |
 | --- | --- |
@@ -36,13 +36,13 @@ The bundled FFmpeg/x264 tools use GPLv2-or-later; their [matching source and bui
 | Chroma ghost | Chroma trail → Back or Wet. |
 | Breathing feedback | Modulation → Breathing trail period. |
 
-Play in MOSH, change one control, then **Ctrl+S** to save your copy. **OUT → H.264 → Browse… → Render · Add job** creates a video to share. The examples stay unchanged. [Browse guide and media storage](docs/EXAMPLE-PROJECTS.md). Candidate checks are still separate from public release acceptance.
+Play in MOSH, change one control, then **Ctrl+S** to save your copy. **OUT → H.264 → Browse… → Render · Add job** creates a video to share. The examples stay unchanged. [Browse guide and media storage](docs/EXAMPLE-PROJECTS.md). The independent laptop workflow remains a gate before stable promotion.
 
 ## Make your first mosh
 
 ![Three stages: IN chooses footage, MOSH arranges and processes it, OUT exports a video.](docs/images/workflow.svg)
 
-Bring **three short video clips you have permission to use**, together in one folder. Moving subjects and textured backgrounds make changes easier to see. The current rc3 download needs your own clips; the upcoming example pack contains original procedural media, not personal footage.
+**Optional: use your own footage.** Bring three short video clips you have permission to use, together in one folder. Moving subjects and textured backgrounds make changes easier to see. To start without your own clips, use the included projects above.
 
 1. **Home → Starter Mosh.** Choose that folder when asked. Wait for preparation to finish; Moshpit creates three blocks, using up to ten seconds from each clip.
 2. **Press Play below the preview.** You are now in **MOSH**. The timeline is the sequence; the highlighted block is the part you are editing.
