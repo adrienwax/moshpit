@@ -7,7 +7,7 @@ import type {
 } from '@moshpit/engine';
 import { CONTAINER_KIND, GROUP_IN_KIND, GROUP_OUT_KIND, MAX_MACROS, MoshpitError, lookFrom, stampLook, OUTPUT, SOURCE_CLIP, collapseSelection, compileBlockGraph, domainOrderOk, isPlaceable, macroParams, mapValue, newId, portsOf, unpackContainer } from '@moshpit/engine';
 import { freeze, produce } from 'immer';
-import { confirmAction, toast } from '../qol/qol';
+import { toast } from '../qol/qol';
 import { createStore, useStore } from './store';
 import { engine, engineKind, defOf } from '../engine';
 import { demoProject, defaults } from '../engine/mockProject';
