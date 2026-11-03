@@ -11,7 +11,7 @@ import { Engine, type EngineOptions } from '../../engine/src/runtime/engine';
 import { compileProject, engineOptions } from '../../engine/src/runtime/session';
 import { H264Encoder } from '../../engine/src/runtime/encode';
 import { duplicateBlock } from '../../engine/src/project/build';
-import type { BlockId, ProjectDoc } from '../../engine/src/model';
+import type { ProjectDoc } from '../../engine/src/model';
 import { MoshpitError } from '../../engine/src/errors';
 import { OUT, gateProject } from './fixtures';
 

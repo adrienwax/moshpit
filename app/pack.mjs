@@ -6,6 +6,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { checkPack } from '../scripts/examples/check-pack.mjs';
 import { ensureScratch, configureToolCaches, requireScratchOutput } from '../scripts/build-scratch/bootstrap.mjs';
 
 const managed = ensureScratch('package');
@@ -29,6 +30,9 @@ if (process.argv.includes('--plan')) {
   console.log(JSON.stringify(plan));
   process.exit(0);
 }
+const examplePack = process.env.MOSHPIT_EXAMPLE_PACK || path.join(root, 'examples', 'starter-pack');
+if (!fs.existsSync(path.join(examplePack, 'manifest.json'))) throw Error('Build the public examples first (scripts/examples/README.txt), then set MOSHPIT_EXAMPLE_PACK to the pack directory.');
+const exampleEvidence = checkPack(examplePack);
 const builder = path.resolve(process.env.MOSHPIT_BUILDER_CLI ?? path.join(root, 'node_modules', 'electron-builder', 'cli.js'));
 const electronDir = path.join(root, 'node_modules', 'electron');
 const electronVersion = JSON.parse(fs.readFileSync(path.join(electronDir, 'package.json'), 'utf8')).version;
@@ -58,7 +62,7 @@ const stage = fs.mkdtempSync(path.join(tmp, 'moshpit-stage-'));
     appId: candidate ? 'com.waxy.moshpit3.candidate' : 'com.waxy.moshpit3', productName, electronVersion,
     electronDist: path.join(electronDir, 'dist'),
     directories: { app: stage, output }, files: ['dist/**', 'package.json'], asar: true, npmRebuild: false,
-    extraResources: [{ from: ffmpegDir, to: 'ffmpeg', filter: ['ffmpeg.exe', 'ffprobe.exe'] },
+    extraResources: [{ from: examplePack, to: 'examples', filter: ['manifest.json', ...JSON.parse(fs.readFileSync(path.join(examplePack, 'manifest.json'), 'utf8')).files.map(f => f.path)] }, { from: ffmpegDir, to: 'ffmpeg', filter: ['ffmpeg.exe', 'ffprobe.exe'] },
       {from:root,to:'legal',filter:['LICENSE','THIRD-PARTY-NOTICES.txt','ASSET-NOTICES.txt','LOCAL-CANDIDATE-NOTICE.txt','third-party/**/*']},
       {from:path.join(root,'third-party-binary'),to:'legal/binary',filter:['FFMPEG-BUILD.txt','FFMPEG-HASHES.json','MPL-SOURCE.txt','mediabunny-source.zip','NOTICE-HASHES.json','SOURCE-BUNDLE.json','notices/**/*']}],
     win: { target: [{ target: installer ? 'nsis' : 'portable', arch: ['x64'] }], icon: path.join(here, 'build', 'icon.png'), signAndEditExecutable: true },
@@ -73,6 +77,6 @@ const stage = fs.mkdtempSync(path.join(tmp, 'moshpit-stage-'));
   fs.copyFileSync(path.join(root, 'docs', 'QUICKSTART.md'), path.join(output, 'QUICKSTART.md'));
   const exe = unpackedOnly ? path.join(output, 'win-unpacked', `${productName}.exe`) : path.join(output, installer ? (candidate ? 'Moshpit-Preview-Setup.exe' : 'Moshpit-Setup.exe') : (candidate ? 'Moshpit-Preview.exe' : 'Moshpit.exe'));
   const build = JSON.parse(fs.readFileSync(path.join(buildOut, 'build-info.json'), 'utf8'));
-  fs.writeFileSync(path.join(output, 'BUILD-MANIFEST.json'), JSON.stringify({ ...build, electron: electronVersion, builder: builderVersion, mediaTools, candidate, unsigned:true, packageKind: unpackedOnly ? 'unpacked-runtime' : installer ? 'nsis-installer' : 'portable', [unpackedOnly ? 'executable' : 'portable']: { file: path.basename(exe), bytes: fs.statSync(exe).size, sha256: sha256(exe) } }, null, 2) + '\n');
+  fs.writeFileSync(path.join(output, 'BUILD-MANIFEST.json'), JSON.stringify({ ...build, electron: electronVersion, builder: builderVersion, mediaTools, examples: exampleEvidence, candidate, unsigned:true, packageKind: unpackedOnly ? 'unpacked-runtime' : installer ? 'nsis-installer' : 'portable', [unpackedOnly ? 'executable' : 'portable']: { file: path.basename(exe), bytes: fs.statSync(exe).size, sha256: sha256(exe) } }, null, 2) + '\n');
   console.log(`pack: ${output}`);
 }

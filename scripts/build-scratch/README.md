@@ -35,6 +35,8 @@ Only this invocation's new `temp` directory is eligible for deletion. A fixed no
 
 On nonzero exit, timeout, process-tracking errors or cleanup uncertainty, scratch stays in place. The wrapper never kills applications. If initial job assignment fails, its newly created suspended child is resumed to avoid leaving it suspended, but remains untrusted for cleanup. The failure receipt says so. If a portable app remains open beyond the timeout, close it normally later; its retained scratch requires a separately reviewed/manual cleanup. No future-run sweep is performed.
 
+Compiler setup uses a separate `<run>/wrapper-temp` directory, retained because compiler finalizers belong to the still-running wrapper rather than its tracked child job. It is never part of child-temp cleanup.
+
 Retained `OWNER.json`, `.owner-lock`, `stdout.log`, `stderr.log`, `artifacts/` and `receipt.json` identify each run. No arguments are copied into receipts, to avoid retaining credentials inadvertently supplied on a command line.
 
 ## Bounded tests

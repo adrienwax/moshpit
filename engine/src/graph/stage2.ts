@@ -221,7 +221,7 @@ export function compileBlockGraph(blockId: BlockId, drawn: BlockGraph, opts: Com
   const steps: Step[] = [];
   const commits: { node: NodeId; from: number }[] = [];
   order.forEach((n, i) => {
-    const inst = byId.get(n)!, def = defOf.get(n) ?? null, st = status.get(n);
+    const def = defOf.get(n) ?? null, st = status.get(n);
     const declared = def?.inputs ?? [{ key: 'in', type: 'VideoFrame' } as never];
     const inputs: number[] = [], disc: (DisconnectedSemantics | null)[] = [], luma: boolean[] = [];
     for (const p of declared as NodeDef['inputs']) {

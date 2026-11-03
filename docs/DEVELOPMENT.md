@@ -19,12 +19,29 @@ npm start
 
 Build/test scratch defaults to `%LOCALAPPDATA%/KRAB/scratch`. Set `KRAB_SCRATCH_ROOT` to an absolute local folder to choose another location. Do not point it at personal media or a release installation.
 
+## Include the public examples
+
+Source runs can start without an example pack, but Browse will report that built-in examples are unavailable. To exercise the same four examples as the upcoming rc4 package, generate a pack with the existing Electron runtime and reviewed FFmpeg, then set its path before starting the app:
+
+```powershell
+$env:KRAB_SCRATCH_ROOT = 'C:/BuildScratch/Moshpit'
+$env:MOSHPIT_FFMPEG = 'C:/Tools/ffmpeg/bin/ffmpeg.exe'
+node scripts/examples/build-pack.mjs --out C:/BuildScratch/Moshpit/pack-01 --work C:/BuildScratch/Moshpit/pack-work-01
+$env:MOSHPIT_EXAMPLE_PACK = 'C:/BuildScratch/Moshpit/pack-01'
+npm start
+```
+
+The generator uses a hidden private Electron/GPU session; keep it separate from other native checks. Use new output/work directories and follow [the authoring instructions](../scripts/examples/README.txt). `--prepare-only` compiles without generating media or launching Electron. A source build does not automatically generate the pack; Windows packaging requires a verified one. Never open raw `pack://` templates directly: the app resolves them to durable user storage before opening a copy.
+
 ## Checks
 
 ```powershell
 npm run typecheck
 npm run test:release
 node --test scripts/build-scratch/bootstrap.test.mjs scripts/check-public-defaults.mjs
+node --test scripts/examples/checks.test.mjs
+# After generating a pack:
+node scripts/examples/check-pack.mjs $env:MOSHPIT_EXAMPLE_PACK
 ```
 
 `npm test` runs the wider suite. Some engine/integration checks require synthetic fixtures: `npm run fixtures` generates them using FFmpeg with the necessary test encoders. `npm run test:engine` selects the engine tests; `npm run test:app` selects the app tests. Use the managed scripts so temporary files remain isolated.
@@ -49,6 +66,6 @@ Generated `node_modules/`, caches, outputs, test footage and installers are igno
 
 ## Packaging and contributions
 
-Use [Windows packaging](WINDOWS-PACKAGING.md) and the [controlled FFmpeg recipe](../scripts/ffmpeg/README.md). The [unsigned test prerelease](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.2-test) can be installed normally or evaluated with the optional Sandbox kit; it is not a signed or accepted stable release. The binary, corresponding sources and notices must match; the original app’s MIT licence does not replace dependency licences.
+Use [Windows packaging](WINDOWS-PACKAGING.md) and the [controlled FFmpeg recipe](../scripts/ffmpeg/README.md). The current [unsigned rc3 test prerelease](https://github.com/adrienwax/moshpit/releases/tag/v1.0.0-rc.3-test) is a portable EXE; no installer or Sandbox is required. The new Browse pack targets rc4 and is not yet publicly available. No stable release has been accepted. The binary, corresponding sources and notices must match; the original app’s MIT licence does not replace dependency licences.
 
 Keep changes focused. Run checks for the affected path and document any native behaviour not exercised. Discuss major feature changes in [Issues](https://github.com/adrienwax/moshpit/issues) first. Use [private security reporting](https://github.com/adrienwax/moshpit/security/advisories/new) for vulnerabilities.

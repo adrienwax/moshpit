@@ -40,9 +40,15 @@ try {
   $previousEnvironment=@{}
   foreach ($key in $scopedEnvironment.Keys) { $previousEnvironment[$key]=[Environment]::GetEnvironmentVariable($key,'Process') }
   try {
+    # Compiler finalizers belong to this wrapper, not the tracked child job.
+    # Retain their separate temp so they cannot race the child's cleanup walk.
+    if (-not ('EdenaScratch.JobProcess' -as [type])) {
+      $wrapperTemp=Join-Path $run 'wrapper-temp'
+      [IO.Directory]::CreateDirectory($wrapperTemp) | Out-Null
+      $env:TEMP=$wrapperTemp; $env:TMP=$wrapperTemp
+      Add-Type -Path (Join-Path $PSScriptRoot 'JobProcess.cs')
+    }
     foreach ($key in $scopedEnvironment.Keys) { [Environment]::SetEnvironmentVariable($key,$scopedEnvironment[$key],'Process') }
-    # Add-Type may spawn compilation helpers; scope scratch before this too.
-    if (-not ('EdenaScratch.JobProcess' -as [type])) { Add-Type -Path (Join-Path $PSScriptRoot 'JobProcess.cs') }
     $result=[EdenaScratch.JobProcess]::Run($exe,$ArgumentList,$cwd,$receipt.Stdout,$receipt.Stderr,$MaxWaitSeconds)
     $receipt.ProcessId=$result.ProcessId
     $receipt.AllProcessesExited=$result.AllExited

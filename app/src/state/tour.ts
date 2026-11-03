@@ -1,7 +1,7 @@
 // The light tour (3.2): six one-line steps of the core loop, each shown in its own workspace, in
 // order, until it is dismissed. Remembered in settings (seen steps, skipped, done); the "?" in the
 // top bar replays it. Not a guided tour: no overlay, no blocking, one small card at a time.
-import { setSettings, settingsStore, type WsId } from './ui';
+import { setSettings, type WsId } from './ui';
 
 /** `over`: a picture area (no controls in it) the card sits inside, top-right; else the bottom-right corner. */
 export interface TourStep { id: string; ws: WsId; title: string; text: string; over?: string }

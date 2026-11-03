@@ -6,7 +6,7 @@ import {
   Background, BackgroundVariant, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, applyEdgeChanges, applyNodeChanges,
   useReactFlow, type Connection, type Edge, type EdgeChange, type Node, type NodeChange, type NodeProps, type OnConnectEnd, type OnConnectStart,
 } from '@xyflow/react';
-import type { Block, BlockGraph, BlockId, ContainerBody, EdgeType, NodeDef, NodeInstance, PortDef } from '@moshpit/engine';
+import type { Block, BlockGraph, BlockId, ContainerBody, EdgeType, NodeDef, NodeInstance } from '@moshpit/engine';
 import { CONTAINER_KIND } from '@moshpit/engine';
 import { defOf } from '../../engine';
 import { CATS, DOMAIN_SHORT, edgeStyle } from '../../lib/cats';

@@ -5,7 +5,7 @@ import type { Block, NodeDef, NodeInstance, ParamDef, ParamValue } from '@moshpi
 import { CONTAINER_KIND, macroValue } from '@moshpit/engine';
 import { defOf } from '../engine';
 import { CATS, FAMILY_COLOUR } from '../lib/cats';
-import { MAX_MACROS, activeBlock, exposeMacro, projectLooks, removeLook, saveLook, unpackNodes, updateFromMaster, updateMaster, getDoc, isFrozen, nodesOf, paramsOf, removeMacro, renameContainer, scopeOfNode, trialGraph, setBypass, setParam, setParams, toggleFreeze, toggleViewer, useProject } from '../state/project';
+import { MAX_MACROS, activeBlock, exposeMacro, projectLooks, removeLook, saveLook, unpackNodes, updateFromMaster, updateMaster, getDoc, isFrozen, nodesOf, paramsOf, removeMacro, renameContainer, scopeOfNode, setBypass, setParam, setParams, toggleFreeze, toggleViewer, useProject } from '../state/project';
 import { blockStarts, blockFrames } from '../lib/timeline';
 import { ParamControl } from '../params/Param';
 import { FrameView } from './FrameView';

@@ -42,7 +42,6 @@ const st = (pane: string | string[], f = 1): StackLayout => {
   return { id: 's-' + panes[0], panes, active: 0, f };
 };
 const col = (id: string, w: number | undefined, stacks: StackLayout[]): ColumnLayout => ({ id, w, stacks });
-const band = (id: string, h: number, stacks: StackLayout[]): ColumnLayout => ({ id, band: true, h, stacks });
 
 /** Bounds every resize respects. */
 export const LIMITS = { colMin: 160, colMax: 560, bandMin: 0.16, bandMax: 0.62, stackMin: 56 };

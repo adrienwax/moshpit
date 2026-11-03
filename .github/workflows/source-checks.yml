@@ -1,0 +1,55 @@
+name: Windows source checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set isolated scratch directory
+        shell: pwsh
+        run: '"KRAB_SCRATCH_ROOT=$env:RUNNER_TEMP\moshpit-checks" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install locked dependencies without native install scripts
+        run: npm ci --ignore-scripts
+      - name: Type check
+        run: npm run typecheck
+      - name: Check colour tokens
+        run: npm run lint:colours
+      - name: Release regressions
+        run: npm run test:release
+      - name: Authored example and manifest checks
+        run: node --test scripts/examples/checks.test.mjs
+      - name: Show isolated test failure details
+        if: failure()
+        shell: pwsh
+        run: |
+          if (Test-Path -LiteralPath $env:KRAB_SCRATCH_ROOT) {
+            Get-ChildItem -LiteralPath $env:KRAB_SCRATCH_ROOT -Directory | Where-Object { $_.Name -match '^[a-f0-9]{32}$' } | ForEach-Object {
+              $receiptPath = Join-Path $_.FullName 'receipt.json'
+              if (Test-Path -LiteralPath $receiptPath) {
+                $receipt = Get-Content -LiteralPath $receiptPath -Raw | ConvertFrom-Json
+                if ($receipt.Status -ne 'Succeeded') {
+                  Get-Content -LiteralPath $receiptPath
+                  foreach ($name in @('stdout.log', 'stderr.log')) {
+                    $logPath = Join-Path $_.FullName $name
+                    if (Test-Path -LiteralPath $logPath) {
+                      Write-Output "--- $name ---"
+                      Get-Content -LiteralPath $logPath -Tail 100
+                    }
+                  }
+                }
+              }
+            }
+          }

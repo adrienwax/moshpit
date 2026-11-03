@@ -323,7 +323,7 @@ function EditParameterField({ spec, value, onChange, fieldKey, variant, mod, dis
   return <Slider key={fieldKey} spec={spec} v={v} onChange={onChange} fieldKey={fieldKey} variant={variant} mod={mod} disabled={disabled} bpm={bpm} seconds={seconds} onToggleUnits={onToggleUnits} onGestureStart={onGestureStart} onGestureEnd={onGestureEnd} resetValue={resetValue} />;
 }
 
-function Slider({ spec, v, onChange, fieldKey, variant, mod, disabled, bpm, seconds, onToggleUnits, onGestureStart, onGestureEnd, resetValue }: Omit<EditProps, 'value' | 'mode'> & { v: number }) {
+function Slider({ spec, v, onChange, variant, mod, disabled, bpm, seconds, onToggleUnits, onGestureStart, onGestureEnd, resetValue }: Omit<EditProps, 'value' | 'mode'> & { v: number }) {
   const [typing, setTyping] = useState(false);
   const scrub = useScrub(spec, v, onChange, disabled, () => setTyping(true), { onGestureStart, onGestureEnd }, resetValue);
   const pc = fraction(spec, v) * 100;

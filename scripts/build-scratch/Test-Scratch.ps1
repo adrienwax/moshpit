@@ -12,8 +12,15 @@ function MustRefuse([scriptblock]$Action,[string]$Pattern) {
 $oldTemp=$env:TEMP; $oldTmp=$env:TMP; $oldManaged=$env:EDENA_SCRATCH_MANAGED
 $wrapper=Join-Path $PSScriptRoot 'Run-WithScratch.ps1'
 $fixture=Join-Path $PSScriptRoot 'fixture-process.mjs'
+# Observe the actual compiler environment without replacing compilation.
+$compilerState=@{Temp=$null}
+function Add-Type { param([string]$Path) $compilerState.Temp=$env:TEMP; Microsoft.PowerShell.Utility\Add-Type -Path $Path }
 $ok=& $wrapper -FilePath $NodePath -ArgumentList @($fixture,'root','normal','space arg','a"b','endslash\') -WorkingDirectory $PSScriptRoot -RunKind portable-test -MaxWaitSeconds 20
 Require ($ok.Status -eq 'Succeeded' -and $ok.TempDeleted -and $ok.AllProcessesExited) 'Tree fixture did not finish and clean safely'
+Require ($compilerState.Temp -eq (Join-Path $ok.RunDirectory 'wrapper-temp')) 'Compiler used tracked child temp'
+Require (Test-Path -LiteralPath $compilerState.Temp -PathType Container) 'Wrapper temp was deleted before wrapper exit'
+Remove-Item Function:Add-Type
+$results.Add(@{Test='Compiler temp is retained separately from successfully cleaned child temp';Passed=$true;Receipt=$ok.Receipt})
 $receipt=Get-Content -LiteralPath $ok.Receipt -Raw | ConvertFrom-Json
 $records=@('root','child','grandchild' | ForEach-Object {Get-Content -LiteralPath (Join-Path $ok.RunDirectory "artifacts/$_.json") -Raw | ConvertFrom-Json})
 foreach($item in $records) { Require ($item.temp -eq $receipt.Temp -and $item.tmp -eq $receipt.Temp -and $item.managed -eq '1' -and $item.run -eq $ok.RunDirectory -and $item.artifacts -eq (Join-Path $ok.RunDirectory 'artifacts')) 'Descendant environment inheritance failed' }
